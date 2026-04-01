@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Football Predictor</title>
+    <style>
+        body {
+            font-family: Arial;
+            background-color: #f4f4f4;
+            text-align: center;
+        }
+        form {
+            background: white;
+            padding: 20px;
+            margin: 20px auto;
+            width: 300px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px gray;
+        }
+        input {
+            margin: 5px;
+            padding: 5px;
+            width: 80%;
+        }
+        button {
+            padding: 10px;
+            margin-top: 10px;
+            width: 90%;
+            background: green;
+            color: white;
+            border: none;
+        }
+        .result {
+            background: white;
+            padding: 20px;
+            margin: 20px auto;
+            width: 300px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px gray;
+        }
+    </style>
+</head>
+<body>
+
+<h1>AI Football Predictor</h1>
+
+<form method="POST">
+    <h3>Match Data</h3>
+    Cote Home:<br>
+    <input name="B365H" required><br>
+    Cote Draw:<br>
+    <input name="B365D" required><br>
+    Cote Away:<br>
+    <input name="B365A" required><br>
+    Shots Home:<br>
+    <input name="HS" required><br>
+    Shots Away:<br>
+    <input name="AS" required><br>
+    Shots Target Home:<br>
+    <input name="HST" required><br>
+    Shots Target Away:<br>
+    <input name="AST" required><br>
+    Corners Home:<br>
+    <input name="HC" required><br>
+    Corners Away:<br>
+    <input name="AC" required><br>
+    <button type="submit">Analyser</button>
+</form>
+
+{% if result %}
+<div class="result">
+    <h2>Résultats IA</h2>
+    Home: {{result.home}} %<br>
+    Draw: {{result.draw}} %<br>
+    Away: {{result.away}} %<br><br>
+
+    Over 2.5: {{result.over}} %<br>
+    BTTS: {{result.btts}} %<br><br>
+
+    <h2>Décision IA</h2>
+    <h3>{{decision}}</h3>
+</div>
+{% endif %}
+
+</body>
+</html>
