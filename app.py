@@ -5,10 +5,8 @@ import os
 
 app = Flask(__name__)
 
-# Chemin du dossier
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# Charger les modèles
 model_result = pickle.load(open(os.path.join(BASE_DIR, "model_result.pkl"), "rb"))
 model_over = pickle.load(open(os.path.join(BASE_DIR, "model_over.pkl"), "rb"))
 model_btts = pickle.load(open(os.path.join(BASE_DIR, "model_btts.pkl"), "rb"))
@@ -70,4 +68,4 @@ def index():
     return render_template("index.html")
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run()
