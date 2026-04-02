@@ -7,63 +7,73 @@ app = Flask(__name__)
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-model_result = pickle.load(open(os.path.join(BASE_DIR, "model_result.pkl"), "rb"))
-model_over = pickle.load(open(os.path.join(BASE_DIR, "model_over.pkl"), "rb"))
-model_btts = pickle.load(open(os.path.join(BASE_DIR, "model_btts.pkl"), "rb"))
+def load_model(name):
+    path = os.path.join(BASE_DIR, name)
+    if os.path.exists(path):
+        return pickle.load(open(path, "rb"))
+    else:
+        return None
 
-@app.route("/", methods=["GET","POST"])
+model_result = load_model("model_result.pkl")
+model_over = load_model("model_over.pkl")
+model_btts = load_model("model_btts.pkl")
+
+@app.route("/", methods=["GET", "POST"])
 def index():
     if request.method == "POST":
-        B365H = float(request.form["B365H"])
-        B365D = float(request.form["B365D"])
-        B365A = float(request.form["B365A"])
-        HS = float(request.form["HS"])
-        AS = float(request.form["AS"])
-        HST = float(request.form["HST"])
-        AST = float(request.form["AST"])
-        HC = float(request.form["HC"])
-        AC = float(request.form["AC"])
+        try:
+            B365H = float(request.form.get("B365H", 0))
+            B365D = float(request.form.get("B365D", 0))
+            B365A = float(request.form.get("B365A", 0))
+            HS = float(request.form.get("HS", 0))
+            AS = float(request.form.get("AS", 0))
+            HST = float(request.form.get("HST", 0))
+            AST = float(request.form.get("AST", 0))
+            HC = float(request.form.get("HC", 0))
+            AC = float(request.form.get("AC", 0))
 
-        match = pd.DataFrame([{
-            "B365H":B365H,
-            "B365D":B365D,
-            "B365A":B365A,
-            "HS":HS,
-            "AS":AS,
-            "HST":HST,
-            "AST":AST,
-            "HC":HC,
-            "AC":AC
-        }])
+            match = pd.DataFrame([{
+                "B365H": B365H,
+                "B365D": B365D,
+                "B365A": B365A,
+                "HS": HS,
+                "AS": AS,
+                "HST": HST,
+                "AST": AST,
+                "HC": HC,
+                "AC": AC
+            }])
 
-        res = model_result.predict_proba(match)
-        over = model_over.predict_proba(match)
-        btts = model_btts.predict_proba(match)
+            result = {}
+            decision = "Pas de modèle chargé"
 
-        result = {
-            "home": round(res[0][2]*100,1),
-            "draw": round(res[0][1]*100,1),
-            "away": round(res[0][0]*100,1),
-            "over": round(over[0][1]*100,1),
-            "btts": round(btts[0][1]*100,1)
-        }
+            if model_result:
+                res = model_result.predict_proba(match)
+                result["home"] = round(res[0][2]*100, 1)
+                result["draw"] = round(res[0][1]*100, 1)
+                result["away"] = round(res[0][0]*100, 1)
 
-        decision = "Match à éviter"
+            if model_over:
+                over = model_over.predict_proba(match)
+                result["over"] = round(over[0][1]*100, 1)
 
-        if result["home"] > 60:
-            decision = "Victoire domicile"
-        elif result["away"] > 60:
-            decision = "Victoire extérieur"
-        elif result["over"] > 60:
-            decision = "Over 2.5"
-        elif result["btts"] > 60:
-            decision = "BTTS"
-        elif result["home"] > 45 and result["draw"] > 25:
-            decision = "1X"
-        elif result["away"] > 45 and result["draw"] > 25:
-            decision = "X2"
+            if model_btts:
+                btts = model_btts.predict_proba(match)
+                result["btts"] = round(btts[0][1]*100, 1)
 
-        return render_template("index.html", result=result, decision=decision)
+            if "home" in result and result["home"] > 60:
+                decision = "Victoire domicile"
+            elif "away" in result and result["away"] > 60:
+                decision = "Victoire extérieur"
+            elif "over" in result and result["over"] > 60:
+                decision = "Over 2.5"
+            elif "btts" in result and result["btts"] > 60:
+                decision = "BTTS"
+
+            return render_template("index.html", result=result, decision=decision)
+
+        except Exception as e:
+            return str(e)
 
     return render_template("index.html")
 
