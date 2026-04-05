@@ -1,0 +1,775 @@
+league_id,league_name,country,type
+62,Ligue 2,France,League
+61,Ligue 1,France,League
+144,Jupiler Pro League,Belgium,League
+71,Serie A,Brazil,League
+39,Premier League,England,League
+78,Bundesliga,Germany,League
+135,Serie A,Italy,League
+88,Eredivisie,Netherlands,League
+94,Primeira Liga,Portugal,League
+140,La Liga,Spain,League
+179,Premiership,Scotland,League
+180,Championship,Scotland,League
+272,NB II,Hungary,League
+390,Premier League,Lebanon,League
+261,National Division,Luxembourg,League
+306,Second Division,Qatar,League
+305,Stars League,Qatar,League
+40,Championship,England,League
+43,National League,England,League
+41,League One,England,League
+42,League Two,England,League
+568,Eerste Divisie,Suriname,League
+571,Vysshaya Liga,Tajikistan,League
+586,West Bank Premier League,Palestine,League
+588,National League,Myanmar,League
+591,Pro League,Trinidad-And-Tobago,League
+336,Druha Liga,Ukraine,League
+334,Persha Liga,Ukraine,League
+333,Premier League,Ukraine,League
+301,Pro League,United-Arab-Emirates,League
+303,Division 1,United-Arab-Emirates,League
+269,Segunda División,Uruguay,League
+202,Ligue 1,Tunisia,League
+203,Süper Lig,Turkey,League
+204,1. Lig,Turkey,League
+205,2. Lig,Turkey,League
+552,3. Lig - Group 1,Turkey,League
+553,3. Lig - Group 2,Turkey,League
+554,3. Lig - Group 3,Turkey,League
+63,National 1,France,League
+67,National 2 - Group A,France,League
+68,National 2 - Group B,France,League
+69,National 2 - Group C,France,League
+310,Superliga,Albania,League
+186,Ligue 1,Algeria,League
+187,Ligue 2,Algeria,League
+512,2nd Division - Group A,Albania,League
+513,2nd Division - Group B,Albania,League
+312,1a Divisió,Andorra,League
+313,2a Divisió,Andorra,League
+131,Primera B Metropolitana,Argentina,League
+129,Primera Nacional,Argentina,League
+132,Primera C,Argentina,League
+133,Primera D,Argentina,League
+134,Torneo Federal A,Argentina,League
+188,A-League,Australia,League
+191,Brisbane Premier League,Australia,League
+193,Northern Territory Premier League,Australia,League
+219,2. Liga,Austria,League
+218,Bundesliga,Austria,League
+418,Birinci Dasta,Azerbaijan,League
+419,Premyer Liqa,Azerbaijan,League
+222,Regionalliga - Mitte,Austria,League
+221,Regionalliga - Ost,Austria,League
+223,Regionalliga - West,Austria,League
+110,Premier League,Wales,League
+299,Primera División,Venezuela,League
+300,Segunda División,Venezuela,League
+406,Professional League,Oman,League
+322,Premier League,Jamaica,League
+387,League,Jordan,League
+388,1. Division,Kazakhstan,League
+330,Premier League,Kuwait,League
+119,Superliga,Denmark,League
+120,1. Division,Denmark,League
+124,Denmark Series - Group 1,Denmark,League
+125,Denmark Series - Group 2,Denmark,League
+126,Denmark Series - Group 3,Denmark,League
+234,Liga Nacional,Honduras,League
+381,HKFA 1st Division,Hong-Kong,League
+380,Premier League,Hong-Kong,League
+271,NB I,Hungary,League
+70,National 2 - Group D,France,League
+233,Premier League,Egypt,League
+370,Primera Division,El-Salvador,League
+328,Esiliiga A,Estonia,League
+329,Meistriliiga,Estonia,League
+326,Erovnuli Liga 2,Georgia,League
+570,Premier League,Ghana,League
+377,Division d'Honneur,Guadeloupe,League
+339,Liga Nacional,Guatemala,League
+338,Primera Division,Guatemala,League
+198,Football League,Greece,League
+197,Super League 1,Greece,League
+79,2. Bundesliga,Germany,League
+80,3. Liga,Germany,League
+311,1st Division,Albania,League
+422,Premier League,Barbados,League
+364,1. Liga,Latvia,League
+365,Virsliga,Latvia,League
+361,1 Lyga,Lithuania,League
+362,A Lyga,Lithuania,League
+72,Serie B,Brazil,League
+75,Serie C,Brazil,League
+76,Serie D,Brazil,League
+585,Premier League,Uganda,League
+598,Première Division,Mali,League
+253,Major League Soccer,USA,League
+268,Primera División - Apertura,Uruguay,League
+270,Primera División - Clausura,Uruguay,League
+369,Super League,Uzbekistan,League
+296,Thai League 1,Thailand,League
+297,Thai League 2,Thailand,League
+366,1. Deild,Faroe-Islands,League
+367,Meistaradeildin,Faroe-Islands,League
+245,Ykkönen,Finland,League
+244,Veikkausliiga,Finland,League
+247,Kakkonen - Lohko A,Finland,League
+248,Kakkonen - Lohko B,Finland,League
+249,Kakkonen - Lohko C,Finland,League
+242,Liga Pro,Ecuador,League
+243,Liga Pro Serie B,Ecuador,League
+397,Girabola,Angola,League
+343,First League,Armenia,League
+342,Premier League,Armenia,League
+481,Northern NSW NPL,Australia,League
+116,Premier League,Belarus,League
+117,1. Division,Belarus,League
+118,2. Division,Belarus,League
+400,Super League,Zambia,League
+340,V.League 1,Vietnam,League
+98,J1 League,Japan,League
+99,J2/J3 League,Japan,League
+100,J3 League,Japan,League
+389,Premier League,Kazakhstan,League
+276,FKF Premier League,Kenya,League
+379,Ligue Haïtienne,Haiti,League
+421,Division di Honor,Aruba,League
+376,National Football League,Fiji,League
+64,Feminine Division 1,France,League
+327,Erovnuli Liga,Georgia,League
+378,Ligue 1,Guinea,League
+520,Acreano,Brazil,League
+122,2. Division,Denmark,League
+123,2nd Division - Group 2,Denmark,League
+128,Liga Profesional Argentina,Argentina,League
+183,League One,Scotland,League
+184,League Two,Scotland,League
+363,Premier League,Ethiopia,League
+567,Ligi kuu Bara,Tanzania,League
+255,USL Championship,USA,League
+569,Premier League,Kyrgyzstan,League
+592,Division 2 - Norra Götaland,Sweden,League
+593,Division 2 - Norra Svealand,Sweden,League
+594,Division 2 - Norrland,Sweden,League
+595,Division 2 - Södra Svealand,Sweden,League
+596,Division 2 - Västra Götaland,Sweden,League
+597,Division 2 - Östra Götaland,Sweden,League
+141,Segunda División,Spain,League
+136,Serie B,Italy,League
+103,Eliteserien,Norway,League
+89,Eerste Divisie,Netherlands,League
+95,Segunda Liga,Portugal,League
+113,Allsvenskan,Sweden,League
+162,Primera División,Costa-Rica,League
+164,Úrvalsdeild,Iceland,League
+169,Super League,China,League
+200,Botola Pro,Morocco,League
+207,Super League,Switzerland,League
+210,HNL,Croatia,League
+235,Premier League,Russia,League
+239,Primera A,Colombia,League
+250,Division Profesional - Apertura,Paraguay,League
+145,Challenger Pro League,Belgium,League
+173,Second League,Bulgaria,League
+170,League One,China,League
+189,Capital Territory NPL,Australia,League
+240,Primera B,Colombia,League
+211,First NL,Croatia,League
+138,Serie C - Girone A,Italy,League
+146,Super League Women,Belgium,League
+74,Brasileiro Women,Brazil,League
+44,FA WSL,England,League
+82,Frauen Bundesliga,Germany,League
+139,Serie A Women,Italy,League
+91,Eredivisie Women,Netherlands,League
+142,Primera División Femenina,Spain,League
+190,A-League Women,Australia,League
+236,First League,Russia,League
+165,1. Deild,Iceland,League
+251,Division Intermedia,Paraguay,League
+104,1. Division,Norway,League
+114,Superettan,Sweden,League
+208,Challenge League,Switzerland,League
+262,Liga MX,Mexico,League
+263,Liga de Expansión MX,Mexico,League
+278,Super League,Malaysia,League
+279,Premier League,Malaysia,League
+280,Premiership,New-Zealand,League
+281,Primera División,Peru,League
+282,Segunda División,Peru,League
+283,Liga I,Romania,League
+284,Liga II,Romania,League
+286,Super Liga,Serbia,League
+287,Prva Liga,Serbia,League
+288,Premier Soccer League,South-Africa,League
+289,1st Division,South-Africa,League
+290,Persian Gulf Pro League,Iran,League
+291,Azadegan League,Iran,League
+292,K League 1,South-Korea,League
+293,K League 2,South-Korea,League
+307,Pro League,Saudi-Arabia,League
+308,Division 1,Saudi-Arabia,League
+309,Division 2,Saudi-Arabia,League
+521,Amapaense,Brazil,League
+522,Amazonense,Brazil,League
+497,Japan Football League,Japan,League
+127,Denmark Series - Group 4,Denmark,League
+563,Ettan - Norra,Sweden,League
+564,Ettan - Södra,Sweden,League
+252,Division Profesional - Clausura,Paraguay,League
+166,2. Deild,Iceland,League
+368,Premier League,Singapore,League
+315,Premijer Liga,Bosnia,League
+371,First League,Macedonia,League
+382,Liga Leumit,Israel,League
+383,Ligat Ha'al,Israel,League
+386,Ligue 1,Ivory-Coast,League
+392,Challenge League,Malta,League
+393,Premier League,Malta,League
+394,Super Liga,Moldova,League
+396,Primera Division,Nicaragua,League
+399,NPFL,Nigeria,League
+401,Premier Soccer League,Zimbabwe,League
+402,Sudani Premier League,Sudan,League
+403,Ligue 1,Senegal,League
+404,Campionato,San-Marino,League
+411,Elite One,Cameroon,League
+410,C-League,Cambodia,League
+417,Premier League,Bahrain,League
+415,Championnat National,Benin,League
+414,Premier League,Bermuda,League
+413,Super League,Bhutan,League
+412,Premier League,Botswana,League
+398,Premier League,Bangladesh,League
+317,1st League - RS,Bosnia,League
+316,1st League - FBiH,Bosnia,League
+295,K3 League,South-Korea,League
+496,Liga Alef,Israel,League
+506,2. liga,Slovakia,League
+488,U19 Bundesliga,Germany,League
+561,Premier Intermediate League,Northern-Ireland,League
+407,Championship,Northern-Ireland,League
+408,Premiership,Northern-Ireland,League
+331,Division 1,Kuwait,League
+584,Premier League,Libya,League
+589,Taiwan Football Premier League,Chinese-Taipei,League
+258,Canadian Soccer League,Canada,League
+274,Liga 1,Indonesia,League
+304,Liga Panameña de Fútbol,Panama,League
+372,Second League,Macedonia,League
+14,UEFA Youth League,World,League
+425,Premier League,Syria,League
+337,Druha Liga - Group B,Ukraine,League
+492,Tweede Divisie,Netherlands,League
+510,1. Liga Promotion,Switzerland,League
+149,Second Amateur Division - VFV A,Belgium,League
+150,Second Amateur Division - VFV B,Belgium,League
+151,Third Amateur Division - VFV A,Belgium,League
+152,Third Amateur Division - VFV B,Belgium,League
+175,Third League - Northeast,Bulgaria,League
+176,Third League - Northwest,Bulgaria,League
+177,Third League - Southeast,Bulgaria,League
+178,Third League - Southwest,Bulgaria,League
+49,National League - Play-offs,England,League
+256,USL League Two,USA,League
+373,1. SNL,Slovenia,League
+374,2. SNL,Slovenia,League
+391,Super League,Malawi,League
+405,National Soccer League,Rwanda,League
+409,Premier League,Namibia,League
+416,Premier League,Belize,League
+106,Ekstraklasa,Poland,League
+172,First League,Bulgaria,League
+163,Liga de Ascenso,Costa-Rica,League
+111,FAW Championship,Wales,League
+265,Primera División,Chile,League
+266,Primera B,Chile,League
+277,Super League,Kenya,League
+318,1. Division,Cyprus,League
+319,2. Division,Cyprus,League
+320,3. Division,Cyprus,League
+201,Botola 2,Morocco,League
+323,Indian Super League,India,League
+324,I-League,India,League
+107,I Liga,Poland,League
+332,Super Liga,Slovakia,League
+345,Czech Liga,Czech-Republic,League
+346,FNL,Czech-Republic,League
+355,First League,Montenegro,League
+356,Second League,Montenegro,League
+344,Primera División,Bolivia,League
+942,Serie C - Girone B,Italy,League
+943,Serie C - Girone C,Italy,League
+638,Kvindeliga,Denmark,League
+642,Curaçao Sekshon Pagá,Curacao,League
+664,Superliga,Kosovo,League
+224,Landesliga - Burgenland,Austria,League
+225,Landesliga - Karnten,Austria,League
+226,Landesliga - Niederosterreich,Austria,League
+227,Landesliga - Oberosterreich,Austria,League
+228,Landesliga - Salzburg,Austria,League
+229,Landesliga - Steiermark,Austria,League
+230,Landesliga - Tirol,Austria,League
+231,Landesliga - Vorarlbergliga,Austria,League
+232,Landesliga - Wien,Austria,League
+148,Second Amateur Division - ACFF,Belgium,League
+153,Provincial - Antwerpen,Belgium,League
+154,Provincial - Brabant VFV,Belgium,League
+155,Provincial - Hainaut,Belgium,League
+156,Provincial - Liege,Belgium,League
+157,Provincial - Limburg,Belgium,League
+158,Provincial - Luxembourg,Belgium,League
+159,Provincial - Namur,Belgium,League
+160,Provincial - Oost-Vlaanderen,Belgium,League
+161,Provincial - West-Vlaanderen,Belgium,League
+423,Ligue 1,Burkina-Faso,League
+424,Ligue 1,Congo-DR,League
+213,Third NL - Istok,Croatia,League
+214,Third NL - Jug,Croatia,League
+215,Third NL - Sjever,Croatia,League
+216,Third NL - Sredite,Croatia,League
+217,Third NL - Zapad,Croatia,League
+348,3. liga - CFL A,Czech-Republic,League
+349,3. liga - MSFL,Czech-Republic,League
+350,4. liga - Divizie A,Czech-Republic,League
+351,4. liga - Divizie B,Czech-Republic,League
+352,4. liga - Divizie C,Czech-Republic,League
+353,4. liga - Divizie D,Czech-Republic,League
+354,4. liga - Divizie E,Czech-Republic,League
+50,National League - North,England,League
+51,National League - South,England,League
+52,Non League Div One - Isthmian North,England,League
+53,Non League Div One - Isthmian South Central,England,League
+54,Non League Div One - Northern West,England,League
+55,Non League Div One - Northern Midlands,England,League
+56,Non League Div One - Southern South,England,League
+57,Non League Div One - Isthmian South East,England,League
+58,Non League Premier - Isthmian,England,League
+59,Non League Premier - Northern,England,League
+60,Non League Premier - Southern South,England,League
+92,Derde Divisie - Saturday,Netherlands,League
+93,Derde Divisie - Sunday,Netherlands,League
+109,II Liga - East,Poland,League
+238,Youth Championship,Russia,League
+83,Regionalliga - Bayern,Germany,League
+84,Regionalliga - Nord,Germany,League
+85,Regionalliga - Nordost,Germany,League
+86,Regionalliga - SudWest,Germany,League
+87,Regionalliga - West,Germany,League
+426,Serie D - Girone A,Italy,League
+427,Serie D - Girone B,Italy,League
+428,Serie D - Girone C,Italy,League
+429,Serie D - Girone D,Italy,League
+430,Serie D - Girone E,Italy,League
+431,Serie D - Girone F,Italy,League
+432,Serie D - Girone G,Italy,League
+433,Serie D - Girone H,Italy,League
+434,Serie D - Girone I,Italy,League
+435,Primera División RFEF - Group 1,Spain,League
+436,Primera División RFEF - Group 2,Spain,League
+437,Primera División RFEF - Group 3,Spain,League
+438,Primera División RFEF - Group 4,Spain,League
+439,Tercera División RFEF - Group 1,Spain,League
+440,Tercera División RFEF - Group 2,Spain,League
+441,Tercera División RFEF - Group 3,Spain,League
+442,Tercera División RFEF - Group 4,Spain,League
+443,Tercera División RFEF - Group 5,Spain,League
+444,Tercera División RFEF - Group 6,Spain,League
+445,Tercera División RFEF - Group 7,Spain,League
+446,Tercera División RFEF - Group 8,Spain,League
+447,Tercera División RFEF - Group 9,Spain,League
+448,Tercera División RFEF - Group 10,Spain,League
+449,Tercera División RFEF - Group 11,Spain,League
+450,Tercera División RFEF - Group 12,Spain,League
+451,Tercera División RFEF - Group 13,Spain,League
+452,Tercera División RFEF - Group 14,Spain,League
+453,Tercera División RFEF - Group 15,Spain,League
+454,Tercera División RFEF - Group 16,Spain,League
+455,Tercera División RFEF - Group 17,Spain,League
+456,Tercera División RFEF - Group 18,Spain,League
+457,Campeonato de Portugal Prio - Group A,Portugal,League
+458,Campeonato de Portugal Prio - Group B,Portugal,League
+459,Campeonato de Portugal Prio - Group C,Portugal,League
+460,Campeonato de Portugal Prio - Group D,Portugal,League
+461,National 3 - Group A,France,League
+462,National 3 - Group B,France,League
+463,National 3 - Group C,France,League
+464,National 3 - Group D,France,League
+465,National 3 - Group E,France,League
+466,National 3 - Group F,France,League
+467,National 3 - Group H,France,League
+468,National 3 - Group I,France,League
+469,National 3 - Group J,France,League
+470,National 3 - Group K,France,League
+471,National 3 - Group L,France,League
+472,National 3 - Group M,France,League
+473,2. Division - Group 1,Norway,League
+474,2. Division - Group 2,Norway,League
+484,Frauenliga,Austria,League
+487,First Amateur Division,Belgium,League
+489,USL League One,USA,League
+494,Super League 2,Greece,League
+566,Ligue A,Burundi,League
+572,Srpska Liga - Belgrade,Serbia,League
+573,Srpska Liga - Vojvodina,Serbia,League
+574,Srpska Liga - East,Serbia,League
+575,Srpska Liga - West,Serbia,League
+576,Gamma Ethniki - Group 1,Greece,League
+577,Gamma Ethniki - Group 2,Greece,League
+578,Gamma Ethniki - Group 3,Greece,League
+579,Gamma Ethniki - Group 4,Greece,League
+580,Gamma Ethniki - Group 5,Greece,League
+581,Gamma Ethniki - Group 6,Greece,League
+582,Gamma Ethniki - Group 7,Greece,League
+583,Gamma Ethniki - Group 8,Greece,League
+590,A Division,Nepal,League
+599,1. Liga Classic - Group 1,Switzerland,League
+600,1. Liga Classic - Group 2,Switzerland,League
+601,1. Liga Classic - Group 3,Switzerland,League
+613,Baiano - 2,Brazil,League
+620,Cearense - 2,Brazil,League
+625,Carioca - 2,Brazil,League
+633,NB III - Northeast,Hungary,League
+634,NB III - Southwest,Hungary,League
+635,NB III - Northwest,Hungary,League
+254,NWSL Women,USA,League
+260,Pacific Coast Soccer League,Canada,League
+192,New South Wales NPL,Australia,League
+194,South Australia NPL,Australia,League
+195,Victoria NPL,Australia,League
+196,Western Australia NPL,Australia,League
+357,Premier Division,Ireland,League
+358,First Division,Ireland,League
+515,U21 League 1,Algeria,League
+518,Reserve Pro League,Belgium,League
+523,NISA,USA,League
+482,Queensland NPL,Australia,League
+275,Liga 2,Indonesia,League
+395,Liga 1,Moldova,League
+565,Liga Primera U20,Nicaragua,League
+602,Baiano - 1,Brazil,League
+603,Paraibano,Brazil,League
+604,Catarinense - 1,Brazil,League
+605,Paulista - A3,Brazil,League
+606,Paranaense - 1,Brazil,League
+607,Roraimense,Brazil,League
+608,Maranhense,Brazil,League
+609,Cearense - 1,Brazil,League
+610,Brasiliense,Brazil,League
+611,Capixaba,Brazil,League
+614,Paranaense - 2,Brazil,League
+615,Rondoniense,Brazil,League
+616,Potiguar,Brazil,League
+619,Mineiro - 2,Brazil,League
+621,Piauiense,Brazil,League
+622,Pernambucano - 1,Brazil,League
+623,Sul-Matogrossense,Brazil,League
+624,Carioca - 1,Brazil,League
+626,Sergipano,Brazil,League
+627,Paraense,Brazil,League
+628,Goiano - 1,Brazil,League
+629,Mineiro - 1,Brazil,League
+630,Matogrossense,Brazil,League
+631,Tocantinense,Brazil,League
+636,Ýokary Liga,Turkmenistan,League
+637,V.League 2,Vietnam,League
+640,Kansallinen Liiga,Finland,League
+643,3. liga - Bratislava,Slovakia,League
+644,3. liga - West,Slovakia,League
+645,3. liga - East,Slovakia,League
+646,3. liga - Center,Slovakia,League
+647,Lao League,Laos,League
+648,Tasmania NPL,Australia,League
+649,Supreme Division Women,Russia,League
+650,Second League - Group 3,Russia,League
+651,Second League - Group 1,Russia,League
+652,Second League - Group 2,Russia,League
+653,Second League - Group 4,Russia,League
+660,WK-League,South-Korea,League
+668,1. Liga U19,Czech-Republic,League
+669,1. Liga Women,Czech-Republic,League
+671,Úrvalsdeild Women,Iceland,League
+673,Liga MX Femenil,Mexico,League
+675,U21 Divisie 1,Netherlands,League
+676,Central Youth League,Poland,League
+679,U21 League,Ukraine,League
+681,Campeonato de Portugal Prio - Group E,Portugal,League
+682,Campeonato de Portugal Prio - Group F,Portugal,League
+683,Campeonato de Portugal Prio - Group G,Portugal,League
+684,Campeonato de Portugal Prio - Group H,Portugal,League
+685,3. liga - CFL B,Czech-Republic,League
+686,4. liga - Divizie F,Czech-Republic,League
+687,Regionalliga - Tirol,Austria,League
+688,Regionalliga - Salzburg,Austria,League
+689,Third Amateur Division - ACFF A,Belgium,League
+690,Third Amateur Division - ACFF B,Belgium,League
+691,Provincial - Brabant ACFF,Belgium,League
+692,Primera División RFEF - Group 5,Spain,League
+475,Paulista - A1,Brazil,League
+476,Paulista - A2,Brazil,League
+477,Gaúcho - 1,Brazil,League
+478,Gaúcho - 2,Brazil,League
+479,Canadian Premier League,Canada,League
+693,Gamma Ethniki - Group 9,Greece,League
+694,Gamma Ethniki - Group 10,Greece,League
+695,U18 Premier League - North,England,League
+696,U18 Premier League - South,England,League
+699,Women's Championship,England,League
+701,Liga Revelação U23,Portugal,League
+702,Premier League 2 Division One,England,League
+703,Professional Development League,England,League
+705,Campionato Primavera - 1,Italy,League
+706,Campionato Primavera - 2,Italy,League
+710,Nacional B,Bolivia,League
+711,Segunda División,Chile,League
+712,Liga Femenina,Colombia,League
+717,I-League - 2nd Division,India,League
+722,Liga Premier Serie A,Mexico,League
+724,U18 Divisie 1,Netherlands,League
+728,Liga 1 Feminin,Romania,League
+730,Football League - Highland League,Scotland,League
+731,Football League - Lowland League,Scotland,League
+733,I Liga - Women,Slovakia,League
+734,Diski Challenge,South-Africa,League
+739,AXA Women’s Super League,Switzerland,League
+744,Oberliga - Schleswig-Holstein,Germany,League
+745,Oberliga - Hamburg,Germany,League
+746,Oberliga - Mittelrhein,Germany,League
+747,Oberliga - Westfalen,Germany,League
+748,Oberliga - Niedersachsen,Germany,League
+749,Oberliga - Bremen,Germany,League
+750,Oberliga - Hessen,Germany,League
+751,Oberliga - Niederrhein,Germany,League
+752,Oberliga - Rheinland-Pfalz / Saar,Germany,League
+753,Oberliga - Baden-Württemberg,Germany,League
+754,Oberliga - Nordost-Nord,Germany,League
+755,Oberliga - Nordost-Süd,Germany,League
+758,Premier Division,Gibraltar,League
+759,Liga Mayor,Dominican-Republic,League
+760,LFA First Division,Liberia,League
+762,Premier League,Mauritania,League
+763,Mauritian League,Mauritius,League
+764,Premier League,Mongolia,League
+765,PFL,Philippines,League
+774,3. Division - Girone 1,Norway,League
+775,3. Division - Girone 2,Norway,League
+776,3. Division - Girone 3,Norway,League
+777,3. Division - Girone 4,Norway,League
+778,3. Division - Girone 5,Norway,League
+779,3. Division - Girone 6,Norway,League
+780,III Liga - Group 1,Poland,League
+781,III Liga - Group 2,Poland,League
+782,III Liga - Group 3,Poland,League
+783,III Liga - Group 4,Poland,League
+784,Liga III - Serie 1,Romania,League
+785,Liga III - Serie 2,Romania,League
+786,Liga III - Serie 3,Romania,League
+787,Liga III - Serie 4,Romania,League
+788,Liga III - Serie 5,Romania,League
+789,Liga III - Serie 6,Romania,League
+790,Liga III - Serie 7,Romania,League
+791,Liga III - Serie 8,Romania,League
+792,Liga III - Serie 9,Romania,League
+793,Liga III - Serie 10,Romania,League
+794,3. SNL - East,Slovenia,League
+795,3. SNL - West,Slovenia,League
+796,2. Liga Interregional - Group 1,Switzerland,League
+797,2. Liga Interregional - Group 2,Switzerland,League
+798,2. Liga Interregional - Group 3,Switzerland,League
+799,2. Liga Interregional - Group 4,Switzerland,League
+800,2. Liga Interregional - Group 5,Switzerland,League
+801,2. Liga Interregional - Group 6,Switzerland,League
+813,Elite Two,Cameroon,League
+828,Ligue 2,Tunisia,League
+829,Youth League,Turkmenistan,League
+844,Ligue 1,Congo,League
+845,GFA League,Gambia,League
+847,Premier League,Eswatini,League
+542,Iraqi League,Iraq,League
+549,Damallsvenskan,Sweden,League
+562,Reserve League,Belarus,League
+851,Carioca A2,Brazil,League
+854,WE League,Japan,League
+855,Dhivehi Premier League,Maldives,League
+861,U20 League,Mexico,League
+862,3. Division,Denmark,League
+865,Liga 3,Portugal,League
+868,Premier League,Pakistan,League
+870,Premier League,Crimea,League
+872,Liga Premier Serie B,Mexico,League
+875,Segunda División RFEF - Group 1,Spain,League
+876,Segunda División RFEF - Group 2,Spain,League
+877,Segunda División RFEF - Group 3,Spain,League
+878,Segunda División RFEF - Group 4,Spain,League
+879,Segunda División RFEF - Group 5,Spain,League
+883,Reserve League,Netherlands,League
+887,Second League,Egypt,League
+888,Second League - Group B,Egypt,League
+889,Second League - Group C,Egypt,League
+867,Copa Paulino Alcantara,Philippines,League
+725,Toppserien,Norway,League
+736,Elitettan,Sweden,League
+833,Queensland Premier League,Australia,League
+834,South Australia State League 1,Australia,League
+835,New South Wales NPL 2,Australia,League
+836,Victoria NPL 2,Australia,League
+846,Somali Premier League,Somalia,League
+906,Reserve League,Argentina,League
+907,Primera Division,Cuba,League
+909,MLS Next Pro,USA,League
+915,1. Division Women,Norway,League
+923,League 1 Ontario,Canada,League
+929,League Two,China,League
+962,Premier League,Lesotho,League
+968,Championnat D1,Gabon,League
+975,Serie C - Relegation - Play-offs,Italy,League
+976,Serie C - Promotion - Play-offs,Italy,League
+974,Serie C - Supercoppa Lega Finals,Italy,League
+977,Tercera División RFEF - Promotion - Play-offs,Spain,League
+978,2nd Division - Play-offs,Albania,League
+979,Provincial - Play-offs VV,Belgium,League
+980,Provincial - Play-offs ACFF,Belgium,League
+981,Third Amateur Division - Play-offs,Belgium,League
+982,Denmark Series - Promotion Round,Denmark,League
+983,Denmark Series - Relegation Round,Denmark,League
+984,National League - North - Play-offs,England,League
+985,National League - South - Play-offs,England,League
+986,Non League Div One - Play-offs,England,League
+987,U18 Premier League - Championship,England,League
+988,Oberliga - Promotion Round,Germany,League
+989,Oberliga - Relegation Round,Germany,League
+990,Gamma Ethniki - Promotion Group,Greece,League
+991,Campeonato de Portugal Prio - Promotion Round,Portugal,League
+992,Football League - Championship,Scotland,League
+993,Non League Premier - Isthmian - Play-offs,England,League
+994,Non League Premier - Northern - Play-offs,England,League
+995,Non League Premier - Southern South - Play-offs,England,League
+996,Non League Premier - Southern Central - Play-offs,England,League
+997,Serie D - Promotion - Play-offs,Italy,League
+998,Serie D - Relegation - Play-offs,Italy,League
+999,Serie D - Championship Round,Italy,League
+1000,Segunda División RFEF - Play-offs,Spain,League
+1002,Regionalliga - Promotion Play-offs,Germany,League
+1003,Regionalliga - Relegation Round,Germany,League
+1004,Derde Divisie - Relegation Round,Netherlands,League
+1005,1. Liga Classic - Play-offs,Switzerland,League
+1006,Primera División RFEF - Play Offs,Spain,League
+1007,3. Lig - Play-offs,Turkey,League
+1009,Liga III - Play-offs,Romania,League
+1010,3. liga - Promotion Play-off,Czech-Republic,League
+1011,Second Amateur Division - Play-offs ,Belgium,League
+1014,Second League - Play-offs,Egypt,League
+931,Non League Premier - Southern Central,England,League
+932,Non League Div One - Northern East,England,League
+933,Non League Div One - Southern Central,England,League
+936,Catarinense - 2,Brazil,League
+938,Oberliga - Bayern Nord,Germany,League
+939,Oberliga - Bayern Süd,Germany,League
+946,Second NL,Croatia,League
+948,1a Divisão - Women,Portugal,League
+954,National League - Central,New-Zealand,League
+955,National League - National,New-Zealand,League
+956,National League - Northern,New-Zealand,League
+957,National League - Southern,New-Zealand,League
+969,Primeira Divisão,Macao,League
+1017,U23 League,Mexico,League
+1020,Calcutta Premier Division,India,League
+1022,Premier League - Summer Series,England,League
+1023,NB III - Southeast,Hungary,League
+1025,Second League A - Division A Gold,Russia,League
+1026,Second League A - Division A Silver,Russia,League
+1027,3. Lig - Group 4,Turkey,League
+1029,National 3 - Group G,France,League
+1030,Goiano - 2,Brazil,League
+1031,Premier League,Bhutan,League
+1032,Copa de la Liga Profesional,Argentina,League
+1033,Ekstraliga Women,Poland,League
+1034,2. Frauen Bundesliga,Germany,League
+1037,Paraibano 2,Brazil,League
+1041,Júniores U19,Portugal,League
+1048,Premier Division,Antigua-And-Barbuda,League
+1052,Kakkonen - Play-offs,Finland,League
+1053,Division 2 - Play-offs,Sweden,League
+1054,2. Division - Play-offs,Norway,League
+1055,Ettan - Relegation Round,Sweden,League
+1056,National League - Championship - Final,New-Zealand,League
+1061,Second League A - Spring Season Gold,Russia,League
+1064,Second League A - Spring Season Silver,Russia,League
+1065,U19 League,Ukraine,League
+1079,Yemeni League,Yemen,League
+1080,Premier Division,Grenada,League
+1084,Championnat National,Togo,League
+1099,Gamma Ethniki - Relegation Play-offs,Greece,League
+1111,NB III - Promotion Play-offs,Hungary,League
+1121,Second League A - Promotion Play-offs,Russia,League
+1062,Paulista - A4,Brazil,League
+1067,Torneo Promocional Amateur,Argentina,League
+1069,Goiano U20,Brazil,League
+1071,Paranaense U20,Brazil,League
+1073,Baiano U20,Brazil,League
+1075,Pro League A,Uzbekistan,League
+1076,Catarinense U20,Brazil,League
+1086,Paulista - U20,Brazil,League
+1087,Ykkösliiga,Finland,League
+1088,Pernambucano - U20,Brazil,League
+1090,NNSW League 1,Australia,League
+1091,Tasmania Northern Championship,Australia,League
+1092,Capital Territory NPL 2,Australia,League
+1093,Tasmania Southern Championship,Australia,League
+1094,Western Australia State League 1,Australia,League
+1095,USL League One Cup,USA,League
+1096,Matogrossense 2,Brazil,League
+1098,Paulista Série B,Brazil,League
+1100,Brasiliense U20,Brazil,League
+1103,Premiership Women,Northern-Ireland,League
+1104,Liga 3,Georgia,League
+1106,Carioca C,Brazil,League
+1107,Mineiro U20,Brazil,League
+1108,Sergipano U20,Brazil,League
+1110,Alagoano U20,Brazil,League
+1112,Cearense U20,Brazil,League
+1114,Carioca U20,Brazil,League
+1115,Paraense A3,Brazil,League
+1116,WPSL,USA,League
+1117,USL W League,USA,League
+1118,NPSL,USA,League
+1119,NWSL - Liga MXF Summer Cup,USA,League
+1120,Paraibano U20,Brazil,League
+1124,Cearense - 3,Brazil,League
+1125,Pernambucano - 2,Brazil,League
+1126,Esiliiga B,Estonia,League
+1128,Brasileiro U17,Brazil,League
+1130,USL Super League,USA,League
+1131,Super Cup,Mongolia,League
+1133,Goiano - 3,Brazil,League
+1134,Amazonense - 2,Brazil,League
+1135,Sergipano - 2,Brazil,League
+1137,Supercup der Frauen,Germany,League
+1138,Paranaense - 3,Brazil,League
+1139,Potiguar - U20,Brazil,League
+1141,Brasiliense B,Brazil,League
+1142,Mineiro - 3,Brazil,League
+1143,Estadual Junior U20,Brazil,League
+1145,Paraense B1,Brazil,League
+1148,Maranhense - 2,Brazil,League
+1149,Potiguar - 2,Brazil,League
+1150,Gaúcho - 3,Brazil,League
+1151,Pernambucano - 3,Brazil,League
+1152,U19 Divisie 1,Netherlands,League
+1154,Catarinense - 3,Brazil,League
+1155,Carioca B2,Brazil,League
+1157,Paraense U20,Brazil,League
+1147,Capixaba B,Brazil,League
+1182,Northern Super League,Canada,League
+1185,3. liga - Play-offs,Slovakia,League
+1195,Liga E Pare,Kosovo,League
+1196,Division One League,Ghana,League
+1200,Liga MX U21,Mexico,League
+1203,Piauiense - 2,Brazil,League
+1204,Rondoniense - 2,Brazil,League
+1218,Pro League U23,United-Arab-Emirates,League
+1211,Tipsport Liga,Czech-Republic,League
+1219,Copa Presidente,El-Salvador,League

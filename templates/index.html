@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Football AI Predictor</title>
+    <title>Football AI Predictions</title>
 </head>
 <body>
-    <h1>Football AI Prediction</h1>
+    <h1>Football AI Predictions</h1>
 
     <form method="POST">
         <label>Home Team:</label>
@@ -21,23 +21,29 @@
             {% endfor %}
         </select>
 
-        <br><br>
+        <label>Odds Home:</label>
+        <input type="text" name="odds_home">
 
-        Odds Home: <input type="text" name="odds_home"><br>
-        Odds Draw: <input type="text" name="odds_draw"><br>
-        Odds Away: <input type="text" name="odds_away"><br>
+        <label>Odds Draw:</label>
+        <input type="text" name="odds_draw">
 
-        <br>
-        <input type="submit" value="Predict">
+        <label>Odds Away:</label>
+        <input type="text" name="odds_away">
+
+        <button type="submit">Predict</button>
     </form>
 
     {% if prediction %}
-        <h2>Prediction</h2>
-        Home Win: {{ prediction.home }}<br>
-        Draw: {{ prediction.draw }}<br>
-        Away Win: {{ prediction.away }}<br>
-        Over 2.5: {{ prediction.over }}<br>
-        BTTS: {{ prediction.btts }}<br>
+    <h2>Prediction</h2>
+    <p>Home Probability: {{ prediction.prob_home }}</p>
+    <p>Draw Probability: {{ prediction.prob_draw }}</p>
+    <p>Away Probability: {{ prediction.prob_away }}</p>
+    <p>Over 2.5 Probability: {{ prediction.prob_over }}</p>
+    <p>BTTS Probability: {{ prediction.prob_btts }}</p>
+    <p>Value Home: {{ prediction.value_home }}</p>
+    <p>Value Draw: {{ prediction.value_draw }}</p>
+    <p>Value Away: {{ prediction.value_away }}</p>
+    <p>Confidence: {{ prediction.confidence }}</p>
     {% endif %}
 
 </body>

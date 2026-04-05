@@ -1,69 +1,44 @@
 import pandas as pd
-import os
 
-# Charger features
-df = pd.read_csv("data_processed/features.csv")
+print("Lecture des matchs API...")
 
-teams = {}
+matches = pd.read_csv("data_raw/api_matches_all_leagues.csv")
 
-for index, row in df.iterrows():
+# Renommer colonnes
+matches = matches.rename(columns={
+    "date": "Date",
+    "home_team": "HomeTeam",
+    "away_team": "AwayTeam",
+    "home_goals": "FTHG",
+    "away_goals": "FTAG"
+})
 
-    home_team = row['home_team']
-    away_team = row['away_team']
+teams = pd.concat([matches["HomeTeam"], matches["AwayTeam"]]).unique()
 
-    # Stats home team
-    teams[home_team] = {
-        'points_per_game': row['home_points_per_game'],
-        'goals_scored_avg': row['home_goals_scored_avg'],
-        'goals_conceded_avg': row['home_goals_conceded_avg'],
-        'goal_diff': row['home_goal_diff_avg'],
-        'over_ratio': row['home_over_ratio'],
-        'btts_ratio': row['home_btts_ratio'],
-        'form': row['home_form'],
-        'elo': row['home_elo']
-    }
+team_stats = []
 
-    # Stats away team
-    teams[away_team] = {
-        'points_per_game': row['away_points_per_game'],
-        'goals_scored_avg': row['away_goals_scored_avg'],
-        'goals_conceded_avg': row['away_goals_conceded_avg'],
-        'goal_diff': row['away_goal_diff_avg'],
-        'over_ratio': row['away_over_ratio'],
-        'btts_ratio': row['away_btts_ratio'],
-        'form': row['away_form'],
-        'elo': row['away_elo']
-    }
+for team in teams:
+    home_matches = matches[matches["HomeTeam"] == team]
+    away_matches = matches[matches["AwayTeam"] == team]
 
-# Convertir en DataFrame
-team_rows = []
+    goals_scored = home_matches["FTHG"].sum() + away_matches["FTAG"].sum()
+    goals_conceded = home_matches["FTAG"].sum() + away_matches["FTHG"].sum()
 
-for team, stats in teams.items():
-    team_rows.append([
-        team,
-        stats['points_per_game'],
-        stats['goals_scored_avg'],
-        stats['goals_conceded_avg'],
-        stats['goal_diff'],
-        stats['over_ratio'],
-        stats['btts_ratio'],
-        stats['form'],
-        stats['elo']
-    ])
+    matches_played = len(home_matches) + len(away_matches)
 
-team_df = pd.DataFrame(team_rows, columns=[
-    'team',
-    'points_per_game',
-    'goals_scored_avg',
-    'goals_conceded_avg',
-    'goal_diff',
-    'over_ratio',
-    'btts_ratio',
-    'form',
-    'elo'
-])
+    if matches_played == 0:
+        continue
 
-os.makedirs("data_processed", exist_ok=True)
-team_df.to_csv("data_processed/team_stats.csv", index=False)
+    team_stats.append({
+        "Team": team,
+        "Matches": matches_played,
+        "GoalsScoredAvg": goals_scored / matches_played,
+        "GoalsConcededAvg": goals_conceded / matches_played,
+        "GoalDiffAvg": (goals_scored - goals_conceded) / matches_played
+    })
+
+team_stats_df = pd.DataFrame(team_stats)
+
+team_stats_df.to_csv("data_processed/team_stats.csv", index=False)
 
 print("team_stats.csv créé !")
