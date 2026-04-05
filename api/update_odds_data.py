@@ -16,21 +16,24 @@ leagues = {
     188: "Australia"
 }
 
-season = 2024
+seasons = [2025, 2024, 2023, 2022, 2021]
 
 all_odds = []
 
-for league_id, league_name in leagues.items():
-    print(f"Downloading odds {league_name}...")
-    df = get_odds(league_id, season)
+for season in seasons:
+    print(f"Season {season}")
+    for league_id, league_name in leagues.items():
+        print(f"Downloading odds {league_name} {season}...")
+        df = get_odds(league_id, season)
 
-    if df.empty:
-        continue
+        if df.empty:
+            continue
 
-    df["league_id"] = league_id
-    df["league_name"] = league_name
+        df["league_id"] = league_id
+        df["league_name"] = league_name
+        df["season"] = season
 
-    all_odds.append(df)
+        all_odds.append(df)
 
 if len(all_odds) > 0:
     final_odds = pd.concat(all_odds)

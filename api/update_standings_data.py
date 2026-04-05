@@ -16,21 +16,23 @@ leagues = {
     188: "Australia"
 }
 
-season = 2024
+seasons = [2025]
 
 all_standings = []
 
-for league_id, league_name in leagues.items():
-    print(f"Downloading standings {league_name}...")
-    df = get_standings(league_id, season)
+for season in seasons:
+    for league_id, league_name in leagues.items():
+        print(f"Downloading standings {league_name}...")
+        df = get_standings(league_id, season)
 
-    if df.empty:
-        continue
+        if df.empty:
+            continue
 
-    df["league_id"] = league_id
-    df["league_name"] = league_name
+        df["league_id"] = league_id
+        df["league_name"] = league_name
+        df["season"] = season
 
-    all_standings.append(df)
+        all_standings.append(df)
 
 if len(all_standings) > 0:
     final_standings = pd.concat(all_standings)

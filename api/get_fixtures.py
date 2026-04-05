@@ -3,7 +3,6 @@ import pandas as pd
 from api.api_config import BASE_URL, HEADERS
 
 def get_fixtures(league, season):
-
     url = BASE_URL + "fixtures"
 
     params = {
@@ -17,14 +16,16 @@ def get_fixtures(league, season):
     matches = []
 
     for match in data["response"]:
-        matches.append({
-            "date": match["fixture"]["date"],
-            "league": league,
-            "home_team": match["teams"]["home"]["name"],
-            "away_team": match["teams"]["away"]["name"],
-            "home_goals": match["goals"]["home"],
-            "away_goals": match["goals"]["away"]
-        })
+        try:
+            matches.append({
+                "fixture_id": match["fixture"]["id"],
+                "date": match["fixture"]["date"],
+                "home_team": match["teams"]["home"]["name"],
+                "away_team": match["teams"]["away"]["name"],
+                "home_goals": match["goals"]["home"],
+                "away_goals": match["goals"]["away"]
+            })
+        except:
+            continue
 
-    df = pd.DataFrame(matches)
-    return df
+    return pd.DataFrame(matches)
