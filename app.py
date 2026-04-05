@@ -1,78 +1,97 @@
 from flask import Flask, render_template, request
-import pickle
 import pandas as pd
-import os
+import joblib
+import numpy as np
 
 app = Flask(__name__)
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+# Charger modèles
+model_result = joblib.load("models/model_result.pkl")
+model_over = joblib.load("models/model_over.pkl")
+model_btts = joblib.load("models/model_btts.pkl")
 
-def load_model(name):
-    path = os.path.join(BASE_DIR, name)
-    if os.path.exists(path):
-        return pickle.load(open(path, "rb"))
-    else:
-        return None
+# Charger stats équipes
+team_stats = pd.read_csv("data_processed/team_stats.csv")
 
-model_result = load_model("model_result.pkl")
-model_over = load_model("model_over.pkl")
-model_btts = load_model("model_btts.pkl")
-
-@app.route("/", methods=["GET", "POST", "HEAD"])
+@app.route("/", methods=["GET", "POST"])
 def index():
+    prediction = None
+
     if request.method == "POST":
-        try:
-            B365H = float(request.form.get("B365H", 0))
-            B365D = float(request.form.get("B365D", 0))
-            B365A = float(request.form.get("B365A", 0))
-            HS = float(request.form.get("HS", 0))
-            AS = float(request.form.get("AS", 0))
-            HST = float(request.form.get("HST", 0))
-            AST = float(request.form.get("AST", 0))
-            HC = float(request.form.get("HC", 0))
-            AC = float(request.form.get("AC", 0))
+        home_team = request.form["home_team"]
+        away_team = request.form["away_team"]
+        odds_home = float(request.form["odds_home"])
+        odds_draw = float(request.form["odds_draw"])
+        odds_away = float(request.form["odds_away"])
 
-            match = pd.DataFrame([{
-                "B365H": B365H,
-                "B365D": B365D,
-                "B365A": B365A,
-                "HS": HS,
-                "AS": AS,
-                "HST": HST,
-                "AST": AST,
-                "HC": HC,
-                "AC": AC
-            }])
+        home_stats = team_stats[team_stats['team'] == home_team].iloc[0]
+        away_stats = team_stats[team_stats['team'] == away_team].iloc[0]
 
-            res = model_result.predict_proba(match)
-            over = model_over.predict_proba(match)
-            btts = model_btts.predict_proba(match)
+        home_features = [
+            home_stats['points_per_game'],
+            home_stats['goals_scored_avg'],
+            home_stats['goals_conceded_avg'],
+            home_stats['goal_diff'],
+            home_stats['over_ratio'],
+            home_stats['btts_ratio'],
+            home_stats['form']
+        ]
 
-            result = {
-                "home": round(res[0][2]*100, 1),
-                "draw": round(res[0][1]*100, 1),
-                "away": round(res[0][0]*100, 1),
-                "over": round(over[0][1]*100, 1),
-                "btts": round(btts[0][1]*100, 1)
-            }
+        away_features = [
+            away_stats['points_per_game'],
+            away_stats['goals_scored_avg'],
+            away_stats['goals_conceded_avg'],
+            away_stats['goal_diff'],
+            away_stats['over_ratio'],
+            away_stats['btts_ratio'],
+            away_stats['form']
+        ]
 
-            decision = "Match à éviter"
+        form_diff = home_features[6] - away_features[6]
+        points_diff = home_features[0] - away_features[0]
+        goal_diff_diff = home_features[3] - away_features[3]
+        over_diff = home_features[4] - away_features[4]
+        btts_diff = home_features[5] - away_features[5]
+        odds_ratio = odds_home / odds_away if odds_away != 0 else 0
 
-            if result["home"] > 60:
-                decision = "Victoire domicile"
-            elif result["away"] > 60:
-                decision = "Victoire extérieur"
-            elif result["over"] > 60:
-                decision = "Over 2.5"
-            elif result["btts"] > 60:
-                decision = "BTTS"
+        home_elo = home_stats['elo']
+        away_elo = away_stats['elo']
+        elo_diff = home_elo - away_elo
 
-            return render_template("index.html", result=result, decision=decision)
+        features = [
+            *home_features,
+            *away_features,
+            form_diff,
+            points_diff,
+            goal_diff_diff,
+            over_diff,
+            btts_diff,
+            odds_ratio,
+            home_elo,
+            away_elo,
+            elo_diff,
+            odds_home,
+            odds_draw,
+            odds_away
+        ]
 
-        except Exception as e:
-            return str(e)
+        X = np.array(features).reshape(1, -1)
 
-    return render_template("index.html")
+        proba_result = model_result.predict_proba(X)[0]
+        proba_over = model_over.predict_proba(X)[0][1]
+        proba_btts = model_btts.predict_proba(X)[0][1]
+
+        prediction = {
+            "home": round(proba_result[2], 3),
+            "draw": round(proba_result[1], 3),
+            "away": round(proba_result[0], 3),
+            "over": round(proba_over, 3),
+            "btts": round(proba_btts, 3),
+        }
+
+    teams = sorted(team_stats['team'].unique())
+
+    return render_template("index.html", prediction=prediction, teams=teams)
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)
