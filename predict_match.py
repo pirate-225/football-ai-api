@@ -1,10 +1,8 @@
 import pandas as pd
 import joblib
 
-# Load team stats
 team_stats = pd.read_csv("data_processed/team_stats.csv")
 
-# Load models
 model_result = joblib.load("models/model_result.pkl")
 model_over = joblib.load("models/model_over.pkl")
 model_btts = joblib.load("models/model_btts.pkl")
@@ -22,7 +20,6 @@ def predict_match(home_team, away_team, odds_home, odds_draw, odds_away):
         home_stats["GoalDiffAvg"] - away_stats["GoalDiffAvg"]
     ]]
 
-    # Probabilities
     probs = model_result.predict_proba(features)[0]
 
     prob_home = probs[0]
@@ -32,20 +29,22 @@ def predict_match(home_team, away_team, odds_home, odds_draw, odds_away):
     prob_over = model_over.predict_proba(features)[0][1]
     prob_btts = model_btts.predict_proba(features)[0][1]
 
+    # Calibration simple Over / BTTS
+    prob_over = min(max(prob_over, 0.05), 0.95)
+    prob_btts = min(max(prob_btts, 0.05), 0.95)
+
     # Bookmaker probabilities
     book_home = 1 / float(odds_home)
     book_draw = 1 / float(odds_draw)
     book_away = 1 / float(odds_away)
 
-    # Edge calculation
+    # Edge
     edge_home = prob_home - book_home
     edge_draw = prob_draw - book_draw
     edge_away = prob_away - book_away
 
-    # Confidence
     confidence = max(prob_home, prob_draw, prob_away)
 
-    # Betting decision
     bet_home = "YES" if edge_home > 0.05 else "NO"
     bet_draw = "YES" if edge_draw > 0.05 else "NO"
     bet_away = "YES" if edge_away > 0.05 else "NO"
@@ -54,6 +53,7 @@ def predict_match(home_team, away_team, odds_home, odds_draw, odds_away):
         "prob_home": round(prob_home, 3),
         "prob_draw": round(prob_draw, 3),
         "prob_away": round(prob_away, 3),
+
         "prob_over": round(prob_over, 3),
         "prob_btts": round(prob_btts, 3),
 
