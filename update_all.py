@@ -1,27 +1,29 @@
 import os
+import subprocess
 
-print("Updating matches...")
-os.system("python -m api.update_api_data")
+print("Starting full update pipeline...")
 
-print("Updating odds...")
-os.system("python -m api.update_odds_data")
+# Create folders if they don't exist
+os.makedirs("data_raw", exist_ok=True)
+os.makedirs("data_processed", exist_ok=True)
+os.makedirs("models", exist_ok=True)
 
-print("Updating standings...")
-os.system("python -m api.update_standings_data")
+def run_script(script):
+    print(f"Running {script}...")
+    result = subprocess.run(["python", script])
+    if result.returncode != 0:
+        print(f"Error while running {script}")
+        exit(1)
 
-print("Building form...")
-os.system("python build_form.py")
+# API data
+run_script("api/update_api_data.py")
 
-print("Building elo...")
-os.system("python build_elo.py")
-
-print("Building master dataset...")
-os.system("python build_master_dataset.py")
-
-print("Building features...")
-os.system("python feature_engineering.py")
-
-print("Training models...")
-os.system("python train_models.py")
+# Build features pipeline
+run_script("build_form.py")
+run_script("build_elo.py")
+run_script("build_master_dataset.py")
+run_script("build_team_stats.py")
+run_script("feature_engineering.py")
+run_script("train_models.py")
 
 print("Update finished successfully")
