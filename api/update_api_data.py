@@ -1,43 +1,56 @@
+import requests
 import pandas as pd
-from api.get_fixtures import get_fixtures
+import os
 
-leagues = {
-    39: "Premier_League",
-    61: "Ligue_1",
-    140: "La_Liga",
-    135: "Serie_A",
-    78: "Bundesliga",
-    71: "Brazil",
-    128: "Argentina",
-    265: "Chile",
-    239: "Colombia",
-    98: "Japan",
-    292: "Korea",
-    188: "Australia"
+API_KEY = "3b63a56a290a3bd3d4b00c5b232d37d3"
+
+headers = {
+    "x-apisports-key": API_KEY
 }
 
-seasons = [2025, 2024, 2023, 2022, 2021]
+leagues = [
+    39,   # Premier League
+    140,  # La Liga
+    135,  # Serie A
+    78,   # Bundesliga
+    61,   # Ligue 1
+    88,   # Eredivisie
+    94,   # Portugal
+    71,   # Brazil
+    128,  # Argentina
+]
 
 all_matches = []
 
-for season in seasons:
-    print(f"Season {season}")
-    for league_id, league_name in leagues.items():
-        print(f"Downloading {league_name} {season}...")
-        df = get_fixtures(league_id, season)
+for league in leagues:
+    print("Downloading league:", league)
 
-        if df.empty:
-            continue
+    url = "https://v3.football.api-sports.io/fixtures"
 
-        df["league_id"] = league_id
-        df["league_name"] = league_name
-        df["season"] = season
+    params = {
+        "league": league,
+        "season": 2024
+    }
 
-        all_matches.append(df)
+    response = requests.get(url, headers=headers, params=params)
+    data = response.json()
 
-if len(all_matches) > 0:
-    final_df = pd.concat(all_matches)
-    final_df.to_csv("data_raw/api_matches_all_leagues.csv", index=False)
-    print("All leagues and seasons downloaded successfully")
-else:
-    print("No matches downloaded")
+    fixtures = data.get("response", [])
+
+    for f in fixtures:
+        match = {
+            "fixture_id": f["fixture"]["id"],
+            "date": f["fixture"]["date"],
+            "home_team": f["teams"]["home"]["name"],
+            "away_team": f["teams"]["away"]["name"],
+            "home_goals": f["goals"]["home"],
+            "away_goals": f["goals"]["away"]
+        }
+        all_matches.append(match)
+
+df = pd.DataFrame(all_matches)
+
+os.makedirs("data_raw", exist_ok=True)
+df.to_csv("data_raw/api_matches.csv", index=False)
+
+print("API matches saved")
