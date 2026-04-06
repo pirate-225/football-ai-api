@@ -9,13 +9,34 @@ headers = {
     "x-apisports-key": API_KEY
 }
 
-print("Loading leagues...")
+print("Loading leagues list...")
 
 leagues_df = pd.read_csv("data_raw/leagues.csv")
 
-# Limite à 80 ligues pour éviter blocage
-leagues_df = leagues_df.head(80)
+# 🌍 Pays importants
+important_countries = [
+    "England", "France", "Spain", "Italy", "Germany",
+    "Netherlands", "Portugal", "Belgium", "Turkey",
+    "Switzerland", "Austria", "Scotland", "Denmark",
+    "Norway", "Sweden", "Poland", "Czech Republic",
+    "Brazil", "Argentina", "Chile", "Colombia",
+    "USA", "Mexico",
+    "Japan", "South Korea",
+    "Morocco", "Egypt", "Algeria", "South Africa",
+    "Australia"
+]
 
+# ✅ Filtrer seulement par pays (plus stable)
+leagues_df = leagues_df[leagues_df["country"].isin(important_countries)]
+
+print("Ligues après filtre pays :", len(leagues_df))
+
+# ⚡ Limiter à 2 ligues max par pays (L1 + L2)
+leagues_df = leagues_df.sort_values("league_id").groupby("country").head(2)
+
+print("Ligues finales :", len(leagues_df))
+
+# Ligues majeures
 big_leagues = [39, 140, 135, 78, 61]
 
 all_matches = []
@@ -23,14 +44,16 @@ all_matches = []
 for _, row in leagues_df.iterrows():
     league_id = row["league_id"]
     league_name = row["league_name"]
+    country = row["country"]
 
+    # Choix des saisons
     if league_id in big_leagues:
         seasons = [2022, 2023, 2024, 2025]
     else:
         seasons = [2024, 2025]
 
     for season in seasons:
-        print("Downloading:", league_name, season)
+        print(f"Downloading {league_name} ({country}) - {season}")
 
         url = "https://v3.football.api-sports.io/fixtures"
 
@@ -55,17 +78,19 @@ for _, row in leagues_df.iterrows():
                     "FTAG": f["goals"]["away"],
                     "league_id": league_id,
                     "league_name": league_name,
+                    "country": country,
                     "season": season
                 })
 
             time.sleep(1)
 
         except Exception as e:
-            print("Error:", league_name, e)
+            print("Erreur:", league_name, e)
 
 df = pd.DataFrame(all_matches)
 
 os.makedirs("data_raw", exist_ok=True)
 df.to_csv("data_raw/api_matches_all_leagues.csv", index=False)
 
-print("Download terminé")
+print("✅ Download terminé")
+print("Matchs :", len(df))
