@@ -1,42 +1,70 @@
 import pandas as pd
+import os
 
-print("Lecture matchs API...")
+print("Building features...")
+
 matches = pd.read_csv("data_processed/master_dataset.csv")
+teams = pd.read_csv("data_processed/team_stats.csv")
 
-print("Création des features...")
+features = []
 
-# Points per game
-matches["home_points_per_game"] = matches["home_points"] / 38
-matches["away_points_per_game"] = matches["away_points"] / 38
+for index, row in matches.iterrows():
 
-# Goal diff
-matches["home_goal_diff"] = matches["FTHG"] - matches["FTAG"]
-matches["away_goal_diff"] = matches["FTAG"] - matches["FTHG"]
+    home_team = row["HomeTeam"]
+    away_team = row["AwayTeam"]
 
-# Diff features
-matches["points_diff"] = matches["home_points_per_game"] - matches["away_points_per_game"]
-matches["goal_diff_diff"] = matches["home_goal_diff"] - matches["away_goal_diff"]
-matches["position_diff"] = matches["home_position"] - matches["away_position"]
-matches["elo_diff"] = matches["elo_home"] - matches["elo_away"]
-matches["form_diff"] = matches["home_form"] - matches["away_form"]
+    home = teams[teams["Team"] == home_team]
+    away = teams[teams["Team"] == away_team]
 
-# Targets
-def get_result(row):
+    if home.empty or away.empty:
+        continue
+
+    home = home.iloc[0]
+    away = away.iloc[0]
+
+    home_ppg = home["PointsPerGame"]
+    away_ppg = away["PointsPerGame"]
+
+    home_goal_diff = home["GoalDiff"]
+    away_goal_diff = away["GoalDiff"]
+
+    home_form = home["Form"]
+    away_form = away["Form"]
+
+    home_elo = home["Elo"]
+    away_elo = away["Elo"]
+
+    home_pos = home["Position"]
+    away_pos = away["Position"]
+
+    result = 0
     if row["FTHG"] > row["FTAG"]:
-        return 0
+        result = 0
     elif row["FTHG"] == row["FTAG"]:
-        return 1
+        result = 1
     else:
-        return 2
+        result = 2
 
-matches["result"] = matches.apply(get_result, axis=1)
-matches["over25"] = ((matches["FTHG"] + matches["FTAG"]) > 2).astype(int)
-matches["btts"] = ((matches["FTHG"] > 0) & (matches["FTAG"] > 0)).astype(int)
+    over25 = 1 if (row["FTHG"] + row["FTAG"]) > 2 else 0
+    btts = 1 if (row["FTHG"] > 0 and row["FTAG"] > 0) else 0
 
-features = matches[[
-    "home_points_per_game",
-    "away_points_per_game",
-    "points_diff",
+    features.append([
+        home_ppg,
+        away_ppg,
+        home_ppg - away_ppg,
+        home_goal_diff - away_goal_diff,
+        home_pos - away_pos,
+        home_elo - away_elo,
+        home_form - away_form,
+        result,
+        over25,
+        btts
+    ])
+
+df = pd.DataFrame(features, columns=[
+    "home_ppg",
+    "away_ppg",
+    "ppg_diff",
     "goal_diff_diff",
     "position_diff",
     "elo_diff",
@@ -44,8 +72,9 @@ features = matches[[
     "result",
     "over25",
     "btts"
-]]
+])
 
-features.to_csv("data_processed/features.csv", index=False)
+os.makedirs("data_processed", exist_ok=True)
+df.to_csv("data_processed/features.csv", index=False)
 
-print("features.csv créé !")
+print("features.csv created")
