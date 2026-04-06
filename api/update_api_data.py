@@ -17,7 +17,7 @@ all_matches = []
 for _, row in leagues_df.iterrows():
     league_id = row["league_id"]
 
-    for season in seasons:
+    for season in [2022, 2023, 2024, 2025]:
         print("Downloading league", league_id, "season", season)
 
         url = "https://v3.football.api-sports.io/fixtures"
@@ -26,7 +26,6 @@ for _, row in leagues_df.iterrows():
             "league": league_id,
             "season": season
         }
-
         try:
             response = requests.get(url, headers=headers, params=params)
             data = response.json()
