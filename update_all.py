@@ -12,7 +12,8 @@ def run_script(script):
     result = subprocess.run(["python", script])
     if result.returncode != 0:
         print("Error in", script)
-        exit(1)
+    else:
+        print(script, "completed")
 
 run_script("api/update_api_data.py")
 run_script("build_form.py")
@@ -22,4 +23,4 @@ run_script("build_team_stats.py")
 run_script("feature_engineering.py")
 run_script("train_models.py")
 
-print("Update finished successfully")
+print("Update finished")
