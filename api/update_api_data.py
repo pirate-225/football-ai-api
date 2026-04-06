@@ -2,46 +2,57 @@ import requests
 import pandas as pd
 import os
 
-print("Downloading API data...")
-
-API_KEY = "3b63a56a290a3bd3d4b00c5b232d37d3"
+API_KEY = "TA_CLE_API_ICI"
 
 headers = {
     "x-apisports-key": API_KEY
 }
 
-url = "https://v3.football.api-sports.io/fixtures"
+leagues_df = pd.read_csv("data_raw/leagues.csv")
 
-params = {
-    "league": 39,   # Premier League
-    "season": 2024
-}
+seasons = [2022, 2023, 2024]
 
-try:
-    response = requests.get(url, headers=headers, params=params)
-    data = response.json()
+all_matches = []
 
-    fixtures = data.get("response", [])
+for _, row in leagues_df.iterrows():
+    league_id = row["league_id"]
 
-    matches = []
+    for season in seasons:
+        print("Downloading league", league_id, "season", season)
 
-    for f in fixtures:
-        matches.append({
-            "fixture_id": f["fixture"]["id"],
-            "date": f["fixture"]["date"],
-            "home_team": f["teams"]["home"]["name"],
-            "away_team": f["teams"]["away"]["name"],
-            "home_goals": f["goals"]["home"],
-            "away_goals": f["goals"]["away"]
-        })
+        url = "https://v3.football.api-sports.io/fixtures"
 
-    df = pd.DataFrame(matches)
+        params = {
+            "league": league_id,
+            "season": season
+        }
 
-    os.makedirs("data_raw", exist_ok=True)
-    df.to_csv("data_raw/api_matches.csv", index=False)
+        try:
+            response = requests.get(url, headers=headers, params=params)
+            data = response.json()
 
-    print("API data saved")
+            fixtures = data.get("response", [])
 
-except Exception as e:
-    print("API ERROR:", e)
-    print("Continuing without API...")
+            for f in fixtures:
+                match = {
+                    "fixture_id": f["fixture"]["id"],
+                    "date": f["fixture"]["date"],
+                    "HomeTeam": f["teams"]["home"]["name"],
+                    "AwayTeam": f["teams"]["away"]["name"],
+                    "FTHG": f["goals"]["home"],
+                    "FTAG": f["goals"]["away"],
+                    "league_id": league_id,
+                    "season": season
+                }
+
+                all_matches.append(match)
+
+        except:
+            print("Error league", league_id)
+
+df = pd.DataFrame(all_matches)
+
+os.makedirs("data_raw", exist_ok=True)
+df.to_csv("data_raw/api_matches_all_leagues.csv", index=False)
+
+print("All matches downloaded")
