@@ -1,13 +1,25 @@
 import pandas as pd
 import joblib
+import os
 
-team_stats = pd.read_csv("data_processed/team_stats.csv")
+def load_models():
+    model_result = joblib.load("models/model_result.pkl")
+    model_over = joblib.load("models/model_over.pkl")
+    model_btts = joblib.load("models/model_btts.pkl")
+    return model_result, model_over, model_btts
 
-model_result = joblib.load("models/model_result.pkl")
-model_over = joblib.load("models/model_over.pkl")
-model_btts = joblib.load("models/model_btts.pkl")
+def load_team_stats():
+    if not os.path.exists("data_processed/team_stats.csv"):
+        return None
+    return pd.read_csv("data_processed/team_stats.csv")
 
 def predict_match(home_team, away_team, odds_home, odds_draw, odds_away):
+
+    team_stats = load_team_stats()
+    if team_stats is None:
+        return {"error": "Team stats not ready yet"}
+
+    model_result, model_over, model_btts = load_models()
 
     home = team_stats[team_stats["Team"] == home_team].iloc[0]
     away = team_stats[team_stats["Team"] == away_team].iloc[0]
@@ -46,7 +58,6 @@ def predict_match(home_team, away_team, odds_home, odds_draw, odds_away):
     prob_over = model_over.predict_proba(features)[0][1]
     prob_btts = model_btts.predict_proba(features)[0][1]
 
-    # Bookmaker probabilities
     book_home = 1 / float(odds_home)
     book_draw = 1 / float(odds_draw)
     book_away = 1 / float(odds_away)
