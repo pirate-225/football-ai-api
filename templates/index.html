@@ -1,50 +1,59 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Football AI Predictions</title>
+    <title>Football AI Predictor</title>
 </head>
 <body>
-    <h1>Football AI Predictions</h1>
 
-    <form method="POST">
-        <label>Home Team:</label>
-        <select name="home_team">
-            {% for team in teams %}
-            <option value="{{ team }}">{{ team }}</option>
-            {% endfor %}
-        </select>
+<h1>Football AI Predictor</h1>
 
-        <label>Away Team:</label>
-        <select name="away_team">
-            {% for team in teams %}
-            <option value="{{ team }}">{{ team }}</option>
-            {% endfor %}
-        </select>
+<form method="POST">
 
-        <label>Odds Home:</label>
-        <input type="text" name="odds_home">
+    <label>Home Team:</label>
+    <select name="home_team">
+        {% for team in teams %}
+        <option value="{{ team }}">{{ team }}</option>
+        {% endfor %}
+    </select>
 
-        <label>Odds Draw:</label>
-        <input type="text" name="odds_draw">
+    <br><br>
 
-        <label>Odds Away:</label>
-        <input type="text" name="odds_away">
+    <label>Away Team:</label>
+    <select name="away_team">
+        {% for team in teams %}
+        <option value="{{ team }}">{{ team }}</option>
+        {% endfor %}
+    </select>
 
-        <button type="submit">Predict</button>
-    </form>
+    <br><br>
 
-    {% if prediction %}
-    <h2>Prediction</h2>
-    <p>Home Probability: {{ prediction.prob_home }}</p>
-    <p>Draw Probability: {{ prediction.prob_draw }}</p>
-    <p>Away Probability: {{ prediction.prob_away }}</p>
-    <p>Over 2.5 Probability: {{ prediction.prob_over }}</p>
-    <p>BTTS Probability: {{ prediction.prob_btts }}</p>
-    <p>Value Home: {{ prediction.value_home }}</p>
-    <p>Value Draw: {{ prediction.value_draw }}</p>
-    <p>Value Away: {{ prediction.value_away }}</p>
-    <p>Confidence: {{ prediction.confidence }}</p>
-    {% endif %}
+    <label>Odds Home:</label>
+    <input type="text" name="odds_home">
+
+    <label>Odds Draw:</label>
+    <input type="text" name="odds_draw">
+
+    <label>Odds Away:</label>
+    <input type="text" name="odds_away">
+
+    <br><br>
+
+    <button type="submit">Predict</button>
+
+</form>
+
+{% if result %}
+<h2>Prediction</h2>
+<p>Home Probability: {{ result.prob_home }}</p>
+<p>Draw Probability: {{ result.prob_draw }}</p>
+<p>Away Probability: {{ result.prob_away }}</p>
+<p>Over 2.5 Probability: {{ result.prob_over }}</p>
+<p>BTTS Probability: {{ result.prob_btts }}</p>
+<p>Edge Home: {{ result.edge_home }}</p>
+<p>Edge Draw: {{ result.edge_draw }}</p>
+<p>Edge Away: {{ result.edge_away }}</p>
+<p>Confidence: {{ result.confidence }}</p>
+{% endif %}
 
 </body>
 </html>
