@@ -1,24 +1,36 @@
 import requests
 import pandas as pd
 import os
+import time
 
-API_KEY = "TA_CLE_API_ICI"
+API_KEY = "3b63a56a290a3bd3d4b00c5b232d37d3"
 
 headers = {
     "x-apisports-key": API_KEY
 }
 
+print("Loading leagues...")
+
 leagues_df = pd.read_csv("data_raw/leagues.csv")
 
-seasons = [2022, 2023, 2024]
+# Limite à 80 ligues pour éviter blocage
+leagues_df = leagues_df.head(80)
+
+big_leagues = [39, 140, 135, 78, 61]
 
 all_matches = []
 
 for _, row in leagues_df.iterrows():
     league_id = row["league_id"]
+    league_name = row["league_name"]
 
-    for season in [2022, 2023, 2024, 2025]:
-        print("Downloading league", league_id, "season", season)
+    if league_id in big_leagues:
+        seasons = [2022, 2023, 2024, 2025]
+    else:
+        seasons = [2024, 2025]
+
+    for season in seasons:
+        print("Downloading:", league_name, season)
 
         url = "https://v3.football.api-sports.io/fixtures"
 
@@ -26,6 +38,7 @@ for _, row in leagues_df.iterrows():
             "league": league_id,
             "season": season
         }
+
         try:
             response = requests.get(url, headers=headers, params=params)
             data = response.json()
@@ -33,7 +46,7 @@ for _, row in leagues_df.iterrows():
             fixtures = data.get("response", [])
 
             for f in fixtures:
-                match = {
+                all_matches.append({
                     "fixture_id": f["fixture"]["id"],
                     "date": f["fixture"]["date"],
                     "HomeTeam": f["teams"]["home"]["name"],
@@ -41,17 +54,18 @@ for _, row in leagues_df.iterrows():
                     "FTHG": f["goals"]["home"],
                     "FTAG": f["goals"]["away"],
                     "league_id": league_id,
+                    "league_name": league_name,
                     "season": season
-                }
+                })
 
-                all_matches.append(match)
+            time.sleep(1)
 
-        except:
-            print("Error league", league_id)
+        except Exception as e:
+            print("Error:", league_name, e)
 
 df = pd.DataFrame(all_matches)
 
 os.makedirs("data_raw", exist_ok=True)
 df.to_csv("data_raw/api_matches_all_leagues.csv", index=False)
 
-print("All matches downloaded")
+print("Download terminé")

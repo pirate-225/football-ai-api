@@ -1,59 +1,46 @@
 import pandas as pd
+import os
 
-print("Loading matches with form and elo...")
-matches = pd.read_csv("data_processed/matches_with_elo.csv")
+print("Building master dataset...")
 
-print("Loading odds...")
-odds = pd.read_csv("data_raw/api_odds.csv")
+# Charger les matchs API (toutes ligues + saisons)
+matches = pd.read_csv("data_raw/api_matches_all_leagues.csv")
 
-print("Loading standings...")
-standings = pd.read_csv("data_raw/api_standings.csv")
+# Nettoyage
+matches = matches.dropna(subset=["HomeTeam", "AwayTeam", "FTHG", "FTAG"])
 
-# Rename
+# Convertir date
+matches["date"] = pd.to_datetime(matches["date"], errors="coerce")
+
+# Trier chronologiquement
+matches = matches.sort_values("date")
+
+# Renommer colonnes pour cohérence
 matches = matches.rename(columns={
-    "date": "Date",
-    "home_team": "HomeTeam",
-    "away_team": "AwayTeam",
-    "home_goals": "FTHG",
-    "away_goals": "FTAG"
+    "HomeTeam": "HomeTeam",
+    "AwayTeam": "AwayTeam",
+    "FTHG": "FTHG",
+    "FTAG": "FTAG",
+    "season": "season",
+    "league_id": "league_id",
+    "league_name": "league_name"
 })
 
-# Merge odds
-odds = odds[["fixture_id", "home_odds", "draw_odds", "away_odds"]]
-dataset = matches.merge(odds, on="fixture_id", how="left")
+# Garder uniquement les colonnes utiles
+matches = matches[[
+    "date",
+    "HomeTeam",
+    "AwayTeam",
+    "FTHG",
+    "FTAG",
+    "league_id",
+    "league_name",
+    "season"
+]]
 
-# Merge standings home
-standings = standings[["team", "position", "points"]]
-
-dataset = dataset.merge(
-    standings,
-    left_on="HomeTeam",
-    right_on="team",
-    how="left"
-)
-
-dataset = dataset.rename(columns={
-    "position": "home_position",
-    "points": "home_points"
-})
-
-dataset = dataset.drop(columns=["team"])
-
-# Merge standings away
-dataset = dataset.merge(
-    standings,
-    left_on="AwayTeam",
-    right_on="team",
-    how="left"
-)
-
-dataset = dataset.rename(columns={
-    "position": "away_position",
-    "points": "away_points"
-})
-
-dataset = dataset.drop(columns=["team"])
-
-dataset.to_csv("data_processed/master_dataset.csv", index=False)
+# Sauvegarde
+os.makedirs("data_processed", exist_ok=True)
+matches.to_csv("data_processed/master_dataset.csv", index=False)
 
 print("master_dataset.csv created")
+print("Nombre de matchs :", len(matches))

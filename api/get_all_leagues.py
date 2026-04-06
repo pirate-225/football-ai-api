@@ -2,7 +2,7 @@ import requests
 import pandas as pd
 import os
 
-API_KEY = "TA_CLE_API_ICI"
+API_KEY = "3b63a56a290a3bd3d4b00c5b232d37d3"
 
 url = "https://v3.football.api-sports.io/leagues"
 

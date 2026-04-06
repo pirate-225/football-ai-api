@@ -37,7 +37,7 @@ for team in teams:
     goal_diff = (goals_scored - goals_conceded) / played
 
     # Form last 5 matches
-    last_matches = pd.concat([home_matches, away_matches]).sort_values("Date").tail(5)
+    last_matches = pd.concat([home_matches, away_matches]).sort_values("date").tail(5)
     form_points = 0
 
     for _, row in last_matches.iterrows():
