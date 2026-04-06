@@ -20,10 +20,10 @@ important_countries = [
     "Switzerland", "Austria", "Scotland", "Denmark",
     "Norway", "Sweden", "Poland", "Czech Republic",
     "Brazil", "Argentina", "Chile", "Colombia",
-    "USA", "Mexico",
-    "Japan", "South Korea",
+    "USA", "Mexico","Costa Rica", "Ecuador", "Paraguay", 
+    "Japan", "South Korea", "Bolivia", "Ireland",
     "Morocco", "Egypt", "Algeria", "South Africa",
-    "Australia"
+    "Australia", "Azerbaijan", "Northern Ireland",
 ]
 
 # ✅ Filtrer seulement par pays (plus stable)
