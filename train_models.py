@@ -1,5 +1,6 @@
 import pandas as pd
 import joblib
+import os
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 
@@ -48,8 +49,12 @@ model_btts = RandomForestClassifier(
 )
 model_btts.fit(X_train, y_btts.loc[X_train.index])
 
-joblib.dump(model_result, "models/model_result.pkl", compress=3)
-joblib.dump(model_over, "models/model_over.pkl", compress=3)
-joblib.dump(model_btts, "models/model_btts.pkl", compress=3)
+# Create models folder
+os.makedirs("models", exist_ok=True)
+
+# Save models
+joblib.dump(model_result, "models/model_result.pkl", compress=9)
+joblib.dump(model_over, "models/model_over.pkl", compress=9)
+joblib.dump(model_btts, "models/model_btts.pkl", compress=9)
 
 print("Models saved")
