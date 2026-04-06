@@ -1,0 +1,7 @@
+data_raw/
+data_processed/
+models/
+__pycache__/
+*.csv
+*.pkl
+.env
