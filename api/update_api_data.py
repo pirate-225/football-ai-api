@@ -9,48 +9,56 @@ headers = {
     "x-apisports-key": API_KEY
 }
 
-print("Loading leagues list...")
+print("Loading leagues...")
 
 leagues_df = pd.read_csv("data_raw/leagues.csv")
 
-# 🌍 Pays importants
+# 🌍 Pays que TU veux (liste complète)
 important_countries = [
     "England", "France", "Spain", "Italy", "Germany",
     "Netherlands", "Portugal", "Belgium", "Turkey",
     "Switzerland", "Austria", "Scotland", "Denmark",
     "Norway", "Sweden", "Poland", "Czech Republic",
     "Brazil", "Argentina", "Chile", "Colombia",
-    "USA", "Mexico","Costa Rica", "Ecuador", "Paraguay", 
+    "USA", "Mexico", "Costa Rica", "Ecuador", "Paraguay",
     "Japan", "South Korea", "Bolivia", "Ireland",
     "Morocco", "Egypt", "Algeria", "South Africa",
     "Australia", "Azerbaijan", "Northern Ireland",
+    "Croatia", "Greece", "Cyprus", "Finland",
+    "Faroe Islands", "Iceland", "Lithuania", "Peru",
+    "Serbia", "Slovakia", "Venezuela", "Wales",
+    "Belarus", "Russia", "Israel", "Saudi Arabia",
+    "Georgia", "Romania", "Uruguay", "China", "Canada"
 ]
 
-# ✅ Filtrer seulement par pays (plus stable)
+# 🌍 Filtre pays
 leagues_df = leagues_df[leagues_df["country"].isin(important_countries)]
 
-print("Ligues après filtre pays :", len(leagues_df))
-
-# ⚡ Limiter à 2 ligues max par pays (L1 + L2)
+# ⚡ Garder seulement 2 ligues max par pays (D1 + D2)
 leagues_df = leagues_df.sort_values("league_id").groupby("country").head(2)
 
-print("Ligues finales :", len(leagues_df))
+# 🌍 Compétitions internationales importantes
+important_leagues_extra = [
+    2,   # Champions League
+    3,   # Europa League
+    848, # Conference League
+    1,   # World Cup
+    4,   # Euro
+    6    # Africa Cup
+]
 
-# Ligues majeures
-big_leagues = [39, 140, 135, 78, 61]
+print("Total ligues sélectionnées :", len(leagues_df))
 
 all_matches = []
 
+# 🎯 SAISONS UNIQUEMENT
+seasons = [2024, 2025]
+
+# 1️⃣ Ligues nationales
 for _, row in leagues_df.iterrows():
     league_id = row["league_id"]
     league_name = row["league_name"]
     country = row["country"]
-
-    # Choix des saisons
-    if league_id in big_leagues:
-        seasons = [2022, 2023, 2024, 2025]
-    else:
-        seasons = [2024, 2025]
 
     for season in seasons:
         print(f"Downloading {league_name} ({country}) - {season}")
@@ -82,15 +90,53 @@ for _, row in leagues_df.iterrows():
                     "season": season
                 })
 
-            time.sleep(1)
+            time.sleep(0.5)
 
         except Exception as e:
             print("Erreur:", league_name, e)
 
+# 2️⃣ Compétitions internationales
+for league_id in important_leagues_extra:
+    for season in seasons:
+        print(f"Downloading INTERNATIONAL league {league_id} - {season}")
+
+        url = "https://v3.football.api-sports.io/fixtures"
+
+        params = {
+            "league": league_id,
+            "season": season
+        }
+
+        try:
+            response = requests.get(url, headers=headers, params=params)
+            data = response.json()
+
+            fixtures = data.get("response", [])
+
+            for f in fixtures:
+                all_matches.append({
+                    "fixture_id": f["fixture"]["id"],
+                    "date": f["fixture"]["date"],
+                    "HomeTeam": f["teams"]["home"]["name"],
+                    "AwayTeam": f["teams"]["away"]["name"],
+                    "FTHG": f["goals"]["home"],
+                    "FTAG": f["goals"]["away"],
+                    "league_id": league_id,
+                    "league_name": "International",
+                    "country": "World",
+                    "season": season
+                })
+
+            time.sleep(0.5)
+
+        except Exception as e:
+            print("Erreur international:", e)
+
+# 💾 Sauvegarde
 df = pd.DataFrame(all_matches)
 
 os.makedirs("data_raw", exist_ok=True)
 df.to_csv("data_raw/api_matches_all_leagues.csv", index=False)
 
 print("✅ Download terminé")
-print("Matchs :", len(df))
+print("Matchs total :", len(df))
