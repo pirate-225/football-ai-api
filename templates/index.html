@@ -42,12 +42,25 @@
             border-bottom: 1px solid #444;
         }
 
-        .form-hot {
+        .positive {
             color: #00ffcc;
+            font-weight: bold;
         }
 
-        .form-cold {
+        .negative {
             color: red;
+        }
+
+        .bet {
+            color: #00ffcc;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .nobet {
+            color: red;
+            font-size: 20px;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -99,7 +112,7 @@
 {% if result %}
 <h2>📊 Prediction</h2>
 
-<table style="margin:auto;">
+<table>
 <tr>
     <th></th>
     <th>Home</th>
@@ -116,13 +129,13 @@
 
 <tr>
     <td>Edge</td>
-    <td style="color: {% if result.edge_home > 0 %}#00ffcc{% else %}red{% endif %}">
+    <td class="{% if result.edge_home > 0 %}positive{% else %}negative{% endif %}">
         {{ result.edge_home }}
     </td>
-    <td style="color: {% if result.edge_draw > 0 %}#00ffcc{% else %}red{% endif %}">
+    <td class="{% if result.edge_draw > 0 %}positive{% else %}negative{% endif %}">
         {{ result.edge_draw }}
     </td>
-    <td style="color: {% if result.edge_away > 0 %}#00ffcc{% else %}red{% endif %}">
+    <td class="{% if result.edge_away > 0 %}positive{% else %}negative{% endif %}">
         {{ result.edge_away }}
     </td>
 </tr>
@@ -135,6 +148,17 @@
 <p>🤝 BTTS: {{ result.prob_btts }}</p>
 
 <p>🎯 Confidence: <b>{{ result.confidence }}</b></p>
+
+<!-- SIGNAL -->
+{% if result.edge_home > 0.05 and result.prob_home > 0.4 %}
+    <p class="bet">✅ BET HOME</p>
+{% elif result.edge_away > 0.05 and result.prob_away > 0.4 %}
+    <p class="bet">✅ BET AWAY</p>
+{% elif result.edge_draw > 0.05 and result.prob_draw > 0.35 %}
+    <p class="bet">⚠️ BET DRAW</p>
+{% else %}
+    <p class="nobet">❌ NO BET</p>
+{% endif %}
 
 {% endif %}
 
