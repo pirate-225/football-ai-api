@@ -97,13 +97,45 @@
 
 <!-- RESULT -->
 {% if result %}
-<h2>Prediction</h2>
-<p>Home: {{ result.prob_home }}</p>
-<p>Draw: {{ result.prob_draw }}</p>
-<p>Away: {{ result.prob_away }}</p>
-<p>Over: {{ result.prob_over }}</p>
-<p>BTTS: {{ result.prob_btts }}</p>
-<p>Confidence: {{ result.confidence }}</p>
+<h2>📊 Prediction</h2>
+
+<table style="margin:auto;">
+<tr>
+    <th></th>
+    <th>Home</th>
+    <th>Draw</th>
+    <th>Away</th>
+</tr>
+
+<tr>
+    <td>Probability</td>
+    <td>{{ result.prob_home }}</td>
+    <td>{{ result.prob_draw }}</td>
+    <td>{{ result.prob_away }}</td>
+</tr>
+
+<tr>
+    <td>Edge</td>
+    <td style="color: {% if result.edge_home > 0 %}#00ffcc{% else %}red{% endif %}">
+        {{ result.edge_home }}
+    </td>
+    <td style="color: {% if result.edge_draw > 0 %}#00ffcc{% else %}red{% endif %}">
+        {{ result.edge_draw }}
+    </td>
+    <td style="color: {% if result.edge_away > 0 %}#00ffcc{% else %}red{% endif %}">
+        {{ result.edge_away }}
+    </td>
+</tr>
+
+</table>
+
+<br>
+
+<p>⚽ Over 2.5: {{ result.prob_over }}</p>
+<p>🤝 BTTS: {{ result.prob_btts }}</p>
+
+<p>🎯 Confidence: <b>{{ result.confidence }}</b></p>
+
 {% endif %}
 
 <!-- TABLE TEAMS -->
