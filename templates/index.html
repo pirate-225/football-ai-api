@@ -1,40 +1,93 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Football AI Predictor</title>
+    <title>Football AI PRO</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #111;
+            color: white;
+            text-align: center;
+        }
+
+        h1 {
+            color: #00ffcc;
+        }
+
+        select, input, button {
+            padding: 10px;
+            margin: 5px;
+            border-radius: 5px;
+            border: none;
+        }
+
+        button {
+            background: #00ffcc;
+            color: black;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        table {
+            margin: auto;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 10px;
+            border-bottom: 1px solid #444;
+        }
+
+        .form-hot {
+            color: #00ffcc;
+        }
+
+        .form-cold {
+            color: red;
+        }
+    </style>
 </head>
+
 <body>
 
-<h1>Football AI Predictor</h1>
+<h1>⚽ Football AI PRO</h1>
 
 <form method="POST">
 
-    <label>Home Team:</label>
-    <select name="home_team">
-        {% for team in teams %}
-        <option value="{{ team }}">{{ team }}</option>
+    <!-- FILTRE LIGUE -->
+    <select name="league">
+        <option value="All">All Leagues</option>
+        {% for l in leagues %}
+        <option value="{{ l }}" {% if l == selected_league %}selected{% endif %}>
+            {{ l }}
+        </option>
         {% endfor %}
     </select>
 
     <br><br>
 
-    <label>Away Team:</label>
-    <select name="away_team">
-        {% for team in teams %}
-        <option value="{{ team }}">{{ team }}</option>
+    <!-- SELECT TEAMS -->
+    <select name="home_team" class="team-select" style="width:300px;">
+        {% for t in teams["Team"] %}
+        <option value="{{ t }}">{{ t }}</option>
+        {% endfor %}
+    </select>
+
+    <select name="away_team" class="team-select" style="width:300px;">
+        {% for t in teams["Team"] %}
+        <option value="{{ t }}">{{ t }}</option>
         {% endfor %}
     </select>
 
     <br><br>
 
-    <label>Odds Home:</label>
-    <input type="text" name="odds_home">
-
-    <label>Odds Draw:</label>
-    <input type="text" name="odds_draw">
-
-    <label>Odds Away:</label>
-    <input type="text" name="odds_away">
+    <input type="text" name="odds_home" placeholder="Home Odds">
+    <input type="text" name="odds_draw" placeholder="Draw Odds">
+    <input type="text" name="odds_away" placeholder="Away Odds">
 
     <br><br>
 
@@ -42,18 +95,57 @@
 
 </form>
 
+<!-- RESULT -->
 {% if result %}
 <h2>Prediction</h2>
-<p>Home Probability: {{ result.prob_home }}</p>
-<p>Draw Probability: {{ result.prob_draw }}</p>
-<p>Away Probability: {{ result.prob_away }}</p>
-<p>Over 2.5 Probability: {{ result.prob_over }}</p>
-<p>BTTS Probability: {{ result.prob_btts }}</p>
-<p>Edge Home: {{ result.edge_home }}</p>
-<p>Edge Draw: {{ result.edge_draw }}</p>
-<p>Edge Away: {{ result.edge_away }}</p>
+<p>Home: {{ result.prob_home }}</p>
+<p>Draw: {{ result.prob_draw }}</p>
+<p>Away: {{ result.prob_away }}</p>
+<p>Over: {{ result.prob_over }}</p>
+<p>BTTS: {{ result.prob_btts }}</p>
 <p>Confidence: {{ result.confidence }}</p>
 {% endif %}
+
+<!-- TABLE TEAMS -->
+<h2>📊 Teams Ranking</h2>
+
+<table>
+<tr>
+    <th>Team</th>
+    <th>PPG</th>
+    <th>Form</th>
+</tr>
+
+{% for _, row in teams.iterrows() %}
+<tr>
+    <td>{{ row["Team"] }}</td>
+    <td>{{ "%.2f"|format(row["PointsPerGame"]) }}</td>
+    <td>
+        {% if row["Form"] > 0.6 %}
+            🔥🔥🔥
+        {% elif row["Form"] > 0.4 %}
+            🔥🔥
+        {% elif row["Form"] > 0.2 %}
+            🔥
+        {% else %}
+            ❄️
+        {% endif %}
+    </td>
+</tr>
+{% endfor %}
+</table>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        $('.team-select').select2({
+            placeholder: "Search team...",
+            allowClear: true
+        });
+    });
+</script>
 
 </body>
 </html>
