@@ -8,7 +8,7 @@ teams = pd.read_csv("data_processed/team_stats.csv")
 
 features = []
 
-for index, row in matches.iterrows():
+for _, row in matches.iterrows():
 
     home_team = row["HomeTeam"]
     away_team = row["AwayTeam"]
@@ -31,13 +31,21 @@ for index, row in matches.iterrows():
     home_form = home["Form"]
     away_form = away["Form"]
 
-    home_elo = home["Elo"]
-    away_elo = away["Elo"]
+    # 🔥 nouvelles features
+    ppg_diff = home_ppg - away_ppg
+    goal_diff_diff = home_goal_diff - away_goal_diff
+    form_diff = home_form - away_form
 
-    home_pos = home["Position"]
-    away_pos = away["Position"]
+    # 🔥 TEAM STRENGTH
+    strength_home = home_ppg + home_goal_diff
+    strength_away = away_ppg + away_goal_diff
+    strength_diff = strength_home - strength_away
 
-    result = 0
+    # 🔥 filtrer matchs trop équilibrés
+    if abs(ppg_diff) < 0.1:
+        continue
+
+    # target
     if row["FTHG"] > row["FTAG"]:
         result = 0
     elif row["FTHG"] == row["FTAG"]:
@@ -51,11 +59,10 @@ for index, row in matches.iterrows():
     features.append([
         home_ppg,
         away_ppg,
-        home_ppg - away_ppg,
-        home_goal_diff - away_goal_diff,
-        home_pos - away_pos,
-        home_elo - away_elo,
-        home_form - away_form,
+        ppg_diff,
+        goal_diff_diff,
+        form_diff,
+        strength_diff,
         result,
         over25,
         btts
@@ -66,9 +73,8 @@ df = pd.DataFrame(features, columns=[
     "away_ppg",
     "ppg_diff",
     "goal_diff_diff",
-    "position_diff",
-    "elo_diff",
     "form_diff",
+    "strength_diff",
     "result",
     "over25",
     "btts"

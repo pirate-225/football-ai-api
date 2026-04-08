@@ -1,28 +1,16 @@
 import pandas as pd
 import joblib
-import os
 
-def load_models():
-    model_result = joblib.load("models/model_result.pkl")
-    model_over = joblib.load("models/model_over.pkl")
-    model_btts = joblib.load("models/model_btts.pkl")
-    return model_result, model_over, model_btts
+teams = pd.read_csv("data_processed/team_stats.csv")
 
-def load_team_stats():
-    if not os.path.exists("data_processed/team_stats.csv"):
-        return None
-    return pd.read_csv("data_processed/team_stats.csv")
+model_result = joblib.load("models/model_result.pkl")
+model_over = joblib.load("models/model_over.pkl")
+model_btts = joblib.load("models/model_btts.pkl")
 
-def predict_match(home_team, away_team, odds_home, odds_draw, odds_away):
+def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
 
-    team_stats = load_team_stats()
-    if team_stats is None:
-        return {"error": "Team stats not ready yet"}
-
-    model_result, model_over, model_btts = load_models()
-
-    home = team_stats[team_stats["Team"] == home_team].iloc[0]
-    away = team_stats[team_stats["Team"] == away_team].iloc[0]
+    home = teams[teams["Team"] == home_team].iloc[0]
+    away = teams[teams["Team"] == away_team].iloc[0]
 
     home_ppg = home["PointsPerGame"]
     away_ppg = away["PointsPerGame"]
@@ -33,38 +21,36 @@ def predict_match(home_team, away_team, odds_home, odds_draw, odds_away):
     home_form = home["Form"]
     away_form = away["Form"]
 
-    elo_home = home["Elo"]
-    elo_away = away["Elo"]
+    ppg_diff = home_ppg - away_ppg
+    goal_diff_diff = home_goal_diff - away_goal_diff
+    form_diff = home_form - away_form
 
-    position_home = home["Position"]
-    position_away = away["Position"]
+    strength_home = home_ppg + home_goal_diff
+    strength_away = away_ppg + away_goal_diff
+    strength_diff = strength_home - strength_away
 
-    features = [[
+    X = [[
         home_ppg,
         away_ppg,
-        home_ppg - away_ppg,
-        home_goal_diff - away_goal_diff,
-        position_home - position_away,
-        elo_home - elo_away,
-        home_form - away_form
+        ppg_diff,
+        goal_diff_diff,
+        form_diff,
+        strength_diff
     ]]
 
-    probs = model_result.predict_proba(features)[0]
+    probs = model_result.predict_proba(X)[0]
 
     prob_home = probs[0]
     prob_draw = probs[1]
     prob_away = probs[2]
 
-    prob_over = model_over.predict_proba(features)[0][1]
-    prob_btts = model_btts.predict_proba(features)[0][1]
+    prob_over = model_over.predict_proba(X)[0][1]
+    prob_btts = model_btts.predict_proba(X)[0][1]
 
-    book_home = 1 / float(odds_home)
-    book_draw = 1 / float(odds_draw)
-    book_away = 1 / float(odds_away)
-
-    edge_home = prob_home - book_home
-    edge_draw = prob_draw - book_draw
-    edge_away = prob_away - book_away
+    # EDGE
+    edge_home = prob_home - (1 / float(odd_home))
+    edge_draw = prob_draw - (1 / float(odd_draw))
+    edge_away = prob_away - (1 / float(odd_away))
 
     confidence = max(prob_home, prob_draw, prob_away)
 

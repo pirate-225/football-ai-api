@@ -1,89 +1,82 @@
 import pandas as pd
+import os
 
-print("Loading matches...")
+print("Building team stats...")
+
 matches = pd.read_csv("data_processed/master_dataset.csv")
 
-teams = pd.concat([matches["HomeTeam"], matches["AwayTeam"]]).unique()
+# ⚠️ utiliser uniquement saison actuelle
+matches = matches[matches["season"] == 2025]
 
-team_stats = []
+teams = pd.unique(matches[["HomeTeam", "AwayTeam"]].values.ravel())
+
+stats = []
 
 for team in teams:
-    home_matches = matches[matches["HomeTeam"] == team]
-    away_matches = matches[matches["AwayTeam"] == team]
+    team_matches_home = matches[matches["HomeTeam"] == team]
+    team_matches_away = matches[matches["AwayTeam"] == team]
 
-    played = len(home_matches) + len(away_matches)
-    if played == 0:
+    all_matches = pd.concat([team_matches_home, team_matches_away])
+
+    if len(all_matches) < 5:
         continue
 
-    # Goals scored / conceded
-    goals_scored = home_matches["FTHG"].sum() + away_matches["FTAG"].sum()
-    goals_conceded = home_matches["FTAG"].sum() + away_matches["FTHG"].sum()
+    # 🔥 FORM dynamique (5 derniers matchs)
+    last_matches = all_matches.sort_values("date").tail(5)
 
-    # Points
     points = 0
-    for _, row in home_matches.iterrows():
-        if row["FTHG"] > row["FTAG"]:
-            points += 3
-        elif row["FTHG"] == row["FTAG"]:
-            points += 1
+    goals_scored = 0
+    goals_conceded = 0
 
-    for _, row in away_matches.iterrows():
-        if row["FTAG"] > row["FTHG"]:
-            points += 3
-        elif row["FTAG"] == row["FTHG"]:
-            points += 1
+    for _, m in last_matches.iterrows():
+        if m["HomeTeam"] == team:
+            goals_scored += m["FTHG"]
+            goals_conceded += m["FTAG"]
 
-    points_per_game = points / played
-    goal_diff = (goals_scored - goals_conceded) / played
-
-    # Form last 5 matches
-    last_matches = pd.concat([home_matches, away_matches]).sort_values("date").tail(5)
-    form_points = 0
-
-    for _, row in last_matches.iterrows():
-        if row["HomeTeam"] == team:
-            if row["FTHG"] > row["FTAG"]:
-                form_points += 3
-            elif row["FTHG"] == row["FTAG"]:
-                form_points += 1
+            if m["FTHG"] > m["FTAG"]:
+                points += 3
+            elif m["FTHG"] == m["FTAG"]:
+                points += 1
         else:
-            if row["FTAG"] > row["FTHG"]:
-                form_points += 3
-            elif row["FTAG"] == row["FTHG"]:
-                form_points += 1
+            goals_scored += m["FTAG"]
+            goals_conceded += m["FTHG"]
 
-    form = form_points / 5
+            if m["FTAG"] > m["FTHG"]:
+                points += 3
+            elif m["FTAG"] == m["FTHG"]:
+                points += 1
 
-    # Elo
-    elo_home = home_matches["elo_home"].mean() if "elo_home" in home_matches else 1500
-    elo_away = away_matches["elo_away"].mean() if "elo_away" in away_matches else 1500
-    elo = (elo_home + elo_away) / 2
+    form = points / 15  # max = 15 points
+    goal_diff = goals_scored - goals_conceded
 
-    # Position (approx via points)
-    position_points = points
+    # 🔥 PPG global saison
+    total_matches = len(all_matches)
+    total_points = 0
 
-    team_stats.append([
-        team,
-        points_per_game,
-        goal_diff,
-        form,
-        elo,
-        position_points
-    ])
+    for _, m in all_matches.iterrows():
+        if m["HomeTeam"] == team:
+            if m["FTHG"] > m["FTAG"]:
+                total_points += 3
+            elif m["FTHG"] == m["FTAG"]:
+                total_points += 1
+        else:
+            if m["FTAG"] > m["FTHG"]:
+                total_points += 3
+            elif m["FTAG"] == m["FTHG"]:
+                total_points += 1
 
-team_stats_df = pd.DataFrame(team_stats, columns=[
-    "Team",
-    "PointsPerGame",
-    "GoalDiff",
-    "Form",
-    "Elo",
-    "Points"
-])
+    ppg = total_points / total_matches if total_matches > 0 else 0
 
-# Position based on points
-team_stats_df = team_stats_df.sort_values("Points", ascending=False)
-team_stats_df["Position"] = range(1, len(team_stats_df) + 1)
+    stats.append({
+        "Team": team,
+        "PointsPerGame": ppg,
+        "GoalDiff": goal_diff,
+        "Form": form
+    })
 
-team_stats_df.to_csv("data_processed/team_stats.csv", index=False)
+df = pd.DataFrame(stats)
+
+os.makedirs("data_processed", exist_ok=True)
+df.to_csv("data_processed/team_stats.csv", index=False)
 
 print("team_stats.csv created")
