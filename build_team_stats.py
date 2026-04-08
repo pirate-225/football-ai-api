@@ -5,30 +5,30 @@ print("Building team stats...")
 
 matches = pd.read_csv("data_processed/master_dataset.csv")
 
-# ⚠️ utiliser uniquement saison actuelle
-matches = matches[matches["season"] == 2025]
+# ⚠️ garder saison récente
+matches = matches[matches["season"].isin([2024, 2025])]
 
 teams = pd.unique(matches[["HomeTeam", "AwayTeam"]].values.ravel())
 
 stats = []
 
 for team in teams:
-    team_matches_home = matches[matches["HomeTeam"] == team]
-    team_matches_away = matches[matches["AwayTeam"] == team]
+    home = matches[matches["HomeTeam"] == team]
+    away = matches[matches["AwayTeam"] == team]
 
-    all_matches = pd.concat([team_matches_home, team_matches_away])
+    all_matches = pd.concat([home, away])
 
-    if len(all_matches) < 5:
+    if len(all_matches) < 10:
         continue
 
-    # 🔥 FORM dynamique (5 derniers matchs)
-    last_matches = all_matches.sort_values("date").tail(5)
+    # 🔥 derniers matchs (form)
+    last = all_matches.sort_values("date").tail(5)
 
-    points = 0
     goals_scored = 0
     goals_conceded = 0
+    points = 0
 
-    for _, m in last_matches.iterrows():
+    for _, m in last.iterrows():
         if m["HomeTeam"] == team:
             goals_scored += m["FTHG"]
             goals_conceded += m["FTAG"]
@@ -46,10 +46,9 @@ for team in teams:
             elif m["FTAG"] == m["FTHG"]:
                 points += 1
 
-    form = points / 15  # max = 15 points
-    goal_diff = goals_scored - goals_conceded
+    form = points / 15
 
-    # 🔥 PPG global saison
+    # 🔥 stats globales
     total_matches = len(all_matches)
     total_points = 0
 
@@ -65,13 +64,19 @@ for team in teams:
             elif m["FTAG"] == m["FTHG"]:
                 total_points += 1
 
-    ppg = total_points / total_matches if total_matches > 0 else 0
+    ppg = total_points / total_matches
+
+    # 🔥 nouvelles features CRUCIALES
+    goals_scored_avg = goals_scored / len(last)
+    goals_conceded_avg = goals_conceded / len(last)
 
     stats.append({
         "Team": team,
         "PointsPerGame": ppg,
-        "GoalDiff": goal_diff,
-        "Form": form
+        "Form": form,
+        "GoalsScoredAvg": goals_scored_avg,
+        "GoalsConcededAvg": goals_conceded_avg,
+        "MatchesPlayed": total_matches
     })
 
 df = pd.DataFrame(stats)

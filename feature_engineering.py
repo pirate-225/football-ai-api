@@ -22,28 +22,33 @@ for _, row in matches.iterrows():
     home = home.iloc[0]
     away = away.iloc[0]
 
+    # 🔥 variables
     home_ppg = home["PointsPerGame"]
     away_ppg = away["PointsPerGame"]
-
-    home_goal_diff = home["GoalDiff"]
-    away_goal_diff = away["GoalDiff"]
 
     home_form = home["Form"]
     away_form = away["Form"]
 
-    # 🔥 nouvelles features
+    home_attack = home["GoalsScoredAvg"]
+    away_attack = away["GoalsScoredAvg"]
+
+    home_defense = home["GoalsConcededAvg"]
+    away_defense = away["GoalsConcededAvg"]
+
+    home_exp = home["MatchesPlayed"]
+    away_exp = away["MatchesPlayed"]
+
+    # 🔥 différences
     ppg_diff = home_ppg - away_ppg
-    goal_diff_diff = home_goal_diff - away_goal_diff
     form_diff = home_form - away_form
+    attack_diff = home_attack - away_attack
+    defense_diff = home_defense - away_defense
+    exp_diff = home_exp - away_exp
 
-    # 🔥 TEAM STRENGTH
-    strength_home = home_ppg + home_goal_diff
-    strength_away = away_ppg + away_goal_diff
+    # 🔥 strength pondérée (IMPORTANT)
+    strength_home = home_ppg * 0.7 + home_attack * 0.3
+    strength_away = away_ppg * 0.7 + away_attack * 0.3
     strength_diff = strength_home - strength_away
-
-    # 🔥 filtrer matchs trop équilibrés
-    if abs(ppg_diff) < 0.1:
-        continue
 
     # target
     if row["FTHG"] > row["FTAG"]:
@@ -60,9 +65,11 @@ for _, row in matches.iterrows():
         home_ppg,
         away_ppg,
         ppg_diff,
-        goal_diff_diff,
         form_diff,
+        attack_diff,
+        defense_diff,
         strength_diff,
+        exp_diff,
         result,
         over25,
         btts
@@ -72,9 +79,11 @@ df = pd.DataFrame(features, columns=[
     "home_ppg",
     "away_ppg",
     "ppg_diff",
-    "goal_diff_diff",
     "form_diff",
+    "attack_diff",
+    "defense_diff",
     "strength_diff",
+    "exp_diff",
     "result",
     "over25",
     "btts"
