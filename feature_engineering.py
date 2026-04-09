@@ -10,11 +10,8 @@ features = []
 
 for _, row in matches.iterrows():
 
-    home_team = row["HomeTeam"]
-    away_team = row["AwayTeam"]
-
-    home = teams[teams["Team"] == home_team]
-    away = teams[teams["Team"] == away_team]
+    home = teams[teams["Team"] == row["HomeTeam"]]
+    away = teams[teams["Team"] == row["AwayTeam"]]
 
     if home.empty or away.empty:
         continue
@@ -22,35 +19,23 @@ for _, row in matches.iterrows():
     home = home.iloc[0]
     away = away.iloc[0]
 
-    # 🔥 variables
-    home_ppg = home["PointsPerGame"]
-    away_ppg = away["PointsPerGame"]
+    # -------- FEATURES --------
+    ppg_diff = home["PPG"] - away["PPG"]
+    home_adv = home["HomePPG"] - away["AwayPPG"]
 
-    home_form = home["Form"]
-    away_form = away["Form"]
+    form_diff = home["Form"] - away["Form"]
 
-    home_attack = home["GoalsScoredAvg"]
-    away_attack = away["GoalsScoredAvg"]
+    attack_diff = home["GoalsScoredAvg"] - away["GoalsScoredAvg"]
+    defense_diff = home["GoalsConcededAvg"] - away["GoalsConcededAvg"]
 
-    home_defense = home["GoalsConcededAvg"]
-    away_defense = away["GoalsConcededAvg"]
+    clean_diff = home["CleanSheetRate"] - away["CleanSheetRate"]
+    fail_diff = home["FailToScoreRate"] - away["FailToScoreRate"]
 
-    home_exp = home["MatchesPlayed"]
-    away_exp = away["MatchesPlayed"]
+    elo_diff = home["ELO"] - away["ELO"]
 
-    # 🔥 différences
-    ppg_diff = home_ppg - away_ppg
-    form_diff = home_form - away_form
-    attack_diff = home_attack - away_attack
-    defense_diff = home_defense - away_defense
-    exp_diff = home_exp - away_exp
+    exp_diff = home["MatchesPlayed"] - away["MatchesPlayed"]
 
-    # 🔥 strength pondérée (IMPORTANT)
-    strength_home = home_ppg * 0.7 + home_attack * 0.3
-    strength_away = away_ppg * 0.7 + away_attack * 0.3
-    strength_diff = strength_home - strength_away
-
-    # target
+    # -------- TARGET --------
     if row["FTHG"] > row["FTAG"]:
         result = 0
     elif row["FTHG"] == row["FTAG"]:
@@ -62,13 +47,14 @@ for _, row in matches.iterrows():
     btts = 1 if (row["FTHG"] > 0 and row["FTAG"] > 0) else 0
 
     features.append([
-        home_ppg,
-        away_ppg,
         ppg_diff,
+        home_adv,
         form_diff,
         attack_diff,
         defense_diff,
-        strength_diff,
+        clean_diff,
+        fail_diff,
+        elo_diff,
         exp_diff,
         result,
         over25,
@@ -76,13 +62,14 @@ for _, row in matches.iterrows():
     ])
 
 df = pd.DataFrame(features, columns=[
-    "home_ppg",
-    "away_ppg",
     "ppg_diff",
+    "home_adv",
     "form_diff",
     "attack_diff",
     "defense_diff",
-    "strength_diff",
+    "clean_diff",
+    "fail_diff",
+    "elo_diff",
     "exp_diff",
     "result",
     "over25",

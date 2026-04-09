@@ -17,6 +17,17 @@
             color: #00ffcc;
         }
 
+        table {
+            margin: auto;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 10px;
+            border-bottom: 1px solid #444;
+        }
+
         select, input, button {
             padding: 10px;
             margin: 5px;
@@ -28,40 +39,13 @@
             background: #00ffcc;
             color: black;
             font-weight: bold;
-            cursor: pointer;
         }
 
-        table {
-            margin: auto;
-            margin-top: 20px;
-            border-collapse: collapse;
-        }
+        .positive { color: #00ffcc; }
+        .negative { color: red; }
 
-        th, td {
-            padding: 10px;
-            border-bottom: 1px solid #444;
-        }
-
-        .positive {
-            color: #00ffcc;
-            font-weight: bold;
-        }
-
-        .negative {
-            color: red;
-        }
-
-        .bet {
-            color: #00ffcc;
-            font-size: 20px;
-            font-weight: bold;
-        }
-
-        .nobet {
-            color: red;
-            font-size: 20px;
-            font-weight: bold;
-        }
+        .bet { color: #00ffcc; font-size: 20px; }
+        .nobet { color: red; font-size: 20px; }
     </style>
 </head>
 
@@ -69,42 +53,53 @@
 
 <h1>⚽ Football AI PRO</h1>
 
+<!-- MATCHS DU JOUR -->
+<h2>📅 Today's Matches</h2>
+
+<table>
+<tr>
+    <th>League</th>
+    <th>Home</th>
+    <th>Away</th>
+    <th>Time</th>
+</tr>
+
+{% for match in today_matches %}
+<tr>
+    <td>{{ match.league }}</td>
+    <td>{{ match.home }}</td>
+    <td>{{ match.away }}</td>
+    <td>{{ match.time }}</td>
+</tr>
+{% endfor %}
+</table>
+
+<br><br>
+
+<!-- FORMULAIRE -->
 <form method="POST">
 
-    <!-- FILTRE LIGUE -->
-    <select name="league">
-        <option value="All">All Leagues</option>
-        {% for l in leagues %}
-        <option value="{{ l }}" {% if l == selected_league %}selected{% endif %}>
-            {{ l }}
-        </option>
-        {% endfor %}
-    </select>
+<select name="home_team" class="team-select" style="width:250px;">
+{% for t in teams["Team"] %}
+<option value="{{ t }}">{{ t }}</option>
+{% endfor %}
+</select>
 
-    <br><br>
+<select name="away_team" class="team-select" style="width:250px;">
+{% for t in teams["Team"] %}
+<option value="{{ t }}">{{ t }}</option>
+{% endfor %}
+</select>
 
-    <!-- SELECT TEAMS -->
-    <select name="home_team" class="team-select" style="width:300px;">
-        {% for t in teams["Team"] %}
-        <option value="{{ t }}">{{ t }}</option>
-        {% endfor %}
-    </select>
+<br>
 
-    <select name="away_team" class="team-select" style="width:300px;">
-        {% for t in teams["Team"] %}
-        <option value="{{ t }}">{{ t }}</option>
-        {% endfor %}
-    </select>
+<input type="text" name="odds_home" placeholder="Home Odds">
+<input type="text" name="odds_draw" placeholder="Draw Odds">
+<input type="text" name="odds_away" placeholder="Away Odds">
 
-    <br><br>
+<br>
 
-    <input type="text" name="odds_home" placeholder="Home Odds">
-    <input type="text" name="odds_draw" placeholder="Draw Odds">
-    <input type="text" name="odds_away" placeholder="Away Odds">
-
-    <br><br>
-
-    <button type="submit">Predict</button>
+<button type="submit">Predict</button>
 
 </form>
 
@@ -139,68 +134,29 @@
         {{ result.edge_away }}
     </td>
 </tr>
-
 </table>
 
-<br>
-
-<p>⚽ Over 2.5: {{ result.prob_over }}</p>
+<p>⚽ Over: {{ result.prob_over }}</p>
 <p>🤝 BTTS: {{ result.prob_btts }}</p>
+<p>🎯 Confidence: {{ result.confidence }}</p>
 
-<p>🎯 Confidence: <b>{{ result.confidence }}</b></p>
-
-<!-- SIGNAL -->
-{% if result.edge_home > 0.05 and result.prob_home > 0.4 %}
-    <p class="bet">✅ BET HOME</p>
-{% elif result.edge_away > 0.05 and result.prob_away > 0.4 %}
-    <p class="bet">✅ BET AWAY</p>
-{% elif result.edge_draw > 0.05 and result.prob_draw > 0.35 %}
-    <p class="bet">⚠️ BET DRAW</p>
+{% if result.edge_home > 0.05 and result.prob_home > 0.45 %}
+<p class="bet">✅ BET HOME</p>
+{% elif result.edge_away > 0.05 and result.prob_away > 0.45 %}
+<p class="bet">✅ BET AWAY</p>
 {% else %}
-    <p class="nobet">❌ NO BET</p>
+<p class="nobet">❌ NO BET</p>
 {% endif %}
 
 {% endif %}
-
-<!-- TABLE TEAMS -->
-<h2>📊 Teams Ranking</h2>
-
-<table>
-<tr>
-    <th>Team</th>
-    <th>PPG</th>
-    <th>Form</th>
-</tr>
-
-{% for _, row in teams.iterrows() %}
-<tr>
-    <td>{{ row["Team"] }}</td>
-    <td>{{ "%.2f"|format(row["PointsPerGame"]) }}</td>
-    <td>
-        {% if row["Form"] > 0.6 %}
-            🔥🔥🔥
-        {% elif row["Form"] > 0.4 %}
-            🔥🔥
-        {% elif row["Form"] > 0.2 %}
-            🔥
-        {% else %}
-            ❄️
-        {% endif %}
-    </td>
-</tr>
-{% endfor %}
-</table>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
 
 <script>
-    $(document).ready(function() {
-        $('.team-select').select2({
-            placeholder: "Search team...",
-            allowClear: true
-        });
-    });
+$(document).ready(function() {
+    $('.team-select').select2();
+});
 </script>
 
 </body>

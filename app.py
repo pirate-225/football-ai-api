@@ -1,28 +1,17 @@
 from flask import Flask, render_template, request
 import pandas as pd
 from predict_match import predict_match
+from api.get_today_matches import get_today_matches
 
 app = Flask(__name__)
 
 teams_df = pd.read_csv("data_processed/team_stats.csv")
 
-def get_leagues():
-    if "league_name" in teams_df.columns:
-        return sorted(teams_df["league_name"].unique())
-    return ["All"]
-
 @app.route("/", methods=["GET", "POST"])
 def index():
+
     result = None
-
-    league = request.form.get("league") if request.method == "POST" else None
-
-    if league and league != "All":
-        teams = teams_df[teams_df["league_name"] == league]
-    else:
-        teams = teams_df
-
-    teams_list = teams.sort_values("PointsPerGame", ascending=False)
+    today_matches = get_today_matches()
 
     if request.method == "POST":
         home_team = request.form["home_team"]
@@ -36,10 +25,9 @@ def index():
 
     return render_template(
         "index.html",
-        teams=teams_list,
-        leagues=get_leagues(),
-        selected_league=league,
-        result=result
+        teams=teams_df,
+        result=result,
+        today_matches=today_matches
     )
 
 if __name__ == "__main__":
