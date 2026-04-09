@@ -1,39 +1,45 @@
 import pandas as pd
-import joblib
 
 teams = pd.read_csv("data_processed/team_stats.csv")
-
-model_result = joblib.load("models/model_result.pkl")
-model_over = joblib.load("models/model_over.pkl")
-model_btts = joblib.load("models/model_btts.pkl")
 
 def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
 
     home = teams[teams["Team"] == home_team].iloc[0]
     away = teams[teams["Team"] == away_team].iloc[0]
 
-    X = [[
-        home["PPG"] - away["PPG"],
-        home["HomePPG"] - away["AwayPPG"],
-        home["Form"] - away["Form"],
-        home["GoalsScoredAvg"] - away["GoalsScoredAvg"],
-        home["GoalsConcededAvg"] - away["GoalsConcededAvg"],
-        home["CleanSheetRate"] - away["CleanSheetRate"],
-        home["FailToScoreRate"] - away["FailToScoreRate"],
-        home["ELO"] - away["ELO"],
-        home["MatchesPlayed"] - away["MatchesPlayed"],
-        0  # league_diff par défaut si absent
-    ]]
+    # 🔥 FORCE SIMPLE ET LOGIQUE
+    home_strength = (
+        home["PPG"] * 0.5 +
+        home["HomePPG"] * 0.3 +
+        home["Form"] * 0.2
+    )
 
-    probs = model_result.predict_proba(X)[0]
-    # 🔥 inversion possible (test)
-    prob_home = probs[2]
-    prob_draw = probs[1]
-    prob_away = probs[0]
+    away_strength = (
+        away["PPG"] * 0.5 +
+        away["AwayPPG"] * 0.3 +
+        away["Form"] * 0.2
+    )
 
-    prob_over = model_over.predict_proba(X)[0][1]
-    prob_btts = model_btts.predict_proba(X)[0][1]
+    total = home_strength + away_strength
 
+    prob_home = home_strength / total
+    prob_away = away_strength / total
+    prob_draw = 1 - (prob_home + prob_away)
+
+    # 🔥 CORRECTION DRAW
+    prob_draw = max(0.2, prob_draw)
+
+    # NORMALISATION
+    s = prob_home + prob_draw + prob_away
+    prob_home /= s
+    prob_draw /= s
+    prob_away /= s
+
+    # OVER / BTTS basés sur goals
+    prob_over = (home["GoalsScoredAvg"] + away["GoalsScoredAvg"]) / 4
+    prob_btts = (1 - home["FailToScoreRate"]) * (1 - away["FailToScoreRate"])
+
+    # EDGE
     edge_home = prob_home - (1 / float(odd_home))
     edge_draw = prob_draw - (1 / float(odd_draw))
     edge_away = prob_away - (1 / float(odd_away))
