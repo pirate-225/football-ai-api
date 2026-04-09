@@ -7,7 +7,7 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
     home = teams[teams["Team"] == home_team].iloc[0]
     away = teams[teams["Team"] == away_team].iloc[0]
 
-    # 🔥 FORCE SIMPLE ET LOGIQUE
+    # 🔥 FORCE RÉELLE (TRÈS IMPORTANT)
     home_strength = (
         home["PPG"] * 0.5 +
         home["HomePPG"] * 0.3 +
@@ -20,26 +20,36 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
         away["Form"] * 0.2
     )
 
+    # 🔥 AVANTAGE DOMICILE
+    home_strength *= 1.10
+
+    # 🔥 NORMALISATION
     total = home_strength + away_strength
 
     prob_home = home_strength / total
     prob_away = away_strength / total
-    prob_draw = 1 - (prob_home + prob_away)
 
-    # 🔥 CORRECTION DRAW
-    prob_draw = max(0.2, prob_draw)
+    # 🔥 DRAW réaliste
+    prob_draw = 0.25 - abs(prob_home - prob_away) * 0.2
+    prob_draw = max(0.15, prob_draw)
 
-    # NORMALISATION
+    # 🔥 NORMALISATION FINALE
     s = prob_home + prob_draw + prob_away
     prob_home /= s
     prob_draw /= s
     prob_away /= s
 
-    # OVER / BTTS basés sur goals
-    prob_over = (home["GoalsScoredAvg"] + away["GoalsScoredAvg"]) / 4
-    prob_btts = (1 - home["FailToScoreRate"]) * (1 - away["FailToScoreRate"])
+    # 🔥 OVER LOGIQUE
+    avg_goals = home["GoalsScoredAvg"] + away["GoalsScoredAvg"]
+    prob_over = min(0.75, avg_goals / 3)
 
-    # EDGE
+    # 🔥 BTTS LOGIQUE
+    prob_btts = (
+        (1 - home["FailToScoreRate"]) *
+        (1 - away["FailToScoreRate"])
+    )
+
+    # 🔥 EDGE CORRECT
     edge_home = prob_home - (1 / float(odd_home))
     edge_draw = prob_draw - (1 / float(odd_draw))
     edge_away = prob_away - (1 / float(odd_away))
