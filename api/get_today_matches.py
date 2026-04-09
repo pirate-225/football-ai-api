@@ -2,15 +2,21 @@ import requests
 import os
 from datetime import datetime
 
-API_KEY = os.getenv("3b63a56a290a3bd3d4b00c5b232d37d3")
-
-headers = {
-    "x-apisports-key": API_KEY
-}
-
 def get_today_matches():
 
+    API_KEY = os.getenv("3b63a56a290a3bd3d4b00c5b232d37d3")
+
+    if not API_KEY:
+        print("❌ API_KEY manquante")
+        return []
+
+    headers = {
+        "x-apisports-key": API_KEY
+    }
+
     today = datetime.now().strftime("%Y-%m-%d")
+
+    print("📅 Date envoyée à API :", today)
 
     url = "https://v3.football.api-sports.io/fixtures"
 
@@ -18,20 +24,30 @@ def get_today_matches():
         "date": today
     }
 
-    response = requests.get(url, headers=headers, params=params)
-    data = response.json()
+    try:
+        response = requests.get(url, headers=headers, params=params)
 
-    matches = []
+        print("📡 Status API :", response.status_code)
 
-    for m in data.get("response", []):
+        data = response.json()
 
-        match = {
-            "league": m["league"]["name"],
-            "home": m["teams"]["home"]["name"],
-            "away": m["teams"]["away"]["name"],
-            "time": m["fixture"]["date"][11:16]  # HH:MM
-        }
+        print("📊 Nombre de matchs reçus :", len(data.get("response", [])))
 
-        matches.append(match)
+        matches = []
 
-    return matches
+        for m in data.get("response", []):
+
+            match = {
+                "league": m["league"]["name"],
+                "home": m["teams"]["home"]["name"],
+                "away": m["teams"]["away"]["name"],
+                "time": m["fixture"]["date"][11:16]
+            }
+
+            matches.append(match)
+
+        return matches
+
+    except Exception as e:
+        print("❌ ERREUR API :", e)
+        return []
