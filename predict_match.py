@@ -7,52 +7,58 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
     home = teams[teams["Team"] == home_team].iloc[0]
     away = teams[teams["Team"] == away_team].iloc[0]
 
-    # 🔥 FORCE RÉELLE (TRÈS IMPORTANT)
-    home_strength = (
+    # 🔥 1. BASE = BOOKMAKER (TRÈS IMPORTANT)
+    imp_home = 1 / float(odd_home)
+    imp_draw = 1 / float(odd_draw)
+    imp_away = 1 / float(odd_away)
+
+    total_imp = imp_home + imp_draw + imp_away
+
+    prob_home = imp_home / total_imp
+    prob_draw = imp_draw / total_imp
+    prob_away = imp_away / total_imp
+
+    # 🔥 2. AJUSTEMENT AVEC TES DATA
+    strength_home = (
         home["PPG"] * 0.5 +
         home["HomePPG"] * 0.3 +
         home["Form"] * 0.2
     )
 
-    away_strength = (
+    strength_away = (
         away["PPG"] * 0.5 +
         away["AwayPPG"] * 0.3 +
         away["Form"] * 0.2
     )
 
-    # 🔥 AVANTAGE DOMICILE
-    home_strength *= 1.10
+    diff = strength_home - strength_away
 
-    # 🔥 NORMALISATION
-    total = home_strength + away_strength
+    # 🔥 petit ajustement (clé du système)
+    adjustment = diff * 0.05
 
-    prob_home = home_strength / total
-    prob_away = away_strength / total
+    prob_home += adjustment
+    prob_away -= adjustment
 
-    # 🔥 DRAW réaliste
-    prob_draw = 0.25 - abs(prob_home - prob_away) * 0.2
-    prob_draw = max(0.15, prob_draw)
+    # 🔥 re-normalisation
+    total = prob_home + prob_draw + prob_away
+    prob_home /= total
+    prob_draw /= total
+    prob_away /= total
 
-    # 🔥 NORMALISATION FINALE
-    s = prob_home + prob_draw + prob_away
-    prob_home /= s
-    prob_draw /= s
-    prob_away /= s
-
-    # 🔥 OVER LOGIQUE
+    # 🔥 OVER
     avg_goals = home["GoalsScoredAvg"] + away["GoalsScoredAvg"]
     prob_over = min(0.75, avg_goals / 3)
 
-    # 🔥 BTTS LOGIQUE
+    # 🔥 BTTS
     prob_btts = (
         (1 - home["FailToScoreRate"]) *
         (1 - away["FailToScoreRate"])
     )
 
-    # 🔥 EDGE CORRECT
-    edge_home = prob_home - (1 / float(odd_home))
-    edge_draw = prob_draw - (1 / float(odd_draw))
-    edge_away = prob_away - (1 / float(odd_away))
+    # 🔥 EDGE (maintenant logique)
+    edge_home = prob_home - imp_home
+    edge_draw = prob_draw - imp_draw
+    edge_away = prob_away - imp_away
 
     confidence = max(prob_home, prob_draw, prob_away)
 
