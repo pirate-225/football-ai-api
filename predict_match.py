@@ -21,7 +21,8 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
         home["CleanSheetRate"] - away["CleanSheetRate"],
         home["FailToScoreRate"] - away["FailToScoreRate"],
         home["ELO"] - away["ELO"],
-        home["MatchesPlayed"] - away["MatchesPlayed"]
+        home["MatchesPlayed"] - away["MatchesPlayed"],
+        0  # league_diff par défaut si absent
     ]]
 
     probs = model_result.predict_proba(X)[0]
