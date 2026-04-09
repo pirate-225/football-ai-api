@@ -26,10 +26,10 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
     ]]
 
     probs = model_result.predict_proba(X)[0]
-
-    prob_home = probs[0]
+    # 🔥 inversion possible (test)
+    prob_home = probs[2]
     prob_draw = probs[1]
-    prob_away = probs[2]
+    prob_away = probs[0]
 
     prob_over = model_over.predict_proba(X)[0][1]
     prob_btts = model_btts.predict_proba(X)[0][1]
