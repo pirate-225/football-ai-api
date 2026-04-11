@@ -4,10 +4,15 @@ teams = pd.read_csv("data_processed/team_stats.csv")
 
 def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
 
-    home = teams[teams["Team"] == home_team].iloc[0]
-    away = teams[teams["Team"] == away_team].iloc[0]
+    home_df = teams[teams["Team"] == home_team]
+    away_df = teams[teams["Team"] == away_team]
 
-    # 🔥 1. BASE = BOOKMAKER (TRÈS IMPORTANT)
+    if home_df.empty or away_df.empty:
+        return None  # 🔥 évite crash
+
+    home = home_df.iloc[0]
+    away = away_df.iloc[0]
+
     imp_home = 1 / float(odd_home)
     imp_draw = 1 / float(odd_draw)
     imp_away = 1 / float(odd_away)
@@ -18,7 +23,6 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
     prob_draw = imp_draw / total_imp
     prob_away = imp_away / total_imp
 
-    # 🔥 2. AJUSTEMENT AVEC TES DATA
     strength_home = (
         home["PPG"] * 0.5 +
         home["HomePPG"] * 0.3 +
@@ -32,30 +36,23 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
     )
 
     diff = strength_home - strength_away
-
-    # 🔥 petit ajustement (clé du système)
-    adjustment = diff * 0.05
+    adjustment = diff * 0.02
 
     prob_home += adjustment
     prob_away -= adjustment
 
-    # 🔥 re-normalisation
     total = prob_home + prob_draw + prob_away
     prob_home /= total
     prob_draw /= total
     prob_away /= total
 
-    # 🔥 OVER
-    avg_goals = home["GoalsScoredAvg"] + away["GoalsScoredAvg"]
-    prob_over = min(0.75, avg_goals / 3)
+    prob_over = min(0.75, (home["GoalsScoredAvg"] + away["GoalsScoredAvg"]) / 3)
 
-    # 🔥 BTTS
     prob_btts = (
         (1 - home["FailToScoreRate"]) *
         (1 - away["FailToScoreRate"])
     )
 
-    # 🔥 EDGE (maintenant logique)
     edge_home = prob_home - imp_home
     edge_draw = prob_draw - imp_draw
     edge_away = prob_away - imp_away
@@ -63,13 +60,13 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
     confidence = max(prob_home, prob_draw, prob_away)
 
     return {
-        "prob_home": round(prob_home, 3),
-        "prob_draw": round(prob_draw, 3),
-        "prob_away": round(prob_away, 3),
-        "prob_over": round(prob_over, 3),
-        "prob_btts": round(prob_btts, 3),
-        "edge_home": round(edge_home, 3),
-        "edge_draw": round(edge_draw, 3),
-        "edge_away": round(edge_away, 3),
-        "confidence": round(confidence, 3)
+        "prob_home": round(float(prob_home), 3),
+        "prob_draw": round(float(prob_draw), 3),
+        "prob_away": round(float(prob_away), 3),
+        "prob_over": round(float(prob_over), 3),
+        "prob_btts": round(float(prob_btts), 3),
+        "edge_home": round(float(edge_home), 3),
+        "edge_draw": round(float(edge_draw), 3),
+        "edge_away": round(float(edge_away), 3),
+        "confidence": round(float(confidence), 3)
     }
