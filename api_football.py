@@ -12,7 +12,7 @@ BASE_URL = "https://v3.football.api-sports.io"
 
 def get_today_matches():
 
-    if not API_KEY:
+    if not API-KEY:
         print("❌ API_KEY manquante")
         return []
 
@@ -24,7 +24,7 @@ def get_today_matches():
         response = requests.get(url, headers=HEADERS, timeout=10)
         data = response.json()
     except:
-        print("❌ erreur API")
+        print("❌ API_KEY manquante")
         return []
 
     matches = []
