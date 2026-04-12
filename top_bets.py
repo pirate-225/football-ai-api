@@ -6,7 +6,7 @@ teams = pd.read_csv("data_processed/team_stats.csv")
 
 
 def normalize(name):
-    return name.lower().replace("fc", "").strip()
+    return name.lower().replace("fc", "").replace(".", "").strip()
 
 
 def find_team(api_name):
@@ -39,35 +39,41 @@ def get_top_bets():
         if result is None:
             continue
 
-        # 🔥 ON PREND TOUS LES EDGES (même petits)
-        bets.append({
-            "match": f"{m['home']} vs {m['away']}",
-            "bet": "HOME",
-            "edge": result["edge_home"],
-            "value": result["prob_home"],
-            "odds": odd_home
-        })
+        # 🔥 PREND LE MEILLEUR EDGE (IMPORTANT)
+        edges = {
+            "HOME": result["edge_home"],
+            "DRAW": result["edge_draw"],
+            "AWAY": result["edge_away"]
+        }
+
+        best_bet = max(edges, key=edges.get)
+        best_edge = edges[best_bet]
+
+        # 🔥 FILTRE MINIMAL (TRÈS IMPORTANT)
+        if best_edge < 0.01:
+            continue
+
+        odds_map = {
+            "HOME": odd_home,
+            "DRAW": odd_draw,
+            "AWAY": odd_away
+        }
+
+        prob_map = {
+            "HOME": result["prob_home"],
+            "DRAW": result["prob_draw"],
+            "AWAY": result["prob_away"]
+        }
 
         bets.append({
             "match": f"{m['home']} vs {m['away']}",
-            "bet": "DRAW",
-            "edge": result["edge_draw"],
-            "value": result["prob_draw"],
-            "odds": odd_draw
+            "bet": best_bet,
+            "edge": round(best_edge, 3),
+            "value": round(prob_map[best_bet], 3),
+            "odds": odds_map[best_bet]
         })
 
-        bets.append({
-            "match": f"{m['home']} vs {m['away']}",
-            "bet": "AWAY",
-            "edge": result["edge_away"],
-            "value": result["prob_away"],
-            "odds": odd_away
-        })
-
-    # 🔥 TRIER PAR EDGE (IMPORTANT)
+    # 🔥 TRI PAR EDGE
     bets = sorted(bets, key=lambda x: x["edge"], reverse=True)
 
-    # 🔥 GARDER LES MEILLEURS (même si petits edges)
-    best_bets = [b for b in bets if b["edge"] > -0.02][:15]
-
-    return best_bets
+    return bets[:10]
