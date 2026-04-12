@@ -79,12 +79,24 @@
 
 {% if result %}
 <h2>📊 Prediction</h2>
+
 <p>Home: {{ result.prob_home }}</p>
 <p>Draw: {{ result.prob_draw }}</p>
 <p>Away: {{ result.prob_away }}</p>
+
 <p>Over 2.5: {{ result.prob_over }}</p>
 <p>BTTS: {{ result.prob_btts }}</p>
+
 <p>Confidence: {{ result.confidence }}</p>
+
+<hr>
+
+<h3>📈 Edge Analysis</h3>
+
+<p>Edge Home: {{ result.edge_home }}</p>
+<p>Edge Draw: {{ result.edge_draw }}</p>
+<p>Edge Away: {{ result.edge_away }}</p>
+
 {% endif %}
 
 <hr>

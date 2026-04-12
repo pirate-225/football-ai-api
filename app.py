@@ -8,6 +8,7 @@ app = Flask(__name__)
 
 teams_df = pd.read_csv("data_processed/team_stats.csv")
 
+
 @app.route("/", methods=["GET", "POST"])
 def index():
 
@@ -19,6 +20,7 @@ def index():
         top_bets = []
 
     if request.method == "POST":
+
         home_team = request.form["home_team"]
         away_team = request.form["away_team"]
 
@@ -35,7 +37,7 @@ def index():
         top_bets=top_bets
     )
 
+
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
-    print(f"🚀 APP RUNNING on port {port}")
     app.run(host="0.0.0.0", port=port)
