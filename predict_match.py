@@ -19,11 +19,25 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
     home = home_df.iloc[0]
     away = away_df.iloc[0]
 
-    # 🔥 HOME ADVANTAGE
-    home_advantage = 0.25
+    # 🔥 FORCE RÉELLE AVEC PPG (IMPORTANT)
+    home_strength = (
+        home["PPG"] * 0.6 +
+        home["GoalsScoredAvg"] * 0.3 -
+        home["GoalsConcededAvg"] * 0.1
+    )
 
-    home_xg = ((home["GoalsScoredAvg"] + away["GoalsConcededAvg"]) / 2) + home_advantage
-    away_xg = (away["GoalsScoredAvg"] + home["GoalsConcededAvg"]) / 2
+    away_strength = (
+        away["PPG"] * 0.6 +
+        away["GoalsScoredAvg"] * 0.3 -
+        away["GoalsConcededAvg"] * 0.1
+    )
+
+    # 🔥 AVANTAGE DOMICILE
+    home_strength += 0.3
+
+    # 🔥 conversion en xG
+    home_xg = max(0.5, home_strength)
+    away_xg = max(0.5, away_strength)
 
     max_goals = 5
 
@@ -56,19 +70,17 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
     prob_draw /= total
     prob_away /= total
 
-    # 🔥 CORRECTION BOOKMAKER (IMPORTANT)
+    # 🔥 BOOKMAKER NORMALISÉ
     imp_home = 1 / float(odd_home)
     imp_draw = 1 / float(odd_draw)
     imp_away = 1 / float(odd_away)
 
     total_imp = imp_home + imp_draw + imp_away
-
-    # 🔥 NORMALISATION (ENLÈVE LA MARGE)
     imp_home /= total_imp
     imp_draw /= total_imp
     imp_away /= total_imp
 
-    # 🔥 EDGE FINAL
+    # 🔥 EDGE
     edge_home = prob_home - imp_home
     edge_draw = prob_draw - imp_draw
     edge_away = prob_away - imp_away
