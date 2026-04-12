@@ -1,6 +1,6 @@
 import requests
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 
 API_KEY = os.environ.get("API_KEY")
 
@@ -16,7 +16,7 @@ def get_today_matches():
     if not API_KEY:
         return []
 
-    today = datetime.today().strftime("%Y-%m-%d")
+    today = datetime.now().strftime("%Y-%m-%d")
 
     url = f"{BASE_URL}/fixtures?date={today}"
 
@@ -28,21 +28,26 @@ def get_today_matches():
 
     matches = []
 
-    # 🔥 LIMITE À 20 MATCHS MAX
-    fixtures = data.get("response", [])[:20]
+    now = datetime.now(timezone.utc)
 
-    for m in fixtures:
+    for m in data.get("response", [])[:30]:
+
+        fixture_date = datetime.fromisoformat(m["fixture"]["date"].replace("Z", "+00:00"))
+
+        # 🔥 FILTRE MATCHS FUTURS UNIQUEMENT
+        if fixture_date < now:
+            continue
 
         home = m["teams"]["home"]["name"]
         away = m["teams"]["away"]["name"]
 
-        # 🔥 PAS D’API ODDS (trop lent)
-        # on utilise odds simplifiées
+        # ⚠️ simplifié pour performance
+        odds = (1.80, 3.50, 4.00)
 
         matches.append({
             "home": home,
             "away": away,
-            "odds": (1.80, 3.50, 4.00)
+            "odds": odds
         })
 
     return matches

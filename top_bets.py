@@ -39,37 +39,41 @@ def get_top_bets():
         if result is None:
             continue
 
-        # 🔥 OVER BET
-        if result["prob_over"] > 0.70:
+        # 🔥 OVER ULTRA STRICT
+        if result["prob_over"] > 0.78:
             bets.append({
                 "match": f"{m['home']} vs {m['away']}",
                 "bet": "OVER 2.5",
-                "value": result["prob_over"]
+                "value": result["prob_over"],
+                "odds": 1.70
             })
 
-        # 🔥 BTTS
-        if result["prob_btts"] > 0.65:
+        # 🔥 BTTS ULTRA STRICT
+        if result["prob_btts"] > 0.75:
             bets.append({
                 "match": f"{m['home']} vs {m['away']}",
                 "bet": "BTTS YES",
-                "value": result["prob_btts"]
+                "value": result["prob_btts"],
+                "odds": 1.65
             })
 
-        # 🔥 WINNER (seulement si fort)
-        if result["prob_home"] > 0.60:
+        # 🔥 WINNER (moins strict)
+        if result["prob_home"] > 0.58:
             bets.append({
                 "match": f"{m['home']} vs {m['away']}",
                 "bet": "HOME",
-                "value": result["prob_home"]
+                "value": result["prob_home"],
+                "odds": odd_home
             })
 
-        elif result["prob_away"] > 0.60:
+        elif result["prob_away"] > 0.58:
             bets.append({
                 "match": f"{m['home']} vs {m['away']}",
                 "bet": "AWAY",
-                "value": result["prob_away"]
+                "value": result["prob_away"],
+                "odds": odd_away
             })
 
     bets = sorted(bets, key=lambda x: x["value"], reverse=True)
 
-    return bets[:15]
+    return bets[:10]
