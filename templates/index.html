@@ -1,182 +1,120 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Football AI PRO</title>
-
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
-
+    <title>Football AI</title>
     <style>
         body {
             font-family: Arial;
-            background: #111;
+            margin: 40px;
+            background: #0f172a;
             color: white;
-            text-align: center;
         }
 
         h1 {
-            color: #00ffcc;
+            color: #38bdf8;
         }
 
         table {
-            margin: auto;
+            width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
+            background: #1e293b;
         }
 
         th, td {
             padding: 10px;
-            border-bottom: 1px solid #444;
+            border: 1px solid #334155;
+            text-align: center;
         }
 
-        select, input, button {
-            padding: 10px;
-            margin: 5px;
-            border-radius: 5px;
-            border: none;
+        th {
+            background: #334155;
         }
 
-        button {
-            background: #00ffcc;
-            color: black;
-            font-weight: bold;
+        .bet-home {
+            color: #22c55e;
         }
 
-        .positive { color: #00ffcc; }
-        .negative { color: red; }
-
-        .bet { color: #00ffcc; font-size: 20px; }
-        .nobet { color: red; font-size: 20px; }
+        .bet-away {
+            color: #f97316;
+        }
     </style>
 </head>
 
 <body>
 
-<h1>⚽ Football AI PRO</h1>
+<h1>⚽ Football AI</h1>
 
-<!-- MATCHS DU JOUR -->
-<h2>📅 Today's Matches</h2>
-
-<table>
-<tr>
-    <th>League</th>
-    <th>Home</th>
-    <th>Away</th>
-    <th>Time</th>
-</tr>
-
-{% for match in today_matches %}
-<tr>
-    <td>{{ match.league }}</td>
-    <td>{{ match.home }}</td>
-    <td>{{ match.away }}</td>
-    <td>{{ match.time }}</td>
-</tr>
-{% endfor %}
-</table>
-
-<br><br>
-
-<!-- FORMULAIRE -->
 <form method="POST">
+    <select name="home_team">
+        {% for team in teams.Team %}
+        <option value="{{ team }}">{{ team }}</option>
+        {% endfor %}
+    </select>
 
-<select name="home_team" class="team-select" style="width:250px;">
-{% for t in teams["Team"] %}
-<option value="{{ t }}">{{ t }}</option>
-{% endfor %}
-</select>
+    vs
 
-<select name="away_team" class="team-select" style="width:250px;">
-{% for t in teams["Team"] %}
-<option value="{{ t }}">{{ t }}</option>
-{% endfor %}
-</select>
+    <select name="away_team">
+        {% for team in teams.Team %}
+        <option value="{{ team }}">{{ team }}</option>
+        {% endfor %}
+    </select>
 
-<br>
+    <br><br>
 
-<input type="text" name="odds_home" placeholder="Home Odds">
-<input type="text" name="odds_draw" placeholder="Draw Odds">
-<input type="text" name="odds_away" placeholder="Away Odds">
+    <input type="text" name="odds_home" placeholder="Odds Home">
+    <input type="text" name="odds_draw" placeholder="Odds Draw">
+    <input type="text" name="odds_away" placeholder="Odds Away">
 
-<br>
+    <br><br>
 
-<button type="submit">Predict</button>
-
+    <button type="submit">Predict</button>
 </form>
 
-<!-- RESULT -->
 {% if result %}
-<h2>📊 Prediction</h2>
+<h2>Prediction</h2>
+<p>Home: {{ result.prob_home }}</p>
+<p>Draw: {{ result.prob_draw }}</p>
+<p>Away: {{ result.prob_away }}</p>
+<p>Over: {{ result.prob_over }}</p>
+<p>BTTS: {{ result.prob_btts }}</p>
+<p>Confidence: {{ result.confidence }}</p>
+{% endif %}
+
+<hr>
+
+<h2>🔥 Top Bets Today</h2>
+
+{% if top_bets and top_bets|length > 0 %}
 
 <table>
-<tr>
-    <th></th>
-    <th>Home</th>
-    <th>Draw</th>
-    <th>Away</th>
-</tr>
+    <tr>
+        <th>Match</th>
+        <th>Bet</th>
+        <th>Edge</th>
+        <th>Confidence</th>
+    </tr>
 
-<tr>
-    <td>Probability</td>
-    <td>{{ result.prob_home }}</td>
-    <td>{{ result.prob_draw }}</td>
-    <td>{{ result.prob_away }}</td>
-</tr>
+    {% for b in top_bets %}
+    <tr>
+        <td>{{ b.match }}</td>
 
-<tr>
-    <td>Edge</td>
-    <td class="{% if result.edge_home > 0 %}positive{% else %}negative{% endif %}">
-        {{ result.edge_home }}
-    </td>
-    <td class="{% if result.edge_draw > 0 %}positive{% else %}negative{% endif %}">
-        {{ result.edge_draw }}
-    </td>
-    <td class="{% if result.edge_away > 0 %}positive{% else %}negative{% endif %}">
-        {{ result.edge_away }}
-    </td>
-</tr>
+        <td class="{% if b.bet == 'HOME' %}bet-home{% else %}bet-away{% endif %}">
+            {{ b.bet }}
+        </td>
+
+        <td>{{ b.edge }}</td>
+        <td>{{ b.confidence }}</td>
+    </tr>
+    {% endfor %}
+
 </table>
 
-<p>⚽ Over: {{ result.prob_over }}</p>
-<p>🤝 BTTS: {{ result.prob_btts }}</p>
-<p>🎯 Confidence: {{ result.confidence }}</p>
-
-{% if result.edge_home > 0.05 and result.prob_home > 0.45 %}
-<p class="bet">✅ BET HOME</p>
-{% elif result.edge_away > 0.05 and result.prob_away > 0.45 %}
-<p class="bet">✅ BET AWAY</p>
 {% else %}
-<p class="nobet">❌ NO BET</p>
-{% endif %}
+
+<p>❌ Aucun value bet aujourd'hui</p>
 
 {% endif %}
-
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
-
-<script>
-$(document).ready(function() {
-    $('.team-select').select2();
-});
-</script>
 
 </body>
 </html>
-<h2>🔥 Top Bets Today</h2>
-
-<table>
-<tr>
-    <th>Match</th>
-    <th>Bet</th>
-    <th>Edge</th>
-    <th>Confidence</th>
-</tr>
-
-{% for b in top_bets %}
-<tr>
-    <td>{{ b.match }}</td>
-    <td>{{ b.bet }}</td>
-    <td>{{ b.edge }}</td>
-    <td>{{ b.confidence }}</td>
-</tr>
-{% endfor %}
-</table>
