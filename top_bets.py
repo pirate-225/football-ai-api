@@ -21,7 +21,7 @@ def find_team(api_name):
 
 def get_top_bets():
 
-    matches = []
+    bets = []
     today_matches = get_today_matches()
 
     for m in today_matches:
@@ -39,18 +39,37 @@ def get_top_bets():
         if result is None:
             continue
 
-        if result["edge_home"] > 0.01:
-            matches.append({
+        # 🔥 OVER BET
+        if result["prob_over"] > 0.70:
+            bets.append({
+                "match": f"{m['home']} vs {m['away']}",
+                "bet": "OVER 2.5",
+                "value": result["prob_over"]
+            })
+
+        # 🔥 BTTS
+        if result["prob_btts"] > 0.65:
+            bets.append({
+                "match": f"{m['home']} vs {m['away']}",
+                "bet": "BTTS YES",
+                "value": result["prob_btts"]
+            })
+
+        # 🔥 WINNER (seulement si fort)
+        if result["prob_home"] > 0.60:
+            bets.append({
                 "match": f"{m['home']} vs {m['away']}",
                 "bet": "HOME",
-                "edge": result["edge_home"]
+                "value": result["prob_home"]
             })
 
-        elif result["edge_away"] > 0.01:
-            matches.append({
+        elif result["prob_away"] > 0.60:
+            bets.append({
                 "match": f"{m['home']} vs {m['away']}",
                 "bet": "AWAY",
-                "edge": result["edge_away"]
+                "value": result["prob_away"]
             })
 
-    return matches[:10]
+    bets = sorted(bets, key=lambda x: x["value"], reverse=True)
+
+    return bets[:15]

@@ -2,6 +2,7 @@
 <html>
 <head>
     <title>Football AI</title>
+
     <style>
         body {
             font-family: Arial;
@@ -12,6 +13,19 @@
 
         h1 {
             color: #38bdf8;
+        }
+
+        input, button {
+            padding: 10px;
+            margin: 5px;
+            border-radius: 5px;
+            border: none;
+        }
+
+        button {
+            background: #38bdf8;
+            color: black;
+            cursor: pointer;
         }
 
         table {
@@ -38,6 +52,14 @@
         .bet-away {
             color: #f97316;
         }
+
+        .bet-over {
+            color: #38bdf8;
+        }
+
+        .bet-btts {
+            color: #eab308;
+        }
     </style>
 </head>
 
@@ -45,20 +67,17 @@
 
 <h1>⚽ Football AI</h1>
 
+<!-- 🔍 RECHERCHE ÉQUIPES -->
 <form method="POST">
-    <select name="home_team">
-        {% for team in teams.Team %}
-        <option value="{{ team }}">{{ team }}</option>
-        {% endfor %}
-    </select>
 
-    vs
+    <input list="teams" name="home_team" placeholder="Home team">
+    <input list="teams" name="away_team" placeholder="Away team">
 
-    <select name="away_team">
+    <datalist id="teams">
         {% for team in teams.Team %}
-        <option value="{{ team }}">{{ team }}</option>
+        <option value="{{ team }}">
         {% endfor %}
-    </select>
+    </datalist>
 
     <br><br>
 
@@ -72,11 +91,11 @@
 </form>
 
 {% if result %}
-<h2>Prediction</h2>
+<h2>📊 Prediction</h2>
 <p>Home: {{ result.prob_home }}</p>
 <p>Draw: {{ result.prob_draw }}</p>
 <p>Away: {{ result.prob_away }}</p>
-<p>Over: {{ result.prob_over }}</p>
+<p>Over 2.5: {{ result.prob_over }}</p>
 <p>BTTS: {{ result.prob_btts }}</p>
 <p>Confidence: {{ result.confidence }}</p>
 {% endif %}
@@ -91,20 +110,26 @@
     <tr>
         <th>Match</th>
         <th>Bet</th>
-        <th>Edge</th>
-        <th>Confidence</th>
+        <th>Value</th>
     </tr>
 
     {% for b in top_bets %}
     <tr>
+
         <td>{{ b.match }}</td>
 
-        <td class="{% if b.bet == 'HOME' %}bet-home{% else %}bet-away{% endif %}">
+        <td class="
+            {% if b.bet == 'HOME' %}bet-home
+            {% elif b.bet == 'AWAY' %}bet-away
+            {% elif b.bet == 'OVER 2.5' %}bet-over
+            {% elif b.bet == 'BTTS YES' %}bet-btts
+            {% endif %}
+        ">
             {{ b.bet }}
         </td>
 
-        <td>{{ b.edge }}</td>
-        <td>{{ b.confidence }}</td>
+        <td>{{ b.value }}</td>
+
     </tr>
     {% endfor %}
 
@@ -112,7 +137,7 @@
 
 {% else %}
 
-<p>❌ Aucun value bet aujourd'hui</p>
+<p>❌ Aucun bet intéressant aujourd’hui</p>
 
 {% endif %}
 
