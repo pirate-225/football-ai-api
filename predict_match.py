@@ -19,8 +19,11 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
     home = home_df.iloc[0]
     away = away_df.iloc[0]
 
-    # 🔥 expected goals
-    home_xg = (home["GoalsScoredAvg"] + away["GoalsConcededAvg"]) / 2
+    # 🔥 HOME ADVANTAGE (IMPORTANT)
+    home_advantage = 0.25
+
+    # 🔥 expected goals corrigés
+    home_xg = ((home["GoalsScoredAvg"] + away["GoalsConcededAvg"]) / 2) + home_advantage
     away_xg = (away["GoalsScoredAvg"] + home["GoalsConcededAvg"]) / 2
 
     max_goals = 5
@@ -49,24 +52,22 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
             if i > 0 and j > 0:
                 prob_btts += p
 
-    # normalisation
     total = prob_home + prob_draw + prob_away
     prob_home /= total
     prob_draw /= total
     prob_away /= total
 
-    # 🔥 IMPLIED PROBABILITIES (BOOKMAKER)
+    # 🔥 implied bookmaker
     imp_home = 1 / float(odd_home)
     imp_draw = 1 / float(odd_draw)
     imp_away = 1 / float(odd_away)
 
     total_imp = imp_home + imp_draw + imp_away
-
     imp_home /= total_imp
     imp_draw /= total_imp
     imp_away /= total_imp
 
-    # 🔥 EDGE (TRÈS IMPORTANT)
+    # 🔥 EDGE
     edge_home = prob_home - imp_home
     edge_draw = prob_draw - imp_draw
     edge_away = prob_away - imp_away
@@ -79,11 +80,8 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
         "prob_away": round(prob_away, 3),
         "prob_over": round(prob_over, 3),
         "prob_btts": round(prob_btts, 3),
-
-        # 🔥 EDGE AJOUTÉ ICI
         "edge_home": round(edge_home, 3),
         "edge_draw": round(edge_draw, 3),
         "edge_away": round(edge_away, 3),
-
         "confidence": round(confidence, 3)
     }
