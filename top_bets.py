@@ -39,32 +39,35 @@ def get_top_bets():
         if result is None:
             continue
 
-        # 🔥 SCORE GLOBAL
-        score = max(
-            result["prob_home"],
-            result["prob_away"],
-            result["prob_over"],
-            result["prob_btts"]
-        )
-
-        # 🔥 TYPE DE BET
-        if result["prob_over"] == score:
-            bet_type = "OVER 2.5"
-        elif result["prob_btts"] == score:
-            bet_type = "BTTS YES"
-        elif result["prob_home"] == score:
-            bet_type = "HOME"
-        else:
-            bet_type = "AWAY"
+        # 🔥 ON PREND TOUS LES EDGES (même petits)
+        bets.append({
+            "match": f"{m['home']} vs {m['away']}",
+            "bet": "HOME",
+            "edge": result["edge_home"],
+            "value": result["prob_home"],
+            "odds": odd_home
+        })
 
         bets.append({
             "match": f"{m['home']} vs {m['away']}",
-            "bet": bet_type,
-            "value": round(score, 3),
-            "odds": odd_home if bet_type == "HOME" else odd_away
+            "bet": "DRAW",
+            "edge": result["edge_draw"],
+            "value": result["prob_draw"],
+            "odds": odd_draw
         })
 
-    # 🔥 TRI PAR QUALITÉ
-    bets = sorted(bets, key=lambda x: x["value"], reverse=True)
+        bets.append({
+            "match": f"{m['home']} vs {m['away']}",
+            "bet": "AWAY",
+            "edge": result["edge_away"],
+            "value": result["prob_away"],
+            "odds": odd_away
+        })
 
-    return bets[:10]
+    # 🔥 TRIER PAR EDGE (IMPORTANT)
+    bets = sorted(bets, key=lambda x: x["edge"], reverse=True)
+
+    # 🔥 GARDER LES MEILLEURS (même si petits edges)
+    best_bets = [b for b in bets if b["edge"] > -0.02][:15]
+
+    return best_bets
