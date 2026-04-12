@@ -1,7 +1,6 @@
 import requests
 import os
 from datetime import datetime
-import random
 
 API_KEY = os.environ.get("API_KEY")
 
@@ -26,37 +25,26 @@ def get_today_matches():
     try:
         response = requests.get(url, headers=HEADERS, timeout=10)
         data = response.json()
-        print("✅ API fixtures OK")
+        print("✅ Fixtures récupérées")
     except Exception as e:
-        print("❌ erreur API:", e)
+        print("❌ erreur fixtures:", e)
         return []
 
     matches = []
-    fixtures = data.get("response", [])
 
-    print("📊 MATCHS TROUVÉS:", len(fixtures))
+    for m in data.get("response", []):
 
-    for m in fixtures:
-
+        fixture_id = m["fixture"]["id"]
         home = m["teams"]["home"]["name"]
         away = m["teams"]["away"]["name"]
-        fixture_id = m["fixture"]["id"]
 
         odds = get_odds(fixture_id)
 
-        # 🔥 SI PAS DE COTES → ON GENERE
         if odds is None:
-            print(f"⚠️ Pas de cotes pour {home} vs {away} → fallback")
+            print(f"❌ Pas de cotes pour {home} vs {away}")
+            continue
 
-            # génération réaliste
-            odd_home = round(random.uniform(1.4, 3.5), 2)
-            odd_draw = round(random.uniform(2.8, 4.5), 2)
-            odd_away = round(random.uniform(1.8, 4.5), 2)
-
-            odds = (odd_home, odd_draw, odd_away)
-
-        else:
-            print(f"💰 {home} vs {away} → {odds}")
+        print(f"💰 {home} vs {away} → {odds}")
 
         matches.append({
             "home": home,
@@ -64,7 +52,7 @@ def get_today_matches():
             "odds": odds
         })
 
-    print("✅ MATCHS UTILISÉS:", len(matches))
+    print("✅ MATCHS AVEC COTES:", len(matches))
 
     return matches
 
@@ -80,26 +68,30 @@ def get_odds(fixture_id):
         return None
 
     try:
-        bookmakers = data["response"]
-
-        if not bookmakers:
+        if not data["response"]:
             return None
 
-        bookmakers = bookmakers[0]["bookmakers"]
+        bookmakers = data["response"][0]["bookmakers"]
 
-        for book in bookmakers:
-            for bet in book["bets"]:
+        for bookmaker in bookmakers:
+            for bet in bookmaker["bets"]:
+
+                # 🔥 IMPORTANT : Match Winner = "Match Winner"
                 if bet["name"] == "Match Winner":
 
                     values = bet["values"]
 
-                    return (
-                        float(values[0]["odd"]),
-                        float(values[1]["odd"]),
-                        float(values[2]["odd"])
-                    )
+                    odds_dict = {v["value"]: float(v["odd"]) for v in values}
 
-    except:
+                    odd_home = odds_dict.get("Home")
+                    odd_draw = odds_dict.get("Draw")
+                    odd_away = odds_dict.get("Away")
+
+                    if odd_home and odd_draw and odd_away:
+                        return (odd_home, odd_draw, odd_away)
+
+    except Exception as e:
+        print("❌ erreur parsing odds:", e)
         return None
 
     return None
