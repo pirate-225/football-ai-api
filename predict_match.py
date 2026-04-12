@@ -19,58 +19,37 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
     home = home_df.iloc[0]
     away = away_df.iloc[0]
 
-    # 🔥 FORCE RÉELLE AVEC PPG (IMPORTANT)
-    home_strength = (
-        home["PPG"] * 0.6 +
-        home["GoalsScoredAvg"] * 0.3 -
-        home["GoalsConcededAvg"] * 0.1
-    )
+    # 🔥 FORCE TYPE ELO (CRUCIAL)
+    home_rating = home["PPG"] * 50
+    away_rating = away["PPG"] * 50
 
-    away_strength = (
-        away["PPG"] * 0.6 +
-        away["GoalsScoredAvg"] * 0.3 -
-        away["GoalsConcededAvg"] * 0.1
-    )
+    # 🔥 DIFFÉRENCE DE NIVEAU
+    rating_diff = home_rating - away_rating
 
     # 🔥 AVANTAGE DOMICILE
-    home_strength += 0.3
+    rating_diff += 10
 
-    # 🔥 conversion en xG
-    home_xg = max(0.5, home_strength)
-    away_xg = max(0.5, away_strength)
+    # 🔥 conversion en probabilité logistique
+    prob_home = 1 / (1 + 10 ** (-rating_diff / 40))
+    prob_away = 1 - prob_home
 
-    max_goals = 5
+    # 🔥 draw réaliste
+    prob_draw = 0.25 * (1 - abs(prob_home - prob_away))
 
-    prob_home = 0
-    prob_draw = 0
-    prob_away = 0
-    prob_over = 0
-    prob_btts = 0
-
-    for i in range(max_goals + 1):
-        for j in range(max_goals + 1):
-
-            p = poisson_prob(home_xg, i) * poisson_prob(away_xg, j)
-
-            if i > j:
-                prob_home += p
-            elif i == j:
-                prob_draw += p
-            else:
-                prob_away += p
-
-            if i + j >= 3:
-                prob_over += p
-
-            if i > 0 and j > 0:
-                prob_btts += p
-
+    # 🔥 normalisation
     total = prob_home + prob_draw + prob_away
     prob_home /= total
     prob_draw /= total
     prob_away /= total
 
-    # 🔥 BOOKMAKER NORMALISÉ
+    # 🔥 goals pour over/btts
+    home_xg = (home["GoalsScoredAvg"] + away["GoalsConcededAvg"]) / 2 + 0.2
+    away_xg = (away["GoalsScoredAvg"] + home["GoalsConcededAvg"]) / 2
+
+    prob_over = min(0.85, (home_xg + away_xg) / 2.8)
+    prob_btts = min(0.85, (home_xg * away_xg) / 2.5)
+
+    # 🔥 bookmaker corrigé
     imp_home = 1 / float(odd_home)
     imp_draw = 1 / float(odd_draw)
     imp_away = 1 / float(odd_away)
