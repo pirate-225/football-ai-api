@@ -1,6 +1,11 @@
 import pandas as pd
+import math
 
 teams = pd.read_csv("data_processed/team_stats.csv")
+
+
+def poisson_prob(lmbda, k):
+    return (lmbda ** k * math.exp(-lmbda)) / math.factorial(k)
 
 
 def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
@@ -14,44 +19,60 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
     home = home_df.iloc[0]
     away = away_df.iloc[0]
 
-    # 🔥 FORCE RÉELLE DES ÉQUIPES
-    strength_home = (
-        home["PPG"] * 0.4 +
-        home["HomePPG"] * 0.3 +
-        home["GoalsScoredAvg"] * 0.2 -
-        home["GoalsConcededAvg"] * 0.1
-    )
+    # 🔥 expected goals (xG simplifié)
+    home_xg = (home["GoalsScoredAvg"] + away["GoalsConcededAvg"]) / 2
+    away_xg = (away["GoalsScoredAvg"] + home["GoalsConcededAvg"]) / 2
 
-    strength_away = (
-        away["PPG"] * 0.4 +
-        away["AwayPPG"] * 0.3 +
-        away["GoalsScoredAvg"] * 0.2 -
-        away["GoalsConcededAvg"] * 0.1
-    )
+    max_goals = 5
 
-    total = strength_home + strength_away
+    prob_home = 0
+    prob_draw = 0
+    prob_away = 0
+    prob_over = 0
+    prob_btts = 0
 
-    prob_home = strength_home / total
-    prob_away = strength_away / total
-    prob_draw = 1 - (prob_home + prob_away)
+    for i in range(max_goals + 1):
+        for j in range(max_goals + 1):
 
-    # 🔥 OVER basé sur attaque
-    prob_over = min(0.85, (home["GoalsScoredAvg"] + away["GoalsScoredAvg"]) / 2.5)
+            p = poisson_prob(home_xg, i) * poisson_prob(away_xg, j)
 
-    # 🔥 BTTS basé sur scoring + défense
-    prob_btts = (
-        (home["GoalsScoredAvg"] > 1.2) *
-        (away["GoalsScoredAvg"] > 1.2)
-    ) * 0.7 + 0.3
+            if i > j:
+                prob_home += p
+            elif i == j:
+                prob_draw += p
+            else:
+                prob_away += p
 
-    # 🔥 EDGE RÉEL
+            # over 2.5
+            if i + j >= 3:
+                prob_over += p
+
+            # BTTS
+            if i > 0 and j > 0:
+                prob_btts += p
+
+    # normalisation
+    total = prob_home + prob_draw + prob_away
+    prob_home /= total
+    prob_draw /= total
+    prob_away /= total
+
+    # 🔥 implied odds bookmaker
     imp_home = 1 / float(odd_home)
+    imp_draw = 1 / float(odd_draw)
     imp_away = 1 / float(odd_away)
 
+    total_imp = imp_home + imp_draw + imp_away
+    imp_home /= total_imp
+    imp_draw /= total_imp
+    imp_away /= total_imp
+
+    # 🔥 edge réel
     edge_home = prob_home - imp_home
+    edge_draw = prob_draw - imp_draw
     edge_away = prob_away - imp_away
 
-    confidence = max(prob_home, prob_away)
+    confidence = max(prob_home, prob_draw, prob_away)
 
     return {
         "prob_home": round(prob_home, 3),
@@ -60,6 +81,7 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
         "prob_over": round(prob_over, 3),
         "prob_btts": round(prob_btts, 3),
         "edge_home": round(edge_home, 3),
+        "edge_draw": round(edge_draw, 3),
         "edge_away": round(edge_away, 3),
         "confidence": round(confidence, 3)
     }
