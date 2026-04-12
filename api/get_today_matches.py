@@ -3,7 +3,7 @@ import os
 
 def get_today_matches():
 
-    API_KEY = os.getenv("3b63a56a290a3bd3d4b00c5b232d37d3")
+    API_KEY = os.getenv("API_KEY")
 
     # 🔥 DEBUG DIRECT DANS LE SITE
     if not API_KEY:
