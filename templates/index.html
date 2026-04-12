@@ -45,21 +45,9 @@
             background: #334155;
         }
 
-        .bet-home {
-            color: #22c55e;
-        }
-
-        .bet-away {
-            color: #f97316;
-        }
-
-        .bet-over {
-            color: #38bdf8;
-        }
-
-        .bet-btts {
-            color: #eab308;
-        }
+        .bet-home { color: #22c55e; }
+        .bet-away { color: #f97316; }
+        .bet-draw { color: #eab308; }
     </style>
 </head>
 
@@ -67,7 +55,6 @@
 
 <h1>⚽ Football AI</h1>
 
-<!-- 🔍 RECHERCHE ÉQUIPES -->
 <form method="POST">
 
     <input list="teams" name="home_team" placeholder="Home team">
@@ -110,7 +97,9 @@
     <tr>
         <th>Match</th>
         <th>Bet</th>
-        <th>Value</th>
+        <th>Edge</th>
+        <th>Probability</th>
+        <th>Odds</th>
     </tr>
 
     {% for b in top_bets %}
@@ -121,14 +110,15 @@
         <td class="
             {% if b.bet == 'HOME' %}bet-home
             {% elif b.bet == 'AWAY' %}bet-away
-            {% elif b.bet == 'OVER 2.5' %}bet-over
-            {% elif b.bet == 'BTTS YES' %}bet-btts
+            {% elif b.bet == 'DRAW' %}bet-draw
             {% endif %}
         ">
             {{ b.bet }}
         </td>
 
+        <td>{{ b.edge }}</td>
         <td>{{ b.value }}</td>
+        <td>{{ b.odds }}</td>
 
     </tr>
     {% endfor %}
