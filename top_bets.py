@@ -4,9 +4,9 @@ from api_football import get_today_matches
 
 teams = pd.read_csv("data_processed/team_stats.csv")
 
-# 🔥 NORMALISATION SIMPLE
+
 def normalize(name):
-    return name.lower().replace("fc", "").replace("cf", "").strip()
+    return name.lower().replace("fc", "").strip()
 
 
 def find_team(api_name):
@@ -24,18 +24,12 @@ def get_top_bets():
     matches = []
     today_matches = get_today_matches()
 
-    print("📊 MATCHS API:", len(today_matches))
-
     for m in today_matches:
 
-        home_api = m["home"]
-        away_api = m["away"]
-
-        home = find_team(home_api)
-        away = find_team(away_api)
+        home = find_team(m["home"])
+        away = find_team(m["away"])
 
         if home is None or away is None:
-            print(f"❌ Non trouvé: {home_api} vs {away_api}")
             continue
 
         odd_home, odd_draw, odd_away = m["odds"]
@@ -45,33 +39,18 @@ def get_top_bets():
         if result is None:
             continue
 
-        prob_home = result["prob_home"]
-        prob_away = result["prob_away"]
-
-        edge_home = result["edge_home"]
-        edge_away = result["edge_away"]
-
-        confidence = result["confidence"]
-
-        # 🔥 filtre assoupli pour test réel
-        if (edge_home > 0.005 and prob_home > 0.45):
+        if result["edge_home"] > 0.01:
             matches.append({
-                "match": f"{home_api} vs {away_api}",
+                "match": f"{m['home']} vs {m['away']}",
                 "bet": "HOME",
-                "edge": edge_home,
-                "confidence": confidence
+                "edge": result["edge_home"]
             })
 
-        elif (edge_away > 0.005 and prob_away > 0.45):
+        elif result["edge_away"] > 0.01:
             matches.append({
-                "match": f"{home_api} vs {away_api}",
+                "match": f"{m['home']} vs {m['away']}",
                 "bet": "AWAY",
-                "edge": edge_away,
-                "confidence": confidence
+                "edge": result["edge_away"]
             })
-
-    matches = sorted(matches, key=lambda x: x["edge"], reverse=True)
-
-    print("✅ TOP BETS:", len(matches))
 
     return matches[:10]
