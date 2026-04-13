@@ -10,56 +10,38 @@ HEADERS = {
 BASE_URL = "https://v3.football.api-sports.io"
 
 
-def get_team_last_matches(team_name):
+def get_today_matches():
 
     if not API_KEY:
-        print("❌ API_KEY manquante")
-        return None
+        print("❌ API KEY manquante")
+        return []
 
     try:
-        # 🔍 chercher team id
         res = requests.get(
-            f"{BASE_URL}/teams?search={team_name}",
+            f"{BASE_URL}/fixtures",
             headers=HEADERS,
             timeout=3
         )
         data = res.json()
 
-        if not data.get("response"):
-            return None
+        matches = []
 
-        team_id = data["response"][0]["team"]["id"]
+        for m in data.get("response", [])[:10]:
 
-        # 🔍 derniers matchs
-        res = requests.get(
-            f"{BASE_URL}/fixtures?team={team_id}&last=5",
-            headers=HEADERS,
-            timeout=3
-        )
-        data = res.json()
+            home = m["teams"]["home"]["name"]
+            away = m["teams"]["away"]["name"]
 
-        matches = data.get("response", [])
+            # 🔥 fallback odds
+            odds = (2.0, 3.2, 3.5)
 
-        if not matches:
-            return None
+            matches.append({
+                "home": home,
+                "away": away,
+                "odds": odds
+            })
 
-        goals_for = []
-        goals_against = []
-
-        for m in matches:
-
-            if m["teams"]["home"]["id"] == team_id:
-                goals_for.append(m["goals"]["home"] or 0)
-                goals_against.append(m["goals"]["away"] or 0)
-            else:
-                goals_for.append(m["goals"]["away"] or 0)
-                goals_against.append(m["goals"]["home"] or 0)
-
-        return {
-            "scored": sum(goals_for) / len(goals_for),
-            "conceded": sum(goals_against) / len(goals_against)
-        }
+        return matches
 
     except Exception as e:
         print("API ERROR:", e)
-        return None
+        return []
