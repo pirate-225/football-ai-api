@@ -6,15 +6,46 @@ teams = pd.read_csv("data_processed/team_stats.csv")
 
 
 def normalize(name):
-    return name.lower().replace("fc", "").strip()
+    return (
+        name.lower()
+        .replace("fc", "")
+        .replace("cf", "")
+        .replace(".", "")
+        .replace("-", "")
+        .strip()
+    )
 
 
 def find_team(api_name):
+
     api_name_n = normalize(api_name)
 
+    best_match = None
+    best_score = 0
+
     for team in teams["Team"]:
-        if normalize(team) in api_name_n or api_name_n in normalize(team):
-            return team
+
+        team_n = normalize(team)
+
+        score = 0
+
+        if team_n in api_name_n:
+            score += 2
+        if api_name_n in team_n:
+            score += 2
+
+        # 🔥 bonus mots communs
+        for word in team_n.split():
+            if word in api_name_n:
+                score += 1
+
+        if score > best_score:
+            best_score = score
+            best_match = team
+
+    # 🔥 seuil minimum
+    if best_score >= 2:
+        return best_match
 
     return None
 
@@ -22,14 +53,17 @@ def find_team(api_name):
 def get_top_bets():
 
     bets = []
-    today_matches = get_today_matches()
+    matches = get_today_matches()
 
-    for m in today_matches:
+    print("MATCHES:", len(matches))
+
+    for m in matches:
 
         home = find_team(m["home"])
         away = find_team(m["away"])
 
         if home is None or away is None:
+            print("SKIP:", m["home"], "vs", m["away"])
             continue
 
         odd_home, odd_draw, odd_away = m["odds"]
@@ -50,11 +84,11 @@ def get_top_bets():
         bets.append({
             "match": f"{m['home']} vs {m['away']}",
             "bet": best_bet,
-            "edge": round(edges[best_bet], 3),
-            "value": round(result[f"prob_{best_bet.lower()}"], 3),
+            "edge": edges[best_bet],
+            "value": result[f"prob_{best_bet.lower()}"],
             "odds": odd_home if best_bet == "HOME" else odd_away
         })
 
-    bets = sorted(bets, key=lambda x: x["edge"], reverse=True)
+    print("BETS FOUND:", len(bets))
 
-    return bets[:10]
+    return sorted(bets, key=lambda x: x["edge"], reverse=True)[:10]

@@ -1,6 +1,5 @@
 import requests
 import os
-from datetime import datetime, timezone
 
 API_KEY = os.environ.get("API_KEY")
 
@@ -11,79 +10,41 @@ HEADERS = {
 BASE_URL = "https://v3.football.api-sports.io"
 
 
-def get_today_matches():
+def get_team_last_matches(team_name):
 
-    today = datetime.now().strftime("%Y-%m-%d")
-
-    url = f"{BASE_URL}/fixtures?date={today}"
+    url = f"{BASE_URL}/teams?search={team_name}"
 
     try:
-        res = requests.get(url, headers=HEADERS, timeout=5)
-        data = res.json()
-    except:
-        return []
-
-    matches = []
-    now = datetime.now(timezone.utc)
-
-    for m in data.get("response", [])[:20]:
-
-        fixture_id = m["fixture"]["id"]
-
-        fixture_date = datetime.fromisoformat(
-            m["fixture"]["date"].replace("Z", "+00:00")
-        )
-
-        # 🔥 matchs futurs uniquement
-        if fixture_date < now:
-            continue
-
-        home = m["teams"]["home"]["name"]
-        away = m["teams"]["away"]["name"]
-
-        odds = get_odds(fixture_id)
-
-        if odds is None:
-            continue
-
-        matches.append({
-            "home": home,
-            "away": away,
-            "odds": odds
-        })
-
-    return matches
-
-
-def get_odds(fixture_id):
-
-    url = f"{BASE_URL}/odds?fixture={fixture_id}"
-
-    try:
-        res = requests.get(url, headers=HEADERS, timeout=5)
-        data = res.json()
+        res = requests.get(url, headers=HEADERS)
+        team_data = res.json()
+        team_id = team_data["response"][0]["team"]["id"]
     except:
         return None
 
+    url = f"{BASE_URL}/fixtures?team={team_id}&last=5"
+
     try:
-        bookmakers = data["response"][0]["bookmakers"]
-
-        for book in bookmakers:
-            for bet in book["bets"]:
-
-                if bet["name"] == "Match Winner":
-
-                    values = bet["values"]
-
-                    odds_dict = {v["value"]: float(v["odd"]) for v in values}
-
-                    return (
-                        odds_dict.get("Home"),
-                        odds_dict.get("Draw"),
-                        odds_dict.get("Away")
-                    )
-
+        res = requests.get(url, headers=HEADERS)
+        matches = res.json()["response"]
     except:
         return None
 
-    return None
+    goals_for = []
+    goals_against = []
+
+    for m in matches:
+
+        if m["teams"]["home"]["id"] == team_id:
+            goals_for.append(m["goals"]["home"])
+            goals_against.append(m["goals"]["away"])
+        else:
+            goals_for.append(m["goals"]["away"])
+            goals_against.append(m["goals"]["home"])
+
+    if not goals_for:
+        return None
+
+    return {
+        "scored": sum(goals_for) / len(goals_for),
+        "conceded": sum(goals_against) / len(goals_against)
+    }

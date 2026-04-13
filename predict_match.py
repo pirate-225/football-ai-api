@@ -1,11 +1,7 @@
 import pandas as pd
-import math
+from api_football import get_team_last_matches
 
 teams = pd.read_csv("data_processed/team_stats.csv")
-
-
-def poisson_prob(lmbda, k):
-    return (lmbda ** k * math.exp(-lmbda)) / math.factorial(k)
 
 
 def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
@@ -19,37 +15,39 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
     home = home_df.iloc[0]
     away = away_df.iloc[0]
 
-    # 🔥 FORCE TYPE ELO (CRUCIAL)
-    home_rating = home["PPG"] * 50
-    away_rating = away["PPG"] * 50
+    # 🔥 API FORM
+    home_form = get_team_last_matches(home_team)
+    away_form = get_team_last_matches(away_team)
 
-    # 🔥 DIFFÉRENCE DE NIVEAU
-    rating_diff = home_rating - away_rating
+    # fallback si API fail
+    if home_form:
+        home_attack = home_form["scored"]
+        home_defense = home_form["conceded"]
+    else:
+        home_attack = home["GoalsScoredAvg"]
+        home_defense = home["GoalsConcededAvg"]
 
-    # 🔥 AVANTAGE DOMICILE
-    rating_diff += 10
+    if away_form:
+        away_attack = away_form["scored"]
+        away_defense = away_form["conceded"]
+    else:
+        away_attack = away["GoalsScoredAvg"]
+        away_defense = away["GoalsConcededAvg"]
 
-    # 🔥 conversion en probabilité logistique
-    prob_home = 1 / (1 + 10 ** (-rating_diff / 40))
-    prob_away = 1 - prob_home
+    # 🔥 FORCE MIX
+    home_strength = (home["PPG"] * 0.5 + home_attack * 0.3 - home_defense * 0.2)
+    away_strength = (away["PPG"] * 0.5 + away_attack * 0.3 - away_defense * 0.2)
 
-    # 🔥 draw réaliste
-    prob_draw = 0.25 * (1 - abs(prob_home - prob_away))
+    # 🔥 avantage domicile
+    home_strength += 0.3
 
-    # 🔥 normalisation
-    total = prob_home + prob_draw + prob_away
-    prob_home /= total
-    prob_draw /= total
-    prob_away /= total
+    total = home_strength + away_strength
 
-    # 🔥 goals pour over/btts
-    home_xg = (home["GoalsScoredAvg"] + away["GoalsConcededAvg"]) / 2 + 0.2
-    away_xg = (away["GoalsScoredAvg"] + home["GoalsConcededAvg"]) / 2
+    prob_home = home_strength / total
+    prob_away = away_strength / total
+    prob_draw = 1 - (prob_home + prob_away)
 
-    prob_over = min(0.85, (home_xg + away_xg) / 2.8)
-    prob_btts = min(0.85, (home_xg * away_xg) / 2.5)
-
-    # 🔥 bookmaker corrigé
+    # 🔥 bookmaker
     imp_home = 1 / float(odd_home)
     imp_draw = 1 / float(odd_draw)
     imp_away = 1 / float(odd_away)
@@ -59,21 +57,16 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
     imp_draw /= total_imp
     imp_away /= total_imp
 
-    # 🔥 EDGE
     edge_home = prob_home - imp_home
     edge_draw = prob_draw - imp_draw
     edge_away = prob_away - imp_away
-
-    confidence = max(prob_home, prob_draw, prob_away)
 
     return {
         "prob_home": round(prob_home, 3),
         "prob_draw": round(prob_draw, 3),
         "prob_away": round(prob_away, 3),
-        "prob_over": round(prob_over, 3),
-        "prob_btts": round(prob_btts, 3),
         "edge_home": round(edge_home, 3),
         "edge_draw": round(edge_draw, 3),
         "edge_away": round(edge_away, 3),
-        "confidence": round(confidence, 3)
+        "confidence": round(max(prob_home, prob_away), 3)
     }
