@@ -12,39 +12,54 @@ BASE_URL = "https://v3.football.api-sports.io"
 
 def get_team_last_matches(team_name):
 
-    url = f"{BASE_URL}/teams?search={team_name}"
+    if not API_KEY:
+        print("❌ API_KEY manquante")
+        return None
 
     try:
-        res = requests.get(url, headers=HEADERS)
-        team_data = res.json()
-        team_id = team_data["response"][0]["team"]["id"]
-    except:
+        # 🔍 chercher team id
+        res = requests.get(
+            f"{BASE_URL}/teams?search={team_name}",
+            headers=HEADERS,
+            timeout=3
+        )
+        data = res.json()
+
+        if not data.get("response"):
+            return None
+
+        team_id = data["response"][0]["team"]["id"]
+
+        # 🔍 derniers matchs
+        res = requests.get(
+            f"{BASE_URL}/fixtures?team={team_id}&last=5",
+            headers=HEADERS,
+            timeout=3
+        )
+        data = res.json()
+
+        matches = data.get("response", [])
+
+        if not matches:
+            return None
+
+        goals_for = []
+        goals_against = []
+
+        for m in matches:
+
+            if m["teams"]["home"]["id"] == team_id:
+                goals_for.append(m["goals"]["home"] or 0)
+                goals_against.append(m["goals"]["away"] or 0)
+            else:
+                goals_for.append(m["goals"]["away"] or 0)
+                goals_against.append(m["goals"]["home"] or 0)
+
+        return {
+            "scored": sum(goals_for) / len(goals_for),
+            "conceded": sum(goals_against) / len(goals_against)
+        }
+
+    except Exception as e:
+        print("API ERROR:", e)
         return None
-
-    url = f"{BASE_URL}/fixtures?team={team_id}&last=5"
-
-    try:
-        res = requests.get(url, headers=HEADERS)
-        matches = res.json()["response"]
-    except:
-        return None
-
-    goals_for = []
-    goals_against = []
-
-    for m in matches:
-
-        if m["teams"]["home"]["id"] == team_id:
-            goals_for.append(m["goals"]["home"])
-            goals_against.append(m["goals"]["away"])
-        else:
-            goals_for.append(m["goals"]["away"])
-            goals_against.append(m["goals"]["home"])
-
-    if not goals_for:
-        return None
-
-    return {
-        "scored": sum(goals_for) / len(goals_for),
-        "conceded": sum(goals_against) / len(goals_against)
-    }
