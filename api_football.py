@@ -26,21 +26,25 @@ def get_today_matches():
     matches = []
     now = datetime.now(timezone.utc)
 
-    for m in data.get("response", [])[:40]:
+    for m in data.get("response", [])[:20]:
+
+        fixture_id = m["fixture"]["id"]
 
         fixture_date = datetime.fromisoformat(
             m["fixture"]["date"].replace("Z", "+00:00")
         )
 
-        # 🔥 uniquement matchs FUTURS
+        # 🔥 matchs futurs uniquement
         if fixture_date < now:
             continue
 
         home = m["teams"]["home"]["name"]
         away = m["teams"]["away"]["name"]
 
-        # 🔥 COTES SIMPLIFIÉES (rapide)
-        odds = (1.80, 3.40, 4.20)
+        odds = get_odds(fixture_id)
+
+        if odds is None:
+            continue
 
         matches.append({
             "home": home,
@@ -51,10 +55,9 @@ def get_today_matches():
     return matches
 
 
-# 🔥 NOUVEAU : FORME ÉQUIPE
-def get_team_form(team_id):
+def get_odds(fixture_id):
 
-    url = f"{BASE_URL}/fixtures?team={team_id}&last=5"
+    url = f"{BASE_URL}/odds?fixture={fixture_id}"
 
     try:
         res = requests.get(url, headers=HEADERS, timeout=5)
@@ -62,25 +65,25 @@ def get_team_form(team_id):
     except:
         return None
 
-    goals = []
-    conceded = []
+    try:
+        bookmakers = data["response"][0]["bookmakers"]
 
-    for m in data.get("response", []):
+        for book in bookmakers:
+            for bet in book["bets"]:
 
-        home = m["teams"]["home"]["id"]
-        away = m["teams"]["away"]["id"]
+                if bet["name"] == "Match Winner":
 
-        if team_id == home:
-            goals.append(m["goals"]["home"])
-            conceded.append(m["goals"]["away"])
-        else:
-            goals.append(m["goals"]["away"])
-            conceded.append(m["goals"]["home"])
+                    values = bet["values"]
 
-    if not goals:
+                    odds_dict = {v["value"]: float(v["odd"]) for v in values}
+
+                    return (
+                        odds_dict.get("Home"),
+                        odds_dict.get("Draw"),
+                        odds_dict.get("Away")
+                    )
+
+    except:
         return None
 
-    return {
-        "scored": sum(goals) / len(goals),
-        "conceded": sum(conceded) / len(conceded)
-    }
+    return None
