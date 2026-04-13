@@ -6,7 +6,7 @@ teams = pd.read_csv("data_processed/team_stats.csv")
 
 
 def normalize(name):
-    return name.lower().replace("fc", "").replace(".", "").strip()
+    return name.lower().replace("fc", "").strip()
 
 
 def find_team(api_name):
@@ -39,7 +39,7 @@ def get_top_bets():
         if result is None:
             continue
 
-        # 🔥 PREND LE MEILLEUR EDGE (IMPORTANT)
+        # 🔥 EDGE MAX
         edges = {
             "HOME": result["edge_home"],
             "DRAW": result["edge_draw"],
@@ -49,31 +49,36 @@ def get_top_bets():
         best_bet = max(edges, key=edges.get)
         best_edge = edges[best_bet]
 
-        # 🔥 FILTRE MINIMAL (TRÈS IMPORTANT)
-        if best_edge < 0.01:
+        # 🔥 FILTRE 1 : edge minimum
+        if best_edge < 0.03:
             continue
 
+        # 🔥 FILTRE 2 : éviter gros pièges
+        prob = result[f"prob_{best_bet.lower()}"]
+
+        if prob < 0.55:
+            continue
+
+        # 🔥 FILTRE 3 : éviter outsiders fake
         odds_map = {
             "HOME": odd_home,
             "DRAW": odd_draw,
             "AWAY": odd_away
         }
 
-        prob_map = {
-            "HOME": result["prob_home"],
-            "DRAW": result["prob_draw"],
-            "AWAY": result["prob_away"]
-        }
+        odds = odds_map[best_bet]
+
+        if odds > 3.5:
+            continue
 
         bets.append({
             "match": f"{m['home']} vs {m['away']}",
             "bet": best_bet,
             "edge": round(best_edge, 3),
-            "value": round(prob_map[best_bet], 3),
-            "odds": odds_map[best_bet]
+            "value": round(prob, 3),
+            "odds": odds
         })
 
-    # 🔥 TRI PAR EDGE
     bets = sorted(bets, key=lambda x: x["edge"], reverse=True)
 
-    return bets[:10]
+    return bets[:7]
