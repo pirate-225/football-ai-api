@@ -16,6 +16,8 @@ def get_today_matches():
         print("❌ API KEY manquante")
         return []
 
+    matches = []
+
     try:
         res = requests.get(
             f"{BASE_URL}/fixtures?next=10",
@@ -25,17 +27,22 @@ def get_today_matches():
 
         data = res.json()
 
-        matches = []
-
         for m in data.get("response", []):
+
+            fixture_id = m["fixture"]["id"]
 
             home = m["teams"]["home"]["name"]
             away = m["teams"]["away"]["name"]
 
+            odds = get_odds(fixture_id)
+
+            if odds is None:
+                continue
+
             matches.append({
                 "home": home,
                 "away": away,
-                "odds": (2.0, 3.2, 3.5)
+                "odds": odds
             })
 
         return matches
@@ -43,3 +50,40 @@ def get_today_matches():
     except Exception as e:
         print("API ERROR:", e)
         return []
+
+
+def get_odds(fixture_id):
+
+    try:
+        res = requests.get(
+            f"{BASE_URL}/odds?fixture={fixture_id}",
+            headers=HEADERS,
+            timeout=3
+        )
+
+        data = res.json()
+
+        if not data.get("response"):
+            return None
+
+        bookmakers = data["response"][0]["bookmakers"]
+
+        for book in bookmakers:
+            for bet in book["bets"]:
+
+                if bet["name"] == "Match Winner":
+
+                    values = bet["values"]
+
+                    odds_dict = {v["value"]: float(v["odd"]) for v in values}
+
+                    return (
+                        odds_dict.get("Home"),
+                        odds_dict.get("Draw"),
+                        odds_dict.get("Away")
+                    )
+
+    except:
+        return None
+
+    return None

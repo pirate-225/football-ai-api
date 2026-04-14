@@ -21,18 +21,18 @@ def get_top_bets():
         if result is None:
             continue
 
-        probs = {
-            "HOME": result["prob_home"],
-            "DRAW": result["prob_draw"],
-            "AWAY": result["prob_away"]
+        edges = {
+            "HOME": result["edge_home"],
+            "DRAW": result["edge_draw"],
+            "AWAY": result["edge_away"]
         }
 
-        best = max(probs, key=probs.get)
+        best = max(edges, key=edges.get)
 
         bets.append({
             "match": f"{m['home']} vs {m['away']}",
             "bet": best,
-            "prob": probs[best]
+            "edge": edges[best]
         })
 
-    return bets[:10]
+    return sorted(bets, key=lambda x: x["edge"], reverse=True)[:10]
