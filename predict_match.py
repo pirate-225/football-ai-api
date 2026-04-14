@@ -5,6 +5,7 @@ import math
 try:
     teams = pd.read_csv("data_processed/team_stats.csv")
 except:
+    print("CSV NOT FOUND")
     teams = pd.DataFrame()
 
 
