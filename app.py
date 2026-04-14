@@ -4,11 +4,9 @@ import os
 
 from predict_match import predict_match
 from top_bets import get_top_bets
-from api_football import get_today_matches
 
 app = Flask(__name__)
 
-# 🔥 LOAD CSV SAFE
 try:
     teams = pd.read_csv("data_processed/team_stats.csv")
 except:
@@ -20,7 +18,7 @@ def index():
 
     result = None
 
-    # 🔥 TOP BETS
+    # 🔥 TOP BETS API
     try:
         top_bets = get_top_bets()
     except:
@@ -29,24 +27,13 @@ def index():
     # 🔥 ANALYSE MANUELLE
     if request.method == "POST":
 
-        home = request.form.get("home_team")
-        away = request.form.get("away_team")
+        try:
+            home = request.form.get("home_team")
+            away = request.form.get("away_team")
 
-        if home and away:
-
-            odd_home, odd_draw, odd_away = (2.0, 3.2, 3.5)
-
-            # 🔥 chercher le match dans les matchs du jour
-            try:
-                matches = get_today_matches()
-
-                for m in matches:
-                    if m["home"] == home and m["away"] == away:
-                        odd_home, odd_draw, odd_away = m["odds"]
-                        break
-
-            except Exception as e:
-                print("ODDS FETCH ERROR:", e)
+            odd_home = float(request.form.get("odd_home"))
+            odd_draw = float(request.form.get("odd_draw"))
+            odd_away = float(request.form.get("odd_away"))
 
             result = predict_match(home, away, odd_home, odd_draw, odd_away)
 
@@ -54,6 +41,10 @@ def index():
                 result["odd_home"] = odd_home
                 result["odd_draw"] = odd_draw
                 result["odd_away"] = odd_away
+
+        except Exception as e:
+            print("INPUT ERROR:", e)
+            result = None
 
     return render_template(
         "index.html",

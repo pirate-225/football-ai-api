@@ -109,11 +109,12 @@ button {
 
 <form method="POST">
 
-<input type="text" id="home" name="home_team" placeholder="Equipe domicile">
-<div id="home_suggestions" class="suggestions"></div>
+<input type="text" name="home_team" placeholder="Equipe domicile">
+<input type="text" name="away_team" placeholder="Equipe extérieur">
 
-<input type="text" id="away" name="away_team" placeholder="Equipe extérieur">
-<div id="away_suggestions" class="suggestions"></div>
+<input type="number" step="0.01" name="odd_home" placeholder="Cote Home">
+<input type="number" step="0.01" name="odd_draw" placeholder="Cote Draw">
+<input type="number" step="0.01" name="odd_away" placeholder="Cote Away">
 
 <button type="submit">Analyser</button>
 
