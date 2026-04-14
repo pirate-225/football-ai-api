@@ -1,11 +1,10 @@
 import pandas as pd
 import math
 
-# 🔥 chargement safe
+# 🔥 LOAD DATA
 try:
     teams = pd.read_csv("data_processed/team_stats.csv")
 except:
-    print("CSV NOT FOUND")
     teams = pd.DataFrame()
 
 
@@ -23,45 +22,47 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
         if teams.empty:
             return None
 
-        home = teams[teams["Team"] == home_team]
-        away = teams[teams["Team"] == away_team]
+        home_df = teams[teams["Team"] == home_team]
+        away_df = teams[teams["Team"] == away_team]
 
-        if home.empty or away.empty:
+        if home_df.empty or away_df.empty:
             return None
 
-        home = home.iloc[0]
-        away = away.iloc[0]
+        home = home_df.iloc[0]
+        away = away_df.iloc[0]
 
-        # 🔥 FORCE ÉQUIPE
-        home_strength = (
-            home["PPG"] * 0.7 +
-            home["GoalsScoredAvg"] * 0.2 -
-            home["GoalsConcededAvg"] * 0.1
-        ) + 0.35
+        # 🔥 FORCE AVEC AJUSTEMENTS
+        home_attack = home["GoalsScoredAvg"]
+        home_defense = home["GoalsConcededAvg"]
 
-        away_strength = (
-            away["PPG"] * 0.7 +
-            away["GoalsScoredAvg"] * 0.2 -
-            away["GoalsConcededAvg"] * 0.1
-        )
+        away_attack = away["GoalsScoredAvg"]
+        away_defense = away["GoalsConcededAvg"]
+
+        # 🔥 avantage domicile réel
+        home_adv = 1.15
+
+        home_strength = (home_attack * away_defense) * home_adv
+        away_strength = (away_attack * home_defense)
 
         total = home_strength + away_strength
 
         prob_home = home_strength / total
         prob_away = away_strength / total
-        prob_draw = max(0.18, 1 - (prob_home + prob_away))
 
-        # 🔥 xG SIMPLE
-        home_xg = (home["GoalsScoredAvg"] + away["GoalsConcededAvg"]) / 2
-        away_xg = (away["GoalsScoredAvg"] + home["GoalsConcededAvg"]) / 2
+        # 🔥 draw dynamique (pas fixe)
+        prob_draw = 1 - (prob_home + prob_away)
+        prob_draw = max(0.20, min(prob_draw, 0.30))
+
+        # 🔥 xG réaliste
+        home_xg = home_attack * away_defense
+        away_xg = away_attack * home_defense
 
         # 🔥 POISSON
-        max_goals = 5
         prob_over = 0
         prob_btts = 0
 
-        for i in range(max_goals + 1):
-            for j in range(max_goals + 1):
+        for i in range(6):
+            for j in range(6):
 
                 p = poisson(home_xg, i) * poisson(away_xg, j)
 
@@ -71,10 +72,10 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
                 if i > 0 and j > 0:
                     prob_btts += p
 
-        # 🔥 bookmaker
-        imp_home = 1 / float(odd_home)
-        imp_draw = 1 / float(odd_draw)
-        imp_away = 1 / float(odd_away)
+        # 🔥 BOOKMAKER
+        imp_home = 1 / odd_home
+        imp_draw = 1 / odd_draw
+        imp_away = 1 / odd_away
 
         total_imp = imp_home + imp_draw + imp_away
 
