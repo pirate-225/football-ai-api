@@ -10,80 +10,65 @@ HEADERS = {
 BASE_URL = "https://v3.football.api-sports.io"
 
 
-def get_today_matches():
-
-    if not API_KEY:
-        print("❌ API KEY manquante")
-        return []
-
-    matches = []
+def get_team_data(team_name):
 
     try:
+        # 🔍 TEAM ID
         res = requests.get(
-            f"{BASE_URL}/fixtures?next=10",
+            f"{BASE_URL}/teams?search={team_name}",
             headers=HEADERS,
             timeout=3
         )
-
-        data = res.json()
-
-        for m in data.get("response", []):
-
-            fixture_id = m["fixture"]["id"]
-
-            home = m["teams"]["home"]["name"]
-            away = m["teams"]["away"]["name"]
-
-            odds = get_odds(fixture_id)
-
-            if odds is None:
-                continue
-
-            matches.append({
-                "home": home,
-                "away": away,
-                "odds": odds
-            })
-
-        return matches
-
-    except Exception as e:
-        print("API ERROR:", e)
-        return []
-
-
-def get_odds(fixture_id):
-
-    try:
-        res = requests.get(
-            f"{BASE_URL}/odds?fixture={fixture_id}",
-            headers=HEADERS,
-            timeout=3
-        )
-
         data = res.json()
 
         if not data.get("response"):
             return None
 
-        bookmakers = data["response"][0]["bookmakers"]
+        team_id = data["response"][0]["team"]["id"]
 
-        for book in bookmakers:
-            for bet in book["bets"]:
+        # 🔥 LAST MATCHES
+        res = requests.get(
+            f"{BASE_URL}/fixtures?team={team_id}&last=5",
+            headers=HEADERS,
+            timeout=3
+        )
+        matches = res.json().get("response", [])
 
-                if bet["name"] == "Match Winner":
+        goals_for = []
+        goals_against = []
+        form_points = 0
 
-                    values = bet["values"]
+        for m in matches:
 
-                    odds_dict = {v["value"]: float(v["odd"]) for v in values}
+            if m["teams"]["home"]["id"] == team_id:
+                gf = m["goals"]["home"] or 0
+                ga = m["goals"]["away"] or 0
+            else:
+                gf = m["goals"]["away"] or 0
+                ga = m["goals"]["home"] or 0
 
-                    return (
-                        odds_dict.get("Home"),
-                        odds_dict.get("Draw"),
-                        odds_dict.get("Away")
-                    )
+            goals_for.append(gf)
+            goals_against.append(ga)
+
+            if gf > ga:
+                form_points += 3
+            elif gf == ga:
+                form_points += 1
+
+        # 🔥 blessures (simple)
+        res = requests.get(
+            f"{BASE_URL}/injuries?team={team_id}",
+            headers=HEADERS,
+            timeout=3
+        )
+        injuries = len(res.json().get("response", []))
+
+        return {
+            "attack": sum(goals_for) / len(goals_for) if goals_for else 1,
+            "defense": sum(goals_against) / len(goals_against) if goals_against else 1,
+            "form": form_points / 15,
+            "injuries": injuries
+        }
 
     except:
         return None
-
-    return None
