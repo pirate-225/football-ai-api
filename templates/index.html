@@ -1,105 +1,198 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
-    <title>Football AI</title>
+<meta charset="UTF-8">
+<title>Football AI Pro</title>
 
-    <style>
-        body {
-            font-family: Arial;
-            background: #0f172a;
-            color: white;
-            text-align: center;
-        }
+<style>
 
-        h1 {
-            color: #38bdf8;
-        }
+body {
+    font-family: Arial, sans-serif;
+    background: #020617;
+    color: white;
+    margin: 0;
+}
 
-        .box {
-            background: #1e293b;
-            padding: 20px;
-            margin: 20px auto;
-            width: 400px;
-            border-radius: 10px;
-        }
+/* HEADER */
+header {
+    background: #020617;
+    padding: 15px;
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    color: #38bdf8;
+    border-bottom: 1px solid #1e293b;
+}
 
-        input, select {
-            width: 90%;
-            padding: 10px;
-            margin: 5px;
-            border-radius: 5px;
-            border: none;
-        }
+/* CONTAINER */
+.container {
+    max-width: 600px;
+    margin: auto;
+    padding: 15px;
+}
 
-        button {
-            padding: 10px 20px;
-            background: #38bdf8;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
+/* SEARCH BOX */
+.search-box {
+    background: #0f172a;
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 15px;
+}
 
-        .result {
-            margin-top: 10px;
-            text-align: left;
-        }
-    </style>
+input {
+    width: 100%;
+    padding: 12px;
+    margin: 6px 0;
+    border-radius: 8px;
+    border: none;
+    background: #1e293b;
+    color: white;
+}
+
+/* AUTOCOMPLETE LIST */
+.suggestions {
+    background: #1e293b;
+    border-radius: 8px;
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+.suggestions div {
+    padding: 8px;
+    cursor: pointer;
+}
+
+.suggestions div:hover {
+    background: #38bdf8;
+    color: black;
+}
+
+/* BUTTON */
+button {
+    width: 100%;
+    padding: 12px;
+    background: #38bdf8;
+    border: none;
+    border-radius: 8px;
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+/* CARD */
+.card {
+    background: #0f172a;
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 15px;
+}
+
+/* BET TAG */
+.bet {
+    background: #38bdf8;
+    color: black;
+    padding: 4px 8px;
+    border-radius: 6px;
+    display: inline-block;
+    margin-top: 5px;
+}
+
+</style>
 </head>
 
 <body>
 
-<h1>⚽ Football AI</h1>
+<header>⚽ Football AI Pro</header>
 
-<div class="box">
+<div class="container">
 
-    <form method="POST">
+<!-- SEARCH -->
+<div class="search-box">
 
-        <input list="teams" name="home_team" placeholder="Equipe domicile">
-        <input list="teams" name="away_team" placeholder="Equipe extérieur">
+<form method="POST">
 
-        <datalist id="teams">
-            {% for team in teams["Team"] %}
-                <option value="{{ team }}">
-            {% endfor %}
-        </datalist>
+<input type="text" id="home" name="home_team" placeholder="Equipe domicile">
+<div id="home_suggestions" class="suggestions"></div>
 
-        <button type="submit">Analyser</button>
+<input type="text" id="away" name="away_team" placeholder="Equipe extérieur">
+<div id="away_suggestions" class="suggestions"></div>
 
-    </form>
+<button type="submit">Analyser</button>
 
-</div>
-
-<div class="box">
-
-    <h2>📊 Prediction</h2>
-
-    {% if result %}
-    <div class="result">
-        Home: {{ result.prob_home }} <br>
-        Draw: {{ result.prob_draw }} <br>
-        Away: {{ result.prob_away }} <br><br>
-
-        Over 2.5: {{ result.prob_over }} <br>
-        BTTS: {{ result.prob_btts }} <br><br>
-
-        Confidence: {{ result.confidence }}
-    </div>
-    {% endif %}
+</form>
 
 </div>
 
-<div class="box">
+<!-- RESULT -->
+{% if result %}
+<div class="card">
 
-    <h2>🔥 Top Bets</h2>
+<h3>📊 Prediction</h3>
 
-    {% for bet in top_bets %}
-        <p>
-            {{ bet.match }} <br>
-            👉 {{ bet.bet }} ({{ bet.value }})
-        </p>
-    {% endfor %}
+<p>Home: {{ result.prob_home }}</p>
+<p>Draw: {{ result.prob_draw }}</p>
+<p>Away: {{ result.prob_away }}</p>
+
+<p>Over 2.5: {{ result.prob_over }}</p>
+<p>BTTS: {{ result.prob_btts }}</p>
+
+<p><strong>Confidence: {{ result.confidence }}</strong></p>
 
 </div>
+{% endif %}
+
+<!-- TOP BETS -->
+<div class="card">
+
+<h3>🔥 Top Bets</h3>
+
+{% for bet in top_bets %}
+<p>
+{{ bet.match }} <br>
+<span class="bet">{{ bet.bet }}</span> ({{ bet.value }})
+</p>
+{% endfor %}
+
+</div>
+
+</div>
+
+<!-- JS AUTOCOMPLETE -->
+<script>
+
+const teams = {{ teams["Team"].tolist() | tojson }};
+
+function setupSearch(inputId, suggestionId) {
+
+    const input = document.getElementById(inputId);
+    const box = document.getElementById(suggestionId);
+
+    input.addEventListener("input", function() {
+
+        const value = this.value.toLowerCase();
+        box.innerHTML = "";
+
+        if (value.length < 2) return;
+
+        const filtered = teams.filter(t => t.toLowerCase().includes(value)).slice(0, 5);
+
+        filtered.forEach(team => {
+            const div = document.createElement("div");
+            div.textContent = team;
+
+            div.onclick = () => {
+                input.value = team;
+                box.innerHTML = "";
+            };
+
+            box.appendChild(div);
+        });
+    });
+}
+
+setupSearch("home", "home_suggestions");
+setupSearch("away", "away_suggestions");
+
+</script>
 
 </body>
 </html>
