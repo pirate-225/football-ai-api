@@ -130,13 +130,14 @@ button {
 <p>🏠 Home: {{ result.prob_home }}</p>
 <p>🤝 Draw: {{ result.prob_draw }}</p>
 <p>✈️ Away: {{ result.prob_away }}</p>
+{% if result and result.odd_home %}
 <hr>
 <h3>💰 Cotes</h3>
 
 <p>Home: {{ result.odd_home }}</p>
 <p>Draw: {{ result.odd_draw }}</p>
 <p>Away: {{ result.odd_away }}</p>
-
+{% endif %}
 <hr>
 
 <p>⚽ Over 2.5: {{ result.prob_over }}</p>
