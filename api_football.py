@@ -18,26 +18,24 @@ def get_today_matches():
 
     try:
         res = requests.get(
-            f"{BASE_URL}/fixtures",
+            f"{BASE_URL}/fixtures?next=10",
             headers=HEADERS,
             timeout=3
         )
+
         data = res.json()
 
         matches = []
 
-        for m in data.get("response", [])[:10]:
+        for m in data.get("response", []):
 
             home = m["teams"]["home"]["name"]
             away = m["teams"]["away"]["name"]
 
-            # 🔥 fallback odds
-            odds = (2.0, 3.2, 3.5)
-
             matches.append({
                 "home": home,
                 "away": away,
-                "odds": odds
+                "odds": (2.0, 3.2, 3.5)
             })
 
         return matches
