@@ -6,16 +6,25 @@
     <style>
         body {
             font-family: Arial;
-            margin: 40px;
             background: #0f172a;
             color: white;
+            text-align: center;
         }
 
         h1 {
             color: #38bdf8;
         }
 
-        input, button {
+        .box {
+            background: #1e293b;
+            padding: 20px;
+            margin: 20px auto;
+            width: 400px;
+            border-radius: 10px;
+        }
+
+        input, select {
+            width: 90%;
             padding: 10px;
             margin: 5px;
             border-radius: 5px;
@@ -23,31 +32,17 @@
         }
 
         button {
+            padding: 10px 20px;
             background: #38bdf8;
-            color: black;
+            border: none;
+            border-radius: 5px;
             cursor: pointer;
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            background: #1e293b;
+        .result {
+            margin-top: 10px;
+            text-align: left;
         }
-
-        th, td {
-            padding: 10px;
-            border: 1px solid #334155;
-            text-align: center;
-        }
-
-        th {
-            background: #334155;
-        }
-
-        .bet-home { color: #22c55e; }
-        .bet-away { color: #f97316; }
-        .bet-draw { color: #eab308; }
     </style>
 </head>
 
@@ -55,93 +50,56 @@
 
 <h1>⚽ Football AI</h1>
 
-<form method="POST">
+<div class="box">
 
-    <input list="teams" name="home_team" placeholder="Home team">
-    <input list="teams" name="away_team" placeholder="Away team">
+    <form method="POST">
 
-    <datalist id="teams">
-        {% for team in teams.Team %}
-        <option value="{{ team }}">
-        {% endfor %}
-    </datalist>
+        <input list="teams" name="home_team" placeholder="Equipe domicile">
+        <input list="teams" name="away_team" placeholder="Equipe extérieur">
 
-    <br><br>
+        <datalist id="teams">
+            {% for team in teams["Team"] %}
+                <option value="{{ team }}">
+            {% endfor %}
+        </datalist>
 
-    <input type="text" name="odds_home" placeholder="Odds Home">
-    <input type="text" name="odds_draw" placeholder="Odds Draw">
-    <input type="text" name="odds_away" placeholder="Odds Away">
+        <button type="submit">Analyser</button>
 
-    <br><br>
+    </form>
 
-    <button type="submit">Predict</button>
-</form>
+</div>
 
-{% if result %}
-<h2>📊 Prediction</h2>
+<div class="box">
 
-<p>Home: {{ result.prob_home }}</p>
-<p>Draw: {{ result.prob_draw }}</p>
-<p>Away: {{ result.prob_away }}</p>
+    <h2>📊 Prediction</h2>
 
-<p>Over 2.5: {{ result.prob_over }}</p>
-<p>BTTS: {{ result.prob_btts }}</p>
+    {% if result %}
+    <div class="result">
+        Home: {{ result.prob_home }} <br>
+        Draw: {{ result.prob_draw }} <br>
+        Away: {{ result.prob_away }} <br><br>
 
-<p>Confidence: {{ result.confidence }}</p>
+        Over 2.5: {{ result.prob_over }} <br>
+        BTTS: {{ result.prob_btts }} <br><br>
 
-<hr>
+        Confidence: {{ result.confidence }}
+    </div>
+    {% endif %}
 
-<h3>📈 Edge Analysis</h3>
+</div>
 
-<p>Edge Home: {{ result.edge_home }}</p>
-<p>Edge Draw: {{ result.edge_draw }}</p>
-<p>Edge Away: {{ result.edge_away }}</p>
+<div class="box">
 
-{% endif %}
+    <h2>🔥 Top Bets</h2>
 
-<hr>
-
-<h2>🔥 Top Bets Today</h2>
-
-{% if top_bets and top_bets|length > 0 %}
-
-<table>
-    <tr>
-        <th>Match</th>
-        <th>Bet</th>
-        <th>Edge</th>
-        <th>Probability</th>
-        <th>Odds</th>
-    </tr>
-
-    {% for b in top_bets %}
-    <tr>
-
-        <td>{{ b.match }}</td>
-
-        <td class="
-            {% if b.bet == 'HOME' %}bet-home
-            {% elif b.bet == 'AWAY' %}bet-away
-            {% elif b.bet == 'DRAW' %}bet-draw
-            {% endif %}
-        ">
-            {{ b.bet }}
-        </td>
-
-        <td>{{ b.edge }}</td>
-        <td>{{ b.value }}</td>
-        <td>{{ b.odds }}</td>
-
-    </tr>
+    {% for bet in top_bets %}
+        <p>
+            {{ bet.match }} <br>
+            👉 {{ bet.bet }} ({{ bet.value }})
+        </p>
     {% endfor %}
 
-</table>
-
-{% else %}
-
-<p>❌ Aucun bet intéressant aujourd’hui</p>
-
-{% endif %}
+</div>
 
 </body>
 </html>
