@@ -7,11 +7,10 @@ from top_bets import get_top_bets
 
 app = Flask(__name__)
 
-# 🔥 SAFE CSV
+# 🔥 LOAD CSV SAFE
 try:
     teams = pd.read_csv("data_processed/team_stats.csv")
 except:
-    print("❌ CSV introuvable")
     teams = pd.DataFrame()
 
 
@@ -20,24 +19,34 @@ def index():
 
     result = None
 
-    # 🔥 TOP BETS (API)
+    # 🔥 TOP BETS
     try:
         top_bets = get_top_bets()
     except Exception as e:
         print("TOP BETS ERROR:", e)
         top_bets = []
 
-    # 🔥 PREDICTION MANUELLE
+    # 🔥 FORM SUBMIT
     if request.method == "POST":
 
         try:
             home = request.form.get("home_team")
             away = request.form.get("away_team")
 
+            # 🔥 sécurité
+            if not home or not away:
+                return render_template(
+                    "index.html",
+                    teams=teams,
+                    result=None,
+                    top_bets=top_bets
+                )
+
             result = predict_match(home, away, 2, 3, 4)
 
         except Exception as e:
             print("PRED ERROR:", e)
+            result = None
 
     return render_template(
         "index.html",
@@ -49,5 +58,4 @@ def index():
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
-    print(f"🚀 RUNNING ON {port}")
     app.run(host="0.0.0.0", port=port)
