@@ -25,46 +25,27 @@ def get_top_bets():
 
         match_name = f"{m['home']} vs {m['away']}"
 
-        # 🔥 HOME
-        if result["edge_home"] > 0.05 and result["prob_home"] > 0.55:
-            bets.append({
-                "match": match_name,
-                "bet": "HOME",
-                "value": result["prob_home"],
-                "edge": result["edge_home"],
-                "odds": odd_home
-            })
+        # 🔥 on prend toujours le meilleur choix
+        probs = {
+            "HOME": result["prob_home"],
+            "DRAW": result["prob_draw"],
+            "AWAY": result["prob_away"]
+        }
 
-        # 🔥 AWAY
-        if result["edge_away"] > 0.05 and result["prob_away"] > 0.55:
-            bets.append({
-                "match": match_name,
-                "bet": "AWAY",
-                "value": result["prob_away"],
-                "edge": result["edge_away"],
-                "odds": odd_away
-            })
+        best = max(probs, key=probs.get)
 
-        # 🔥 OVER
-        if result["prob_over"] >= 0.65:
-            bets.append({
-                "match": match_name,
-                "bet": "OVER 2.5",
-                "value": result["prob_over"],
-                "edge": None,
-                "odds": None
-            })
+        odds_map = {
+            "HOME": odd_home,
+            "DRAW": odd_draw,
+            "AWAY": odd_away
+        }
 
-        # 🔥 BTTS
-        if result["prob_btts"] >= 0.60:
-            bets.append({
-                "match": match_name,
-                "bet": "BTTS YES",
-                "value": result["prob_btts"],
-                "edge": None,
-                "odds": None
-            })
+        bets.append({
+            "match": match_name,
+            "bet": best,
+            "value": probs[best],
+            "edge": result[f"edge_{best.lower()}"],
+            "odds": odds_map[best]
+        })
 
-    bets = sorted(bets, key=lambda x: x["value"], reverse=True)
-
-    return bets[:10]
+    return sorted(bets, key=lambda x: x["value"], reverse=True)[:10]
