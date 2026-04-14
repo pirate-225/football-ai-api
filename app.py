@@ -3,6 +3,7 @@ import pandas as pd
 import os
 
 from predict_match import predict_match
+from top_bets import get_top_bets
 
 app = Flask(__name__)
 
@@ -17,20 +18,26 @@ def index():
 
     result = None
 
+    # 🔥 TEST TOP BETS
+    try:
+        top_bets = get_top_bets()
+    except Exception as e:
+        print("TOP BETS ERROR:", e)
+        top_bets = []
+
     if request.method == "POST":
 
         home = request.form.get("home_team")
         away = request.form.get("away_team")
 
         if home and away:
-
             result = predict_match(home, away, 2, 3, 4)
 
     return render_template(
         "index.html",
         teams=teams,
         result=result,
-        top_bets=[]
+        top_bets=top_bets
     )
 
 
