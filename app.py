@@ -42,7 +42,18 @@ def index():
                     top_bets=top_bets
                 )
 
-            result = predict_match(home, away, 2, 3, 4)
+            # 🔥 cotes visibles même en manuel
+odd_home = 2.0
+odd_draw = 3.2
+odd_away = 3.5
+
+result = predict_match(home, away, odd_home, odd_draw, odd_away)
+
+# 🔥 on ajoute les cotes au résultat
+if result:
+    result["odd_home"] = odd_home
+    result["odd_draw"] = odd_draw
+    result["odd_away"] = odd_away
 
         except Exception as e:
             print("PRED ERROR:", e)
