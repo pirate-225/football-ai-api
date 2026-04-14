@@ -6,7 +6,16 @@ from top_bets import get_top_bets
 
 app = Flask(__name__)
 
-teams_df = pd.read_csv("data_processed/team_stats.csv")
+# 🔥 SAFE LOAD CSV
+try:
+    if os.path.exists("data_processed/team_stats.csv"):
+        teams_df = pd.read_csv("data_processed/team_stats.csv")
+    else:
+        print("❌ CSV introuvable")
+        teams_df = pd.DataFrame()
+except Exception as e:
+    print("CSV ERROR:", e)
+    teams_df = pd.DataFrame()
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -16,19 +25,24 @@ def index():
 
     try:
         top_bets = get_top_bets()
-    except:
+    except Exception as e:
+        print("TOP BETS ERROR:", e)
         top_bets = []
 
     if request.method == "POST":
 
-        home_team = request.form["home_team"]
-        away_team = request.form["away_team"]
+        try:
+            home_team = request.form.get("home_team")
+            away_team = request.form.get("away_team")
 
-        odds_home = request.form["odds_home"]
-        odds_draw = request.form["odds_draw"]
-        odds_away = request.form["odds_away"]
+            odds_home = request.form.get("odds_home")
+            odds_draw = request.form.get("odds_draw")
+            odds_away = request.form.get("odds_away")
 
-        result = predict_match(home_team, away_team, odds_home, odds_draw, odds_away)
+            result = predict_match(home_team, away_team, odds_home, odds_draw, odds_away)
+
+        except Exception as e:
+            print("PREDICTION ERROR:", e)
 
     return render_template(
         "index.html",
@@ -40,4 +54,5 @@ def index():
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
+    print(f"🚀 Starting server on port {port}")
     app.run(host="0.0.0.0", port=port)
