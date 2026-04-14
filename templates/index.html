@@ -7,32 +7,27 @@
 <style>
 
 body {
-    font-family: Arial, sans-serif;
+    font-family: Arial;
     background: #020617;
     color: white;
     margin: 0;
 }
 
-/* HEADER */
 header {
-    background: #020617;
     padding: 15px;
     text-align: center;
-    font-size: 24px;
-    font-weight: bold;
+    font-size: 22px;
     color: #38bdf8;
     border-bottom: 1px solid #1e293b;
 }
 
-/* CONTAINER */
 .container {
     max-width: 600px;
     margin: auto;
     padding: 15px;
 }
 
-/* SEARCH BOX */
-.search-box {
+.card {
     background: #0f172a;
     padding: 15px;
     border-radius: 12px;
@@ -41,36 +36,17 @@ header {
 
 input {
     width: 100%;
-    padding: 12px;
-    margin: 6px 0;
+    padding: 10px;
+    margin: 5px 0;
     border-radius: 8px;
     border: none;
     background: #1e293b;
     color: white;
 }
 
-/* AUTOCOMPLETE LIST */
-.suggestions {
-    background: #1e293b;
-    border-radius: 8px;
-    max-height: 150px;
-    overflow-y: auto;
-}
-
-.suggestions div {
-    padding: 8px;
-    cursor: pointer;
-}
-
-.suggestions div:hover {
-    background: #38bdf8;
-    color: black;
-}
-
-/* BUTTON */
 button {
     width: 100%;
-    padding: 12px;
+    padding: 10px;
     background: #38bdf8;
     border: none;
     border-radius: 8px;
@@ -78,15 +54,6 @@ button {
     font-weight: bold;
 }
 
-/* CARD */
-.card {
-    background: #0f172a;
-    padding: 15px;
-    border-radius: 12px;
-    margin-bottom: 15px;
-}
-
-/* BET TAG */
 .bet {
     background: #38bdf8;
     color: black;
@@ -94,6 +61,14 @@ button {
     border-radius: 6px;
     display: inline-block;
     margin-top: 5px;
+}
+
+.edge-pos {
+    color: #22c55e;
+}
+
+.edge-neg {
+    color: #ef4444;
 }
 
 </style>
@@ -105,21 +80,22 @@ button {
 
 <div class="container">
 
-<!-- SEARCH -->
-<div class="search-box">
-
+<!-- FORM -->
+<div class="card">
 <form method="POST">
 
-<input type="text" id="home" name="home_team" placeholder="Equipe domicile">
-<div id="home_suggestions" class="suggestions"></div>
+<input list="teams" name="home_team" placeholder="Equipe domicile">
+<input list="teams" name="away_team" placeholder="Equipe extérieur">
 
-<input type="text" id="away" name="away_team" placeholder="Equipe extérieur">
-<div id="away_suggestions" class="suggestions"></div>
+<datalist id="teams">
+{% for team in teams["Team"] %}
+<option value="{{ team }}">
+{% endfor %}
+</datalist>
 
 <button type="submit">Analyser</button>
 
 </form>
-
 </div>
 
 <!-- RESULT -->
@@ -137,6 +113,22 @@ button {
 
 <p><strong>Confidence: {{ result.confidence }}</strong></p>
 
+<hr>
+
+<h3>📈 Edge</h3>
+
+<p class="{{ 'edge-pos' if result.edge_home > 0 else 'edge-neg' }}">
+Home Edge: {{ result.edge_home }}
+</p>
+
+<p class="{{ 'edge-pos' if result.edge_draw > 0 else 'edge-neg' }}">
+Draw Edge: {{ result.edge_draw }}
+</p>
+
+<p class="{{ 'edge-pos' if result.edge_away > 0 else 'edge-neg' }}">
+Away Edge: {{ result.edge_away }}
+</p>
+
 </div>
 {% endif %}
 
@@ -145,54 +137,28 @@ button {
 
 <h3>🔥 Top Bets</h3>
 
-{% for bet in top_bets %}
-<p>
-{{ bet.match }} <br>
-<span class="bet">{{ bet.bet }}</span> ({{ bet.value }})
-</p>
-{% endfor %}
+{% if top_bets %}
+    {% for bet in top_bets %}
+        <p>
+        {{ bet.match }} <br>
+        <span class="bet">{{ bet.bet }}</span>
+
+        {% if bet.value %}
+        ({{ bet.value }})
+        {% endif %}
+
+        {% if bet.edge %}
+        - Edge: {{ bet.edge }}
+        {% endif %}
+        </p>
+    {% endfor %}
+{% else %}
+    <p>❌ Aucun bet aujourd’hui</p>
+{% endif %}
 
 </div>
 
 </div>
-
-<!-- JS AUTOCOMPLETE -->
-<script>
-
-const teams = {{ teams["Team"].tolist() | tojson }};
-
-function setupSearch(inputId, suggestionId) {
-
-    const input = document.getElementById(inputId);
-    const box = document.getElementById(suggestionId);
-
-    input.addEventListener("input", function() {
-
-        const value = this.value.toLowerCase();
-        box.innerHTML = "";
-
-        if (value.length < 2) return;
-
-        const filtered = teams.filter(t => t.toLowerCase().includes(value)).slice(0, 5);
-
-        filtered.forEach(team => {
-            const div = document.createElement("div");
-            div.textContent = team;
-
-            div.onclick = () => {
-                input.value = team;
-                box.innerHTML = "";
-            };
-
-            box.appendChild(div);
-        });
-    });
-}
-
-setupSearch("home", "home_suggestions");
-setupSearch("away", "away_suggestions");
-
-</script>
 
 </body>
 </html>
