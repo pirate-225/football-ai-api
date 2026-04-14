@@ -4,7 +4,6 @@ import os
 
 from predict_match import predict_match
 from top_bets import get_top_bets
-from api_football import get_match_odds
 
 app = Flask(__name__)
 
@@ -12,7 +11,6 @@ app = Flask(__name__)
 try:
     teams = pd.read_csv("data_processed/team_stats.csv")
 except:
-    print("CSV ERROR")
     teams = pd.DataFrame()
 
 
@@ -24,8 +22,7 @@ def index():
     # 🔥 TOP BETS
     try:
         top_bets = get_top_bets()
-    except Exception as e:
-        print("TOP BETS ERROR:", e)
+    except:
         top_bets = []
 
     # 🔥 FORM
@@ -37,14 +34,10 @@ def index():
 
             if home and away:
 
-                # 🔥 récupération cotes API
-                odds = get_match_odds(home, away)
-
-                if odds:
-                    odd_home, odd_draw, odd_away = odds
-                else:
-                    # fallback sécurisé
-                    odd_home, odd_draw, odd_away = (2.0, 3.2, 3.5)
+                # 🔥 version stable (sans API)
+                odd_home = 2.0
+                odd_draw = 3.2
+                odd_away = 3.5
 
                 result = predict_match(home, away, odd_home, odd_draw, odd_away)
 
@@ -54,8 +47,7 @@ def index():
                     result["odd_away"] = odd_away
 
         except Exception as e:
-            print("PRED ERROR:", e)
-            result = None
+            print("ERROR:", e)
 
     return render_template(
         "index.html",
@@ -67,5 +59,4 @@ def index():
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
-    print(f"RUNNING ON PORT {port}")
     app.run(host="0.0.0.0", port=port)
