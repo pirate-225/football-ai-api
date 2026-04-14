@@ -37,13 +37,30 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
     home_xg = (home["GoalsScoredAvg"] + away["GoalsConcededAvg"]) / 2
     away_xg = (away["GoalsScoredAvg"] + home["GoalsConcededAvg"]) / 2
 
-    total_xg = home_xg + away_xg
+import math
 
-    # 🔥 OVER 2.5 (approximation rapide)
-    prob_over = min(0.85, total_xg / 2.8)
+# 🔥 fonction poisson
+def poisson(lmbda, k):
+    return (lmbda ** k * math.exp(-lmbda)) / math.factorial(k)
 
-    # 🔥 BTTS (approximation logique)
-    prob_btts = min(0.85, (home_xg * away_xg) / 2.5)
+# 🔥 distribution buts
+max_goals = 5
+
+prob_over = 0
+prob_btts = 0
+
+for i in range(max_goals + 1):
+    for j in range(max_goals + 1):
+
+        p = poisson(home_xg, i) * poisson(away_xg, j)
+
+        # OVER 2.5
+        if i + j >= 3:
+            prob_over += p
+
+        # BTTS
+        if i > 0 and j > 0:
+            prob_btts += p
 
     # 🔥 bookmaker
     imp_home = 1 / float(odd_home)
