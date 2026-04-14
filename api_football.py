@@ -10,71 +10,69 @@ HEADERS = {
 BASE_URL = "https://v3.football.api-sports.io"
 
 
-def get_match_odds(home_team, away_team):
-
-    # 🔥 sécurité totale
+def safe_request(url):
     try:
+        res = requests.get(url, headers=HEADERS, timeout=3)
+        return res.json()
+    except:
+        return None
 
-        if not API_KEY:
-            print("NO API KEY")
-            return (2.0, 3.2, 3.5)
 
-        res = requests.get(
-            f"{BASE_URL}/fixtures?next=20",
-            headers=HEADERS,
-            timeout=3
-        )
+def get_today_matches():
 
-        data = res.json()
+    if not API_KEY:
+        return []
 
-        for m in data.get("response", []):
+    data = safe_request(f"{BASE_URL}/fixtures?next=8")
 
+    if not data or "response" not in data:
+        return []
+
+    matches = []
+
+    for m in data["response"]:
+
+        try:
+            fixture_id = m["fixture"]["id"]
             home = m["teams"]["home"]["name"]
             away = m["teams"]["away"]["name"]
 
-            if home == home_team and away == away_team:
+            odds = get_odds_safe(fixture_id)
 
-                fixture_id = m["fixture"]["id"]
+            if not odds:
+                odds = (2.0, 3.2, 3.5)
 
-                odds = get_odds_safe(fixture_id)
+            matches.append({
+                "home": home,
+                "away": away,
+                "odds": odds
+            })
 
-                if odds:
-                    return odds
+        except:
+            continue
 
-        # 🔥 fallback si match non trouvé
-        return (2.0, 3.2, 3.5)
-
-    except Exception as e:
-        print("MATCH ODDS ERROR:", e)
-        return (2.0, 3.2, 3.5)
+    return matches
 
 
 def get_odds_safe(fixture_id):
 
+    data = safe_request(f"{BASE_URL}/odds?fixture={fixture_id}")
+
+    if not data or "response" not in data or not data["response"]:
+        return None
+
     try:
-
-        res = requests.get(
-            f"{BASE_URL}/odds?fixture={fixture_id}",
-            headers=HEADERS,
-            timeout=3
-        )
-
-        data = res.json()
-
-        if not data.get("response"):
-            return None
-
         bookmakers = data["response"][0]["bookmakers"]
 
         for book in bookmakers:
 
-            if book["name"] == "Bet365":
+            if book.get("name") == "Bet365":
 
-                for bet in book["bets"]:
+                for bet in book.get("bets", []):
 
-                    if bet["name"] == "Match Winner":
+                    if bet.get("name") == "Match Winner":
 
-                        values = bet["values"]
+                        values = bet.get("values", [])
 
                         odds_dict = {
                             v["value"]: float(v["odd"])
@@ -87,8 +85,7 @@ def get_odds_safe(fixture_id):
                             odds_dict.get("Away")
                         )
 
+    except:
         return None
 
-    except Exception as e:
-        print("ODDS ERROR:", e)
-        return None
+    return None
