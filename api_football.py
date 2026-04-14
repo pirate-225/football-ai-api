@@ -10,17 +10,11 @@ HEADERS = {
 BASE_URL = "https://v3.football.api-sports.io"
 
 
-def get_today_matches():
-
-    matches = []
-
-    if not API_KEY:
-        print("❌ API KEY manquante")
-        return []
+def get_match_odds(home_team, away_team):
 
     try:
         res = requests.get(
-            f"{BASE_URL}/fixtures?next=8",
+            f"{BASE_URL}/fixtures?next=20",
             headers=HEADERS,
             timeout=3
         )
@@ -29,28 +23,19 @@ def get_today_matches():
 
         for m in data.get("response", []):
 
-            fixture_id = m["fixture"]["id"]
-
             home = m["teams"]["home"]["name"]
             away = m["teams"]["away"]["name"]
 
-            odds = get_odds(fixture_id)
+            if home == home_team and away == away_team:
 
-            # 🔥 fallback si pas de cotes API
-            if odds is None:
-                odds = (2.0, 3.2, 3.5)
+                fixture_id = m["fixture"]["id"]
 
-            matches.append({
-                "home": home,
-                "away": away,
-                "odds": odds
-            })
+                return get_odds(fixture_id)
 
-        return matches
+    except:
+        return None
 
-    except Exception as e:
-        print("API ERROR:", e)
-        return []
+    return None
 
 
 def get_odds(fixture_id):
@@ -90,8 +75,7 @@ def get_odds(fixture_id):
                             odds_dict.get("Away")
                         )
 
-    except Exception as e:
-        print("ODDS ERROR:", e)
+    except:
         return None
 
     return None

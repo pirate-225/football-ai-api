@@ -23,29 +23,43 @@ def get_top_bets():
         if result is None:
             continue
 
-        match_name = f"{m['home']} vs {m['away']}"
+        match = f"{m['home']} vs {m['away']}"
 
-        # 🔥 on prend toujours le meilleur choix
-        probs = {
-            "HOME": result["prob_home"],
-            "DRAW": result["prob_draw"],
-            "AWAY": result["prob_away"]
-        }
+        # 🔥 filtre PRO
+        if result["prob_home"] > 0.60 and result["edge_home"] > 0.05:
+            bets.append({
+                "match": match,
+                "bet": "HOME",
+                "value": result["prob_home"],
+                "edge": result["edge_home"],
+                "odds": odd_home
+            })
 
-        best = max(probs, key=probs.get)
+        if result["prob_away"] > 0.60 and result["edge_away"] > 0.05:
+            bets.append({
+                "match": match,
+                "bet": "AWAY",
+                "value": result["prob_away"],
+                "edge": result["edge_away"],
+                "odds": odd_away
+            })
 
-        odds_map = {
-            "HOME": odd_home,
-            "DRAW": odd_draw,
-            "AWAY": odd_away
-        }
+        if result["prob_over"] > 0.70:
+            bets.append({
+                "match": match,
+                "bet": "OVER 2.5",
+                "value": result["prob_over"],
+                "edge": None,
+                "odds": None
+            })
 
-        bets.append({
-            "match": match_name,
-            "bet": best,
-            "value": probs[best],
-            "edge": result[f"edge_{best.lower()}"],
-            "odds": odds_map[best]
-        })
+        if result["prob_btts"] > 0.65:
+            bets.append({
+                "match": match,
+                "bet": "BTTS YES",
+                "value": result["prob_btts"],
+                "edge": None,
+                "odds": None
+            })
 
-    return sorted(bets, key=lambda x: x["value"], reverse=True)[:10]
+    return sorted(bets, key=lambda x: x["value"], reverse=True)[:8]

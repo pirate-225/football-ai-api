@@ -1,3 +1,4 @@
+from api_football import get_match_odds
 from flask import Flask, render_template, request
 import pandas as pd
 import os
@@ -27,22 +28,26 @@ def index():
 
     if request.method == "POST":
 
-        home = request.form.get("home_team")
-        away = request.form.get("away_team")
+    home = request.form.get("home_team")
+    away = request.form.get("away_team")
 
-        if home and away:
+    if home and away:
 
-            # 🔥 cotes fixes (safe)
-            odd_home = 2.0
-            odd_draw = 3.2
-            odd_away = 3.5
+        # 🔥 récupération cotes API
+        odds = get_match_odds(home, away)
 
-            result = predict_match(home, away, odd_home, odd_draw, odd_away)
+        if odds:
+            odd_home, odd_draw, odd_away = odds
+        else:
+            # fallback si API ne trouve pas
+            odd_home, odd_draw, odd_away = (2.0, 3.2, 3.5)
 
-            if result:
-                result["odd_home"] = odd_home
-                result["odd_draw"] = odd_draw
-                result["odd_away"] = odd_away
+        result = predict_match(home, away, odd_home, odd_draw, odd_away)
+
+        if result:
+            result["odd_home"] = odd_home
+            result["odd_draw"] = odd_draw
+            result["odd_away"] = odd_away
 
     return render_template(
         "index.html",
