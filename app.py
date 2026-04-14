@@ -12,7 +12,6 @@ app = Flask(__name__)
 try:
     teams = pd.read_csv("data_processed/team_stats.csv")
 except:
-    print("CSV ERROR")
     teams = pd.DataFrame()
 
 
@@ -21,35 +20,40 @@ def index():
 
     result = None
 
-    # 🔥 TOP BETS (API)
+    # 🔥 TOP BETS
     try:
         top_bets = get_top_bets()
-    except Exception as e:
-        print("TOP BETS ERROR:", e)
+    except:
         top_bets = []
 
     # 🔥 ANALYSE MANUELLE
     if request.method == "POST":
 
-        try:
-            home = request.form.get("home_team")
-            away = request.form.get("away_team")
+        home = request.form.get("home_team")
+        away = request.form.get("away_team")
 
-            if home and away:
+        if home and away:
 
-                # 🔥 fallback simple (stable)
-                odd_home, odd_draw, odd_away = (2.0, 3.2, 3.5)
+            odd_home, odd_draw, odd_away = (2.0, 3.2, 3.5)
 
-                result = predict_match(home, away, odd_home, odd_draw, odd_away)
+            # 🔥 chercher le match dans les matchs du jour
+            try:
+                matches = get_today_matches()
 
-                if result:
-                    result["odd_home"] = odd_home
-                    result["odd_draw"] = odd_draw
-                    result["odd_away"] = odd_away
+                for m in matches:
+                    if m["home"] == home and m["away"] == away:
+                        odd_home, odd_draw, odd_away = m["odds"]
+                        break
 
-        except Exception as e:
-            print("PRED ERROR:", e)
-            result = None
+            except Exception as e:
+                print("ODDS FETCH ERROR:", e)
+
+            result = predict_match(home, away, odd_home, odd_draw, odd_away)
+
+            if result:
+                result["odd_home"] = odd_home
+                result["odd_draw"] = odd_draw
+                result["odd_away"] = odd_away
 
     return render_template(
         "index.html",
@@ -61,5 +65,4 @@ def index():
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
-    print(f"RUNNING ON PORT {port}")
     app.run(host="0.0.0.0", port=port)
