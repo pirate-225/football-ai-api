@@ -47,11 +47,14 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
         home_form_boost = home_form / 1.5
         away_form_boost = away_form / 1.5
 
-# 🔥 forme légère (10-15% max)
+        home_attack = max(0.5, home_attack)
+        away_attack = max(0.5, away_attack)
+
+        # 🔥 forme légère (10-15% max)
 home_attack = home_attack * (1 + (home_form - 1.5) * 0.15)
 away_attack = away_attack * (1 + (away_form - 1.5) * 0.15)
-home_attack = max(0.5, home_attack)
-away_attack = max(0.5, away_attack)
+
+
 
         # 🔥 avantage domicile réel
         home_adv = 1.15
