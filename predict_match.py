@@ -32,11 +32,24 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
         away = away_df.iloc[0]
 
         # 🔥 FORCE AVEC AJUSTEMENTS
+        # 🔥 stats de base
         home_attack = home["GoalsScoredAvg"]
         home_defense = home["GoalsConcededAvg"]
 
         away_attack = away["GoalsScoredAvg"]
         away_defense = away["GoalsConcededAvg"]
+
+        # 🔥 FORM BOOST (très important)
+        home_form = home.get("PPG", 1.2)
+        away_form = away.get("PPG", 1.2)
+
+        # normalisation (1.0 = moyen)
+        home_form_boost = home_form / 1.5
+        away_form_boost = away_form / 1.5
+
+        # application du boost
+        home_attack *= home_form_boost
+        away_attack *= away_form_boost
 
         # 🔥 avantage domicile réel
         home_adv = 1.15
