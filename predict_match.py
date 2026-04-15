@@ -38,6 +38,15 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
         away_attack = float(away["GoalsScoredAvg"])
         away_defense = float(away["GoalsConcededAvg"])
 
+        # 🔥 ELO IMPACT (TRÈS IMPORTANT)
+        home_elo = float(home.get("ELO", 1000))
+        away_elo = float(away.get("ELO", 1000))
+
+        elo_diff = (home_elo - away_elo) / 400
+
+        home_attack *= (1 + elo_diff * 0.1)
+        away_attack *= (1 - elo_diff * 0.1)
+
         # 🔥 FORME (pondérée correctement)
         home_form = float(home.get("PPG", 1.5))
         away_form = float(away.get("PPG", 1.5))

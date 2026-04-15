@@ -1,11 +1,790 @@
-Team,GoalsScoredAvg,GoalsConcededAvg,PPG
-Liverpool,1.5,1.1,2.1
-Manchester City,1.7,0.9,2.3
-Arsenal,1.6,1.0,2.0
-Barcelona,1.6,1.2,2.0
-Real Madrid,1.7,1.1,2.2
-PSG,1.8,1.2,2.3
-Bayern Munich,1.9,1.1,2.4
-Juventus,1.3,1.0,1.8
-Inter Milan,1.7,1.0,2.2
-AC Milan,1.5,1.1,2.0
+Team,GoalsScoredAvg,GoalsConcededAvg,PPG,ELO
+Morocco,1.71,0.14,2.43,1243.0
+Mali,0.6,0.8,0.8,1080.0
+Egypt,1.29,0.71,2.0,1200.0
+Senegal,1.71,0.71,2.29,1229.0
+Nigeria,2.0,0.57,2.43,1243.0
+Algeria,1.6,0.6,2.4,1240.0
+Ivory Coast,2.0,1.2,2.0,1200.0
+Cameroon,1.2,1.0,2.0,1200.0
+KuPS,0.75,1.12,1.25,1125.0
+Milsami Orhei,0.83,1.17,1.33,1133.0
+Malmo FF,1.46,1.21,1.52,1152.0
+FC Noah,1.38,1.44,1.44,1144.0
+FC Levadia Tallinn,1.17,1.5,1.17,1117.0
+Rīgas FS,2.32,1.06,2.18,1218.0
+Olimpija Ljubljana,1.62,1.88,1.12,1112.0
+Kairat Almaty,0.88,1.62,0.81,1081.0
+Shkendija,0.81,1.44,1.25,1125.0
+Lincoln Red Imps FC,1.0,2.36,1.07,1107.0
+Drita,1.12,1.62,1.25,1125.0
+FC Differdange 03,1.25,1.38,1.12,1112.0
+Egnatia Rrogozhinë,1.0,1.5,1.67,1167.0
+Breidablik,1.36,1.79,1.07,1107.0
+Virtus,1.33,2.0,0.5,1050.0
+Zrinjski,1.12,1.5,1.25,1125.0
+Hamrun Spartans,0.79,1.86,0.71,1071.0
+FCSB,1.56,1.69,1.25,1125.0
+Ludogorets,1.39,1.5,1.39,1139.0
+Shelbourne,0.71,1.21,1.07,1107.0
+Linfield,0.88,1.12,1.0,1100.0
+FK Crvena Zvezda,1.25,0.81,1.75,1175.0
+Ferencvarosi TC,1.67,1.44,1.89,1189.0
+FC Copenhagen,1.73,1.52,1.43,1142.0
+Plzen,1.55,1.07,1.71,1171.0
+Servette FC,1.62,1.74,1.13,1113.0
+Pafos,1.14,1.0,1.64,1164.0
+Maccabi Tel Aviv,0.79,2.0,0.79,1079.0
+Dynamo Kyiv,1.42,1.25,1.25,1125.0
+Slovan Bratislava,1.82,1.28,1.77,1177.0
+Lech Poznan,1.94,1.44,1.81,1181.0
+Rangers,0.93,1.86,0.79,1079.0
+Panathinaikos,1.0,1.11,1.33,1133.0
+HNK Rijeka,1.06,1.06,1.44,1144.0
+Brann,1.19,1.25,1.19,1119.0
+Red Bull Salzburg,1.73,1.33,1.44,1144.0
+Qarabag,1.94,2.19,1.56,1156.0
+Club Brugge KV,2.11,1.43,2.0,1200.0
+Nice,1.05,1.92,0.79,1079.0
+Benfica,1.79,0.77,2.05,1205.0
+Feyenoord,1.93,1.55,1.6,1160.0
+Fenerbahçe,1.95,1.02,1.98,1198.0
+Celtic,1.25,1.58,1.33,1133.0
+Bodo/Glimt,2.0,1.71,1.5,1150.0
+Sturm Graz,1.44,1.21,1.65,1165.0
+FC Basel 1893,1.43,1.38,1.43,1143.0
+PSV Eindhoven,2.63,1.47,2.16,1216.0
+Union St. Gilloise,1.5,0.85,2.02,1202.0
+Athletic Club,1.08,1.51,1.18,1118.0
+Arsenal,2.02,0.66,2.32,1232.0
+Tottenham,1.48,1.55,1.19,1119.0
+Villarreal,1.56,1.38,1.59,1159.0
+Juventus,1.76,1.1,1.81,1181.0
+Borussia Dortmund,2.1,1.28,2.0,1200.0
+Real Madrid,2.18,1.09,2.16,1216.0
+Marseille,1.86,1.41,1.65,1165.0
+Olympiakos Piraeus,1.0,1.6,1.2,1120.0
+Slavia Praha,1.81,1.08,1.97,1197.0
+Liverpool,1.73,1.25,1.66,1166.0
+Atletico Madrid,1.89,1.29,1.78,1178.0
+Paris Saint Germain,2.41,0.98,2.27,1227.0
+Atalanta,1.36,1.16,1.57,1157.0
+Bayern München,3.49,1.0,2.66,1266.0
+Chelsea,1.71,1.4,1.52,1152.0
+Ajax,1.71,1.53,1.5,1150.0
+Inter,2.19,0.98,2.14,1214.0
+Bayer Leverkusen,1.83,1.37,1.68,1168.0
+Monaco,1.59,1.59,1.54,1154.0
+Newcastle,1.68,1.48,1.43,1143.0
+Barcelona,2.7,1.16,2.37,1237.0
+Manchester City,1.93,1.02,1.95,1195.0
+Napoli,1.43,1.15,1.85,1185.0
+Eintracht Frankfurt,1.73,2.03,1.24,1124.0
+Galatasaray,2.05,1.02,2.05,1205.0
+Sporting CP,2.38,0.8,2.27,1228.0
+Sabah FA,1.83,1.67,1.17,1117.0
+Celje,1.89,1.5,1.83,1183.0
+AEK Larnaca,1.12,0.94,1.44,1144.0
+FK Partizan,1.67,0.83,2.0,1200.0
+Sheriff Tiraspol,1.33,2.17,0.67,1067.0
+Paks,0.67,1.33,1.33,1133.0
+CFR 1907 Cluj,1.0,1.38,1.38,1138.0
+Levski Sofia,0.5,0.88,1.12,1112.0
+Shakhtar Donetsk,1.88,0.71,2.06,1206.0
+Spartak Trnava,1.72,1.34,1.69,1169.0
+BK Hacken,1.39,1.5,1.2,1120.0
+Legia Warszawa,1.57,1.43,1.64,1164.0
+Utrecht,1.55,1.25,1.39,1139.0
+Baník Ostrava,0.97,1.56,0.79,1079.0
+FC Midtjylland,2.31,0.98,2.12,1212.0
+Hibernian,1.67,1.83,0.83,1083.0
+SC Braga,1.89,0.82,1.98,1198.0
+Beşiktaş,1.8,1.29,1.77,1177.0
+Anderlecht,1.45,1.32,1.45,1145.0
+FC Lugano,1.46,1.24,1.65,1165.0
+PAOK,1.71,1.29,1.36,1136.0
+Wolfsberger AC,1.21,1.41,1.07,1107.0
+Sigma Olomouc,1.02,1.23,1.3,1130.0
+Samsunspor,1.27,1.2,1.44,1144.0
+BSC Young Boys,1.84,1.81,1.47,1147.0
+Genk,1.59,1.46,1.57,1157.0
+Aberdeen,0.62,2.38,0.38,1038.0
+AS Roma,1.48,0.93,1.76,1176.0
+SC Freiburg,1.5,1.32,1.57,1158.0
+Real Betis,1.5,1.12,1.6,1160.0
+Nottingham Forest,1.2,1.24,1.2,1120.0
+Dinamo Zagreb,1.6,2.2,1.1,1110.0
+Lille,1.51,1.15,1.66,1166.0
+GO Ahead Eagles,1.47,1.55,1.13,1113.0
+Aston Villa,1.94,1.27,2.02,1202.0
+Bologna,1.42,1.13,1.62,1162.0
+VfB Stuttgart,1.95,1.29,1.8,1180.0
+Celta Vigo,1.48,1.27,1.52,1152.0
+Lyon,1.59,0.95,1.87,1187.0
+FC Porto,1.93,0.57,2.5,1250.0
+KI Klaksvik,1.17,0.5,2.17,1217.0
+Kauno Žalgiris,1.17,1.0,1.33,1133.0
+Neman,1.5,1.38,1.62,1162.0
+BFC Daugavpils,1.48,1.77,1.36,1136.0
+Vikingur Reykjavik,2.83,1.33,2.0,1200.0
+St Patrick's Athl.,1.5,1.5,1.67,1167.0
+Larne,0.5,1.0,0.83,1083.0
+Auda,1.27,1.32,1.34,1134.0
+Silkeborg,1.23,2.0,1.03,1103.0
+Dinamo Tirana,1.33,1.5,1.33,1133.0
+AIK Stockholm,1.5,1.08,1.69,1169.0
+Rosenborg,1.83,0.83,2.17,1217.0
+Shamrock Rovers,1.42,1.25,1.25,1125.0
+Gyori ETO FC,1.5,1.33,1.5,1150.0
+AZ Alkmaar,1.85,1.32,1.74,1174.0
+Arda Kardzhali,1.0,0.83,1.33,1133.0
+Sparta Praha,1.93,1.05,2.02,1202.0
+Hammarby FF,1.81,0.92,1.94,1194.0
+Charleroi,1.21,1.38,1.12,1112.0
+Başakşehir,1.66,1.06,1.63,1163.0
+Jagiellonia,1.5,1.0,1.86,1186.0
+Omonia Nicosia,1.57,0.71,1.64,1164.0
+Polessya,1.83,1.83,1.0,1100.0
+Riga,2.44,0.92,2.31,1231.0
+AEK Athens FC,1.8,1.07,1.87,1187.0
+Santa Clara,0.94,1.17,1.03,1103.0
+FK Košice,1.62,1.69,1.31,1131.0
+Lausanne,1.45,1.43,1.36,1136.0
+Austria Vienna,1.59,1.52,1.55,1155.0
+Brondby,1.28,1.06,1.34,1134.0
+Universitatea Craiova,1.83,1.33,1.58,1158.0
+Raków Częstochowa,1.57,0.64,2.07,1207.0
+Žilina,1.93,1.31,1.69,1169.0
+Rapid Vienna,1.25,1.28,1.44,1144.0
+FSV Mainz 05,1.27,1.25,1.4,1140.0
+Strasbourg,1.62,1.15,1.72,1172.0
+Rayo Vallecano,1.26,1.12,1.43,1143.0
+Fiorentina,1.33,1.33,1.31,1131.0
+Crystal Palace,1.25,1.0,1.52,1152.0
+Bournemouth,1.5,1.53,1.41,1141.0
+Burnley,1.03,1.97,0.62,1062.0
+Brighton,1.34,1.16,1.44,1144.0
+Fulham,1.34,1.44,1.38,1138.0
+Sunderland,1.03,1.12,1.44,1144.0
+West Ham,1.25,1.78,1.0,1100.0
+Wolves,0.75,1.81,0.53,1053.0
+Brentford,1.5,1.38,1.47,1147.0
+Manchester United,1.78,1.41,1.72,1172.0
+Leeds,1.22,1.53,1.12,1112.0
+Everton,1.22,1.16,1.47,1147.0
+Birmingham,1.21,1.24,1.33,1133.0
+Ipswich,1.73,1.02,1.83,1183.0
+Southampton,1.74,1.19,1.71,1171.0
+Wrexham,1.5,1.43,1.52,1152.0
+Charlton,0.93,1.21,1.17,1117.0
+Watford,1.24,1.21,1.36,1136.0
+Coventry,2.0,1.0,2.02,1202.0
+Hull City,1.52,1.43,1.62,1162.0
+West Brom,1.0,1.33,1.1,1110.0
+Blackburn,0.88,1.23,1.12,1112.0
+Middlesbrough,1.48,1.0,1.71,1171.0
+Swansea,1.19,1.29,1.36,1136.0
+Norwich,1.31,1.19,1.38,1138.0
+Millwall,1.33,1.12,1.74,1174.0
+QPR,1.38,1.5,1.38,1138.0
+Preston,1.19,1.26,1.36,1136.0
+Stoke City,1.17,1.1,1.31,1131.0
+Derby,1.45,1.26,1.5,1150.0
+Oxford United,0.98,1.29,1.05,1105.0
+Portsmouth,1.02,1.36,1.14,1114.0
+Sheffield Utd,1.4,1.4,1.29,1129.0
+Bristol City,1.24,1.21,1.38,1138.0
+Leicester,1.29,1.52,1.12,1112.0
+Sheffield Wednesday,0.6,1.95,0.33,1033.0
+Luton,1.4,1.21,1.52,1152.0
+AFC Wimbledon,1.14,1.51,1.16,1116.0
+Cardiff,1.83,1.02,1.95,1195.0
+Peterborough,1.46,1.41,1.24,1124.0
+Huddersfield,1.53,1.33,1.47,1147.0
+Leyton Orient,1.33,1.53,1.19,1119.0
+Wigan,1.14,1.3,1.28,1128.0
+Northampton,0.83,1.48,0.83,1083.0
+Rotherham,0.86,1.55,0.88,1088.0
+Port Vale,0.75,1.35,0.88,1088.0
+Burton Albion,1.07,1.3,1.19,1119.0
+Mansfield Town,1.22,1.05,1.32,1132.0
+Bradford,1.24,1.1,1.69,1169.0
+Wycombe,1.47,1.19,1.4,1140.0
+Doncaster,1.02,1.52,1.26,1126.0
+Exeter City,1.09,1.28,1.09,1109.0
+Blackpool,1.19,1.51,1.19,1119.0
+Stevenage,1.05,1.02,1.6,1160.0
+Plymouth,1.57,1.38,1.5,1150.0
+Barnsley,1.54,1.59,1.34,1134.0
+Lincoln,1.88,0.86,2.21,1221.0
+Reading,1.44,1.28,1.44,1144.0
+Stockport County,1.49,1.22,1.71,1171.0
+Bolton,1.49,1.05,1.7,1170.0
+Rennes,1.69,1.41,1.72,1172.0
+Lens,1.93,0.96,2.11,1211.0
+Le Havre,0.83,1.28,1.0,1100.0
+Toulouse,1.34,1.34,1.28,1128.0
+Stade Brestois 29,1.32,1.54,1.29,1129.0
+Angers,0.86,1.34,1.14,1114.0
+Paris FC,1.28,1.55,1.21,1121.0
+Auxerre,0.79,1.28,0.83,1083.0
+Lorient,1.31,1.52,1.31,1131.0
+Metz,0.9,2.17,0.52,1052.0
+Nantes,0.86,1.61,0.68,1068.0
+Girona,1.06,1.45,1.23,1123.0
+Oviedo,0.77,1.55,0.87,1087.0
+Mallorca,1.26,1.55,1.1,1110.0
+Valencia,1.1,1.48,1.13,1113.0
+Real Sociedad,1.58,1.55,1.35,1135.0
+Alaves,1.13,1.48,1.06,1106.0
+Levante,1.13,1.61,0.94,1094.0
+Getafe,0.87,1.03,1.32,1132.0
+Sevilla,1.26,1.65,1.1,1110.0
+Espanyol,1.19,1.55,1.23,1123.0
+Elche,1.26,1.52,1.03,1103.0
+Osasuna,1.19,1.23,1.26,1126.0
+Sassuolo,1.22,1.34,1.31,1131.0
+Genoa,1.19,1.41,1.12,1112.0
+Lecce,0.66,1.41,0.84,1084.0
+AC Milan,1.47,0.84,1.97,1197.0
+Cremonese,0.81,1.47,0.84,1084.0
+Cagliari,1.03,1.38,1.03,1103.0
+Como,1.75,0.81,1.81,1181.0
+Lazio,1.0,0.94,1.38,1138.0
+Parma,0.72,1.25,1.12,1112.0
+Pisa,0.72,1.81,0.56,1056.0
+Udinese,1.19,1.31,1.34,1134.0
+Hellas Verona,0.72,1.72,0.56,1056.0
+Torino,1.16,1.69,1.22,1122.0
+RB Leipzig,1.93,1.24,1.93,1193.0
+FC Augsburg,1.24,1.83,1.14,1114.0
+1899 Hoffenheim,1.97,1.48,1.76,1176.0
+Werder Bremen,1.1,1.79,0.97,1097.0
+1. FC Heidenheim,1.1,2.21,0.66,1066.0
+VfL Wolfsburg,1.34,2.24,0.72,1072.0
+Union Berlin,1.14,1.72,1.1,1110.0
+FC St. Pauli,0.86,1.72,0.86,1086.0
+1. FC Köln,1.48,1.72,1.03,1103.0
+Borussia Mönchengladbach,1.21,1.69,1.03,1103.0
+Hamburger SV,1.1,1.55,1.07,1107.0
+Fortuna Sittard,1.47,1.83,1.2,1120.0
+NEC Nijmegen,2.4,1.6,1.8,1180.0
+Excelsior,1.03,1.7,0.93,1093.0
+NAC Breda,1.0,1.7,0.83,1083.0
+Heerenveen,1.77,1.67,1.47,1147.0
+FC Volendam,1.03,1.67,0.93,1093.0
+Sparta Rotterdam,1.17,1.63,1.4,1140.0
+PEC Zwolle,1.33,2.0,1.13,1113.0
+Twente,1.7,1.07,1.77,1177.0
+Telstar,1.3,1.73,0.9,1090.0
+Groningen,1.4,1.23,1.4,1140.0
+Heracles,1.13,2.57,0.63,1063.0
+Casa Pia,1.0,1.86,0.89,1089.0
+Nacional,1.07,1.41,0.86,1086.0
+GIL Vicente,1.52,1.03,1.59,1159.0
+Arouca,1.28,2.0,1.1,1110.0
+AVS,0.66,2.14,0.41,1041.0
+Famalicao,1.24,0.86,1.62,1162.0
+Moreirense,1.1,1.41,1.24,1124.0
+Alverca,1.1,1.62,1.21,1121.0
+Tondela,0.75,1.64,0.75,1075.0
+Estoril,1.76,1.72,1.28,1128.0
+Estrela,1.14,1.66,0.97,1097.0
+Guimaraes,1.21,1.48,1.24,1124.0
+Rio Ave,1.07,1.66,1.14,1114.0
+Antwerp,1.03,1.12,1.09,1109.0
+Dender,0.81,1.66,0.69,1069.0
+Cercle Brugge,1.38,1.53,1.09,1109.0
+Zulte Waregem,1.31,1.56,1.12,1112.0
+KV Mechelen,1.25,1.22,1.44,1144.0
+RAAL La Louvière,0.94,1.28,0.97,1097.0
+Standard Liege,0.97,1.19,1.34,1134.0
+KVC Westerlo,1.25,1.28,1.41,1141.0
+OH Leuven,1.03,1.44,1.09,1109.0
+St. Truiden,1.5,1.19,1.78,1178.0
+Gent,1.59,1.47,1.44,1144.0
+Gaziantep FK,1.31,1.69,1.17,1117.0
+Gençlerbirliği S.K.,0.97,1.45,0.86,1086.0
+Antalyaspor,1.03,1.62,0.97,1097.0
+Kasımpaşa,0.97,1.41,0.97,1097.0
+Rizespor,1.34,1.38,1.24,1124.0
+Göztepe,1.24,0.9,1.62,1162.0
+Eyüpspor,0.69,1.48,0.76,1076.0
+Konyaspor,1.24,1.41,1.17,1117.0
+Trabzonspor,1.93,1.07,2.21,1221.0
+Kocaelispor,0.83,1.14,1.21,1121.0
+Fatih Karagümrük,0.9,1.76,0.69,1069.0
+Alanyaspor,1.21,1.17,1.14,1114.0
+Kayserispor,0.72,1.86,0.79,1079.0
+FC Zurich,1.36,1.91,1.03,1103.0
+FC Sion,1.55,1.06,1.58,1158.0
+FC ST. Gallen,1.94,1.21,1.82,1182.0
+Grasshoppers,1.21,1.97,0.82,1082.0
+FC Luzern,1.94,1.85,1.21,1121.0
+FC Thun,2.25,1.12,2.22,1222.0
+FC Winterthur,1.06,2.61,0.58,1058.0
+Lask Linz,1.58,1.42,1.69,1169.0
+SCR Altach,1.12,1.08,1.38,1138.0
+WSG Wattens,1.38,1.65,1.31,1131.0
+TSV Hartberg,1.15,1.04,1.35,1135.0
+Ried,1.27,1.38,1.35,1135.0
+FC BW Linz,1.15,1.65,0.81,1081.0
+Grazer AK,1.19,1.5,1.12,1112.0
+Sao Paulo,1.25,1.16,1.49,1149.0
+Sport Recife,0.74,1.97,0.45,1045.0
+Gremio,1.24,1.31,1.27,1127.0
+Atletico-MG,1.16,1.16,1.27,1127.0
+Cruzeiro,1.41,1.06,1.63,1163.0
+Mirassol,1.52,1.25,1.41,1141.0
+Juventude,0.92,1.82,0.92,1092.0
+Vitoria,0.96,1.38,1.23,1123.0
+Fortaleza EC,1.13,1.53,1.13,1113.0
+Fluminense,1.39,1.06,1.71,1171.0
+Flamengo,2.0,0.77,2.06,1206.0
+Internacional,1.08,1.37,1.16,1116.0
+Palmeiras,1.68,0.82,2.08,1208.0
+Botafogo,1.58,1.23,1.58,1158.0
+Vasco DA Gama,1.45,1.57,1.18,1118.0
+Santos,1.32,1.26,1.29,1129.0
+Bahia,1.35,1.17,1.67,1167.0
+Corinthians,1.15,1.07,1.47,1147.0
+RB Bragantino,1.2,1.24,1.34,1134.0
+Ceara,0.89,1.05,1.13,1113.0
+Atletico Paranaense,1.55,1.18,1.73,1173.0
+Remo,1.0,1.64,0.73,1073.0
+Coritiba,1.18,1.09,1.45,1145.0
+Chapecoense-sc,1.0,1.8,0.8,1080.0
+Godoy Cruz,0.59,1.16,0.91,1091.0
+Rosario Central,1.19,0.65,1.88,1188.0
+Tigre,1.04,0.81,1.48,1148.0
+Velez Sarsfield,0.89,0.98,1.41,1141.0
+Defensa Y Justicia,1.07,1.18,1.27,1127.0
+Banfield,0.96,1.27,1.07,1107.0
+Lanus,1.09,0.83,1.55,1155.0
+Deportivo Riestra,0.79,0.7,1.26,1126.0
+Newells Old Boys,0.78,1.36,0.96,1096.0
+Independ. Rivadavia,1.24,1.04,1.57,1157.0
+Barracas Central,1.1,1.08,1.48,1148.0
+Racing Club,1.24,0.92,1.58,1158.0
+Independiente,1.21,0.85,1.5,1150.0
+Sarmiento Junin,0.78,1.11,1.13,1113.0
+Belgrano Cordoba,0.87,1.02,1.31,1131.0
+Huracan,0.98,0.82,1.51,1151.0
+San Martin S.J.,0.56,1.06,0.88,1088.0
+Atletico Tucuman,1.04,1.36,0.98,1098.0
+San Lorenzo,0.88,0.78,1.49,1149.0
+Talleres Cordoba,0.74,0.89,1.2,1120.0
+Estudiantes L.P.,1.1,0.94,1.52,1152.0
+Union Santa Fe,1.11,1.0,1.26,1126.0
+Instituto Cordoba,0.87,1.2,1.11,1111.0
+Gimnasia L.P.,0.88,1.15,1.27,1127.0
+Platense,0.73,0.92,1.24,1124.0
+River Plate,1.38,0.77,1.73,1173.0
+Boca Juniors,1.4,0.66,1.8,1180.0
+Argentinos JRS,1.27,0.71,1.78,1178.0
+Central Cordoba de Santiago,0.98,1.09,1.21,1121.0
+Aldosivi,0.76,1.33,0.87,1087.0
+Gimnasia M.,0.77,1.23,1.0,1100.0
+Estudiantes de Rio Cuarto,0.31,1.46,0.38,1038.0
+Deportes Iquique,1.13,2.0,0.8,1080.0
+Coquimbo Unido,1.58,0.71,2.29,1229.0
+Palestino,1.41,1.23,1.54,1154.0
+Cobresal,1.28,1.49,1.38,1138.0
+O'Higgins,1.41,1.23,1.77,1177.0
+Huachipato,1.49,1.38,1.49,1149.0
+Universidad de Chile,1.74,0.97,1.74,1174.0
+Nublense,1.05,1.18,1.26,1126.0
+D. La Serena,1.08,1.62,1.0,1100.0
+Colo Colo,1.45,1.05,1.63,1163.0
+Deportes Limache,1.44,1.33,1.23,1123.0
+Everton de Vina,0.85,1.38,0.87,1087.0
+U. Catolica,1.72,1.03,1.92,1192.0
+A. Italiano,1.59,1.38,1.59,1159.0
+Union La Calera,1.0,1.33,1.08,1108.0
+Union Espanola,1.1,1.93,0.7,1070.0
+Concepción,0.44,1.56,0.44,1044.0
+Universidad de Concepcion,0.89,1.56,1.56,1156.0
+Chico,0.71,1.56,0.85,1085.0
+Bucaramanga,1.32,0.9,1.56,1156.0
+America de Cali,1.28,0.87,1.63,1163.0
+Llaneros,0.96,1.21,1.18,1118.0
+Atletico Nacional,1.76,1.03,1.84,1184.0
+Once Caldas,1.24,1.16,1.44,1144.0
+Santa Fe,1.2,1.03,1.53,1153.0
+Deportivo Pereira,0.98,1.54,0.95,1095.0
+Junior,1.41,1.07,1.69,1169.0
+Deportivo Cali,0.96,1.05,1.21,1121.0
+Alianza Valledupar,1.04,1.2,1.3,1130.0
+Independiente Medellin,1.46,1.07,1.58,1158.0
+Águilas Doradas,1.11,1.18,1.25,1125.0
+Internacional de Bogota,0.84,1.52,0.88,1088.0
+Deportes Tolima,1.39,0.9,1.76,1176.0
+Deportivo Pasto,1.21,1.16,1.41,1141.0
+Fortaleza FC,0.98,1.26,1.21,1121.0
+Envigado,0.85,1.27,0.95,1095.0
+Millonarios,1.35,1.05,1.53,1153.0
+Union Magdalena,0.9,1.55,0.8,1080.0
+Jaguares,0.88,1.75,0.88,1088.0
+Cucuta,1.31,1.69,0.94,1094.0
+Los Angeles FC,2.0,1.05,1.89,1189.0
+Minnesota United FC,1.53,1.33,1.58,1158.0
+Orlando City SC,1.67,1.86,1.36,1136.0
+Philadelphia Union,1.55,1.14,1.66,1166.0
+Atlanta United FC,1.07,1.83,0.78,1078.0
+CF Montreal,1.02,1.93,0.76,1076.0
+Columbus Crew,1.57,1.45,1.43,1143.0
+Chicago Fire,1.86,1.61,1.59,1159.0
+DC United,0.83,1.83,0.8,1080.0
+Toronto FC,1.15,1.34,1.05,1105.0
+FC Cincinnati,1.44,1.44,1.73,1173.0
+New York Red Bulls,1.44,1.51,1.32,1132.0
+Inter Miami,2.43,1.53,1.96,1196.0
+New York City FC,1.52,1.28,1.67,1167.0
+Houston Dynamo,1.32,1.8,1.07,1108.0
+FC Dallas,1.58,1.6,1.33,1133.0
+Nashville SC,1.73,1.3,1.66,1166.0
+New England Revolution,1.4,1.5,1.12,1112.0
+Austin,1.09,1.44,1.23,1123.0
+Sporting Kansas City,1.29,2.12,0.78,1078.0
+St. Louis City,1.22,1.63,0.93,1093.0
+Colorado Rapids,1.54,1.66,1.29,1129.0
+Seattle Sounders,1.65,1.28,1.7,1170.0
+Charlotte,1.57,1.34,1.61,1161.0
+San Jose Earthquakes,1.78,1.59,1.44,1144.0
+Real Salt Lake,1.24,1.46,1.32,1132.0
+Portland Timbers,1.29,1.62,1.22,1122.0
+Vancouver Whitecaps,2.07,1.07,1.93,1193.0
+Los Angeles Galaxy,1.37,1.88,0.93,1093.0
+San Diego,1.91,1.24,1.83,1183.0
+Puebla,1.03,1.9,0.81,1081.0
+Atlas,1.23,1.71,1.16,1116.0
+FC Juarez,1.49,1.66,1.23,1123.0
+Club America,1.52,1.03,1.7,1170.0
+Club Tijuana,1.47,1.29,1.41,1141.0
+Club Queretaro,1.03,1.52,1.13,1113.0
+Toluca,1.89,0.89,2.0,1200.0
+Necaxa,1.32,1.68,1.06,1106.0
+Santos Laguna,1.26,2.03,0.94,1094.0
+U.N.A.M. - Pumas,1.59,1.34,1.5,1150.0
+Cruz Azul,1.77,1.11,1.97,1197.0
+Mazatlán,1.16,1.84,0.81,1081.0
+Pachuca,1.39,1.12,1.61,1161.0
+Monterrey,1.66,1.46,1.49,1149.0
+Leon,0.97,1.77,1.03,1103.0
+Atletico San Luis,1.48,1.68,1.0,1100.0
+Tigres UANL,1.78,1.05,1.73,1173.0
+Guadalajara Chivas,1.79,1.27,1.85,1185.0
+Manta FC,1.09,1.55,0.98,1098.0
+Barcelona SC,1.33,1.06,1.71,1171.0
+Aucas,1.44,1.29,1.46,1146.0
+Tecnico Universitario,0.89,1.41,1.0,1100.0
+Libertad,1.29,1.23,1.38,1138.0
+Independiente del Valle,1.73,0.79,2.1,1210.0
+Macara,1.23,0.83,1.5,1150.0
+Orense SC,1.15,1.29,1.38,1138.0
+LDU de Quito,1.56,1.04,1.65,1165.0
+Cuniburo,1.11,1.42,0.89,1089.0
+El Nacional,1.13,1.72,1.15,1115.0
+Deportivo Cuenca,1.25,1.02,1.46,1146.0
+Emelec,1.0,1.23,1.31,1131.0
+Universidad Catolica,1.67,1.12,1.54,1154.0
+Mushuc Runa SC,1.16,1.45,1.05,1105.0
+Delfin SC,0.72,1.4,1.0,1100.0
+Leones del Norte,0.5,1.12,0.88,1088.0
+Guayaquil City FC,0.62,1.12,1.12,1112.0
+Sport Huancayo,1.36,1.4,1.27,1127.0
+Alianza Atletico,1.16,0.89,1.51,1151.0
+FBC Melgar,1.51,1.13,1.56,1156.0
+UTC Cajamarca,1.0,1.61,1.04,1104.0
+Atletico Grau,1.07,1.32,1.02,1102.0
+Ayacucho FC,0.86,1.6,0.83,1083.0
+Alianza Lima,1.49,0.83,1.98,1198.0
+Cusco,1.68,0.98,1.89,1189.0
+Alianza Universidad,1.11,1.89,0.8,1080.0
+Sporting Cristal,1.71,1.16,1.67,1167.0
+Sport Boys,1.09,1.51,0.98,1098.0
+Juan Pablo II College,1.04,1.63,1.02,1102.0
+Comerciantes Unidos,1.14,1.48,1.11,1111.0
+Universitario,1.8,0.73,2.2,1220.0
+Cienciano,1.73,1.32,1.57,1157.0
+ADT,1.16,1.4,1.29,1129.0
+Club Deportivo Los Chankas,1.43,1.43,1.66,1166.0
+Deportivo Garcilaso,1.3,1.14,1.41,1141.0
+Deportivo Binacional,1.0,1.65,1.0,1100.0
+FC Cajamarca,1.11,1.89,0.56,1056.0
+UCV Moquegua,1.1,1.5,1.3,1130.0
+Gamba Osaka,1.38,1.4,1.48,1148.0
+Cerezo Osaka,1.42,1.4,1.33,1133.0
+Vissel Kobe,1.39,0.88,1.8,1180.0
+Urawa,1.23,1.06,1.48,1148.0
+Yokohama F. Marinos,1.23,1.35,1.08,1108.0
+Albirex Niigata,0.95,1.76,0.63,1063.0
+Yokohama FC,0.71,1.18,0.92,1092.0
+FC Tokyo,1.16,1.14,1.43,1143.0
+Fagiano Okayama,0.92,1.25,1.15,1115.0
+Kyoto Sanga,1.6,1.06,1.73,1173.0
+Avispa Fukuoka,0.88,1.12,1.19,1119.0
+Kashiwa Reysol,1.54,1.0,1.77,1177.0
+Shonan Bellmare,0.95,1.66,0.84,1084.0
+Kashima,1.58,0.75,2.12,1212.0
+Kawasaki Frontale,1.69,1.56,1.44,1144.0
+Nagoya Grampus,1.25,1.44,1.21,1121.0
+Machida Zelvia,1.35,1.08,1.61,1161.0
+Sanfrecce Hiroshima,1.23,0.88,1.65,1165.0
+Tokyo Verdy,0.75,1.17,1.15,1115.0
+Shimizu S-pulse,1.1,1.24,1.2,1120.0
+V-varen Nagasaki,1.0,1.5,1.2,1120.0
+JEF United Chiba,1.0,1.5,0.9,1090.0
+Mito Hollyhock,1.0,1.6,0.9,1090.0
+Pohang Steelers,1.0,1.13,1.44,1144.0
+Daejeon Citizen,1.42,1.2,1.58,1158.0
+Jeju United FC,1.04,1.28,1.13,1113.0
+FC Seoul,1.47,1.24,1.51,1151.0
+Gwangju FC,0.98,1.18,1.33,1133.0
+Suwon City FC,1.43,1.54,1.2,1120.0
+Ulsan Hyundai FC,1.16,1.31,1.27,1127.0
+FC Anyang,1.24,1.22,1.24,1124.0
+Daegu FC,1.38,1.82,1.0,1100.0
+Gangwon FC,1.0,1.04,1.36,1136.0
+Jeonbuk Motors,1.6,0.84,2.0,1200.0
+Gimcheon Sangmu FC,1.44,1.16,1.49,1149.0
+Suwon Bluewings,1.77,1.15,1.83,1183.0
+Bucheon FC 1995,1.41,1.16,1.69,1169.0
+Incheon United,1.63,0.91,1.85,1185.0
+Gyeongnam FC,0.89,1.51,1.0,1100.0
+Cheonan City,1.07,1.71,0.82,1082.0
+Jeonnam Dragons,1.54,1.41,1.43,1143.0
+Busan I Park,1.37,1.15,1.61,1161.0
+Gimpo Citizen,1.24,0.93,1.47,1147.0
+Ansan Greeners,0.76,1.54,0.76,1076.0
+Seongnam FC,1.17,0.81,1.64,1164.0
+Hwaseong,0.91,1.24,1.04,1104.0
+Cheongju,0.85,1.63,0.78,1078.0
+Seoul E-Land FC,1.64,1.09,1.66,1166.0
+Asan Mugunghwa,1.38,1.24,1.4,1140.0
+Gimhae City,0.67,2.5,0.17,1017.0
+Yongin City,0.86,1.86,0.43,1043.0
+Paju Citizen,1.57,1.57,1.29,1129.0
+Adelaide United,1.71,1.42,1.54,1154.0
+Sydney,1.29,0.96,1.54,1154.0
+Brisbane Roar,1.0,1.29,1.08,1108.0
+Macarthur,1.33,1.71,1.29,1129.0
+Western Sydney Wanderers,1.08,1.62,0.88,1088.0
+Melbourne City,1.21,1.21,1.46,1146.0
+Melbourne Victory,1.67,1.29,1.5,1150.0
+Auckland,1.67,1.08,1.71,1171.0
+Perth Glory,1.25,1.58,1.12,1112.0
+Wellington Phoenix,1.42,1.79,1.25,1125.0
+Central Coast Mariners,1.42,1.58,1.21,1121.0
+Newcastle Jets,2.04,1.54,1.83,1183.0
+Chabab Atl. Khenifra,0.71,0.71,1.38,1138.0
+Wydad Fès,1.14,0.95,1.38,1138.0
+Chabab Mohammédia,0.81,1.14,1.38,1138.0
+Amal Tiznit,1.24,0.76,1.67,1167.0
+Union Sportive Boujaad,0.81,0.71,1.19,1119.0
+Moghreb Tetouan,0.95,0.71,1.67,1167.0
+Riadi Salmi,1.24,1.0,1.57,1157.0
+Stade Marocain,0.76,0.95,1.1,1110.0
+El Massira,0.76,0.57,1.38,1138.0
+USM Oujda,1.0,1.0,1.14,1114.0
+Widad Témara,1.14,0.86,1.76,1176.0
+Chabab Ben Guerir,0.9,1.19,1.05,1105.0
+KAC Kenitra,1.0,1.1,1.14,1114.0
+Raja Beni Mellal,0.48,1.0,0.86,1086.0
+Mouloudia Oujda,1.33,1.19,1.43,1143.0
+Racing de Casablanca,0.71,1.14,0.76,1076.0
+ES Metlaoui,0.6,0.92,1.28,1128.0
+CA Bizertin,0.64,0.88,1.28,1128.0
+AS Gabes,0.4,1.2,0.68,1068.0
+ES Tunis,1.67,0.29,2.25,1225.0
+Club Africain,1.44,0.32,2.2,1220.0
+AS Marsa,0.84,1.04,1.12,1112.0
+JS Kairouanaise,0.68,1.52,0.96,1096.0
+AS Soliman,0.44,1.08,0.68,1068.0
+CS Sfaxien,1.36,0.48,1.96,1196.0
+ES Zarzis,0.83,1.0,1.17,1117.0
+US Ben Guerdane,0.6,0.8,1.12,1112.0
+Olympique Béja,0.56,1.44,0.88,1088.0
+US Monastirienne,0.92,0.56,1.56,1156.0
+Stade Tunisien,1.16,0.36,1.88,1188.0
+Jeunesse Sportive Omrane,0.76,1.04,1.28,1128.0
+ES Sahel,0.96,0.88,1.4,1140.0
+Wadi Degla,1.04,0.83,1.46,1146.0
+Pyramids FC,1.62,0.76,2.1,1210.0
+AL Masry,1.41,1.14,1.5,1150.0
+Al Ittihad,0.79,1.12,1.08,1108.0
+Ceramica Cleopatra,1.41,0.82,1.82,1182.0
+Zamalek SC,1.71,0.67,2.19,1219.0
+Smouha SC,1.0,0.77,1.41,1141.0
+El Geish,0.71,1.04,1.21,1121.0
+El Mokawloon,0.71,1.04,0.96,1096.0
+Masr,1.0,0.83,1.38,1138.0
+Ismaily SC,0.5,1.25,0.58,1058.0
+Petrojet,1.04,1.17,1.25,1125.0
+Future FC,0.79,1.04,1.12,1112.0
+Al Ahly,1.64,0.95,2.0,1200.0
+Kahraba Ismailia,1.04,1.67,0.83,1083.0
+El Gouna FC,0.67,0.67,1.29,1129.0
+National Bank of Egypt,1.04,0.79,1.38,1138.0
+Ghazl El Mehalla,0.62,0.71,1.04,1104.0
+Pharco,0.5,1.12,0.83,1083.0
+Enppi,1.05,0.77,1.55,1155.0
+Haras El Hodood,0.75,1.46,0.79,1079.0
+Amazulu,1.04,0.92,1.62,1162.0
+Orbit College,0.71,1.62,0.79,1079.0
+Polokwane City,0.83,0.7,1.43,1143.0
+Magesi,0.71,1.46,0.71,1071.0
+Chippa United,0.8,1.32,0.96,1096.0
+Mamelodi Sundowns,1.83,0.52,2.43,1243.0
+Richards Bay,0.83,1.12,1.12,1112.0
+Marumo Gallants,0.71,1.42,0.79,1079.0
+Orlando Pirates,1.96,0.46,2.29,1229.0
+Sekhukhune United,1.0,0.71,1.58,1158.0
+Siwelele,0.57,0.74,1.17,1117.0
+Golden Arrows,1.21,1.29,1.29,1129.0
+TS Galaxy,1.04,1.38,1.04,1104.0
+Durban City,0.83,0.71,1.46,1146.0
+Stellenbosch,0.87,1.09,1.22,1122.0
+Kaizer Chiefs,1.22,0.61,1.96,1196.0
+Djurgardens IF,1.75,1.06,1.72,1172.0
+IF Brommapojkarna,1.38,1.59,1.03,1103.0
+IFK Goteborg,1.28,1.16,1.59,1159.0
+IF Elfsborg,1.53,1.66,1.38,1138.0
+Mjallby AIF,1.78,0.72,2.34,1234.0
+IFK Norrkoping,1.25,1.88,0.94,1094.0
+Osters IF,0.97,1.6,0.87,1087.0
+Halmstad,0.78,1.72,1.09,1109.0
+Degerfors IF,1.12,1.72,1.03,1103.0
+IFK Varnamo,1.2,2.3,0.53,1053.0
+Sirius,1.81,1.59,1.41,1141.0
+Gais,1.44,1.06,1.62,1162.0
+Sparta Praha II,0.74,2.0,0.74,1074.0
+Baník Ostrava II,1.48,1.39,1.43,1143.0
+Příbram,0.96,1.09,1.52,1152.0
+Opava,1.65,0.96,1.78,1178.0
+Vlašim,1.39,1.13,1.3,1130.0
+Slavia Praha II,1.48,1.39,1.26,1126.0
+Ústí nad Labem,1.83,1.52,1.57,1157.0
+Vysočina Jihlava,0.96,1.3,0.83,1083.0
+České Budějovice,0.96,1.35,1.17,1117.0
+Zbrojovka Brno,2.13,0.78,2.57,1257.0
+Táborsko,1.74,1.04,1.87,1187.0
+Prostějov,1.04,1.48,0.87,1087.0
+Hanácká,0.91,1.61,1.0,1100.0
+Viktoria Žižkov,1.3,1.43,1.61,1161.0
+Chrudim,1.3,1.78,1.09,1109.0
+Artis,1.65,1.26,1.78,1178.0
+Viborg,1.62,1.46,1.54,1154.0
+Vejle,1.19,1.92,0.69,1069.0
+Randers FC,1.04,1.27,1.15,1115.0
+FC Fredericia,1.31,2.15,1.08,1108.0
+FC Nordsjaelland,1.65,1.58,1.58,1158.0
+Sonderjyske,1.42,1.35,1.46,1146.0
+Aarhus,1.92,1.0,2.15,1215.0
+Odense,1.58,1.96,1.31,1131.0
+Pardubice,1.25,1.61,1.25,1125.0
+Bohemians 1905,0.79,1.25,1.07,1107.0
+Karviná,1.46,1.68,1.29,1129.0
+Dukla Praha,0.61,1.39,0.71,1071.0
+Teplice,0.96,1.21,1.04,1104.0
+Zlin,1.18,1.54,1.11,1111.0
+FK Jablonec,1.39,1.0,1.82,1182.0
+Slovácko,0.86,1.46,0.82,1082.0
+Mlada Boleslav,1.46,1.86,1.11,1111.0
+Slovan Liberec,1.46,1.04,1.5,1150.0
+Hradec Králové,1.43,1.18,1.54,1154.0
+Grobiņa,0.86,1.57,1.0,1100.0
+FS Jelgava,1.02,1.4,1.02,1102.0
+Super Nova,1.24,1.55,1.0,1100.0
+Tukums,1.12,1.76,0.93,1093.0
+FK Liepaja,1.52,1.48,1.62,1162.0
+Metta / LU,1.08,2.06,0.86,1086.0
+Ogre United,0.67,1.5,0.33,1033.0
+Novorizontino,1.32,1.04,1.6,1160.0
+Ponte Preta,0.75,1.1,1.15,1115.0
+Velo Clube,0.75,1.45,0.9,1090.0
+Noroeste,1.15,1.5,0.8,1080.0
+Guarani Campinas,1.0,1.05,1.25,1125.0
+Botafogo SP,0.65,1.1,1.1,1110.0
+Portuguesa,1.29,1.14,1.38,1138.0
+Água Santa,0.83,1.92,0.58,1058.0
+São Bernardo,1.29,1.38,1.48,1148.0
+Inter De Limeira,0.75,1.58,0.58,1058.0
+Capivariano,0.78,1.56,1.44,1144.0
+Primavera SP,1.75,1.88,1.0,1100.0
+Deportivo Recoleta,1.59,1.36,1.45,1145.0
+Sportivo Trinidense,1.14,0.95,1.5,1150.0
+Cerro Porteno,1.5,0.82,2.09,1209.0
+General Caballero,1.0,1.5,1.09,1109.0
+Libertad Asuncion,1.18,1.09,1.18,1118.0
+Sportivo Luqueno,1.23,1.64,1.14,1114.0
+Olimpia,1.5,1.73,1.18,1118.0
+Nacional Asuncion,1.18,0.77,1.59,1159.0
+Club Guarani,2.0,0.91,2.05,1205.0
+2 de Mayo,1.27,1.23,1.5,1150.0
+Sportivo Ameliano,1.0,1.82,0.86,1086.0
+Atlético Tembetary,0.91,1.68,0.68,1068.0
+Dinamo de Puerto La Cruz,1.15,0.82,1.67,1167.0
+Angostura FC,0.89,1.79,0.79,1079.0
+Trujillanos FC,1.24,0.5,2.12,1212.0
+Atletico el Vigia FC,1.22,1.33,1.19,1119.0
+Puerto Cabello II,1.0,1.31,1.08,1108.0
+Titanes FC,1.5,1.21,1.47,1147.0
+Urena SC,1.11,1.61,1.06,1106.0
+Real Frontera,1.29,1.53,1.13,1113.0
+Aragua FC,0.78,0.73,1.19,1119.0
+Marítimo,1.68,0.86,1.57,1157.0
+Mineros de Guyana,0.83,1.17,1.0,1100.0
+Bolívar,0.83,1.26,1.26,1126.0
+Fundación Lara Deportiva,1.47,0.84,1.92,1192.0
+Petare FC,1.32,0.76,1.84,1184.0
+Héroes de Falcón,1.18,1.5,1.14,1114.0
+Monagas II,1.12,1.68,1.12,1112.0
+Yaracuyanos FC,1.5,1.12,1.62,1162.0
+Deportivo Lara,1.0,0.88,1.62,1162.0
+Club Atletico Barinas,1.5,2.25,0.88,1088.0
+Atletico Avila FC,0.43,0.86,0.71,1071.0
+Zamora FC B,1.5,1.38,1.12,1112.0
+Dunajska Streda,1.73,1.04,1.88,1188.0
+Zemplín Michalovce,1.37,1.59,1.41,1141.0
+Komárno,1.07,1.44,0.96,1096.0
+AS Trencin,0.93,1.52,1.33,1133.0
+Tatran Prešov,0.85,1.44,0.85,1085.0
+Podbrezová,1.81,1.59,1.33,1133.0
+Skalica,0.89,1.48,0.85,1085.0
+Ružomberok,0.96,1.52,1.04,1104.0
+Potters Tigers,1.95,1.55,1.65,1165.0
+Pigotts Bullets,1.85,1.1,1.8,1180.0
+John Hughes,0.8,2.95,0.8,1080.0
+Old Road,3.05,1.63,1.68,1168.0
+Ottos Rangers,1.1,3.14,0.43,1043.0
+Garden Stars,2.24,1.81,1.38,1138.0
+Green City,1.57,1.86,1.05,1105.0
+All Saints United,3.21,0.74,2.63,1263.0
+Attacking Saints,1.74,2.11,1.16,1116.0
+Grenades,2.73,0.93,2.53,1253.0
+Jennings United,0.5,3.35,0.3,1030.0
+Tormenta,1.77,1.52,1.48,1148.0
+Richmond Kickers,1.32,1.74,0.88,1088.0
+Greenville Triumph,1.35,1.47,1.12,1112.0
+Westchester SC,1.57,1.94,0.89,1089.0
+Naples,1.26,0.95,1.61,1161.0
+Chattanooga Red Wolves,1.35,1.03,1.74,1174.0
+Union Omaha,1.67,1.22,1.64,1164.0
+Charlotte Independence,1.56,1.65,1.21,1121.0
+Alta,1.36,1.61,1.11,1111.0
+Forward Madison,1.03,1.36,1.24,1124.0
+Spokane Velocity,1.36,1.18,1.69,1169.0
+One Knoxville,1.41,0.82,1.97,1197.0
+Texoma,1.17,1.83,1.0,1100.0
+Portland Hearts of Pine,1.47,1.14,1.5,1150.0
+Sarasota Paradise,0.67,1.5,0.67,1067.0
+NY Cosmos,1.8,2.2,1.2,1120.0
+Morocco U20,1.71,0.71,2.29,1229.0
+Spain U20,1.2,1.4,1.4,1140.0
+Argentina U20,2.14,0.57,2.57,1257.0
+Mexico U20,1.8,1.4,1.6,1160.0
+France U20,1.71,1.0,1.86,1186.0
+Norway U20,0.8,0.6,1.6,1160.0
+Colombia U20,1.29,0.71,2.0,1200.0
+United States U20,3.4,1.2,1.8,1180.0
