@@ -28,52 +28,10 @@ important_countries = [
     "Faroe Islands", "Iceland", "Lithuania", "Peru",
     "Serbia", "Slovakia", "Venezuela", "Wales",
     "Belarus", "Russia", "Israel", "Saudi Arabia",
-    "Georgia", "Romania", "Uruguay", "China", "Canada"
+    "Georgia", "Romania", "Uruguay", "China", "Canada", 
+    "Latvia", "Jamaica", "Costa Rica"
 ]
 
-# 🔥 TOUTES TES LIGUES (COMPLET)
-LEAGUES = [
-
-    # 🇬🇧
-    41,   # League One
-
-    # 🇬🇧 Irlande du Nord
-    332,  # NIFL Premiership
-
-    # 🇸🇻 Salvador
-    345,  # Primera Division
-
-    # 🇯🇲 Jamaïque
-    475,  # Premier League
-
-    # 🇱🇻 Lettonie
-    365,  # Virsliga
-
-    # 🇨🇷 Costa Rica
-    218,  # Primera Division
-
-    # 🇰🇷 Corée
-    292,  # K League 1
-    293,  # K League 2
-
-    # 🇺🇸 USA
-    489,  # USL Championship
-    490,  # USL League One
-
-    # 🇫🇴 Îles Féroé
-    252,  # Premier League
-
-    # 🇨🇦 Canada
-    300,  # Canadian Premier League
-
-    # 🇩🇪 Allemagne (Regionalliga)
-    1046, # Regionalliga Nordost
-    1047, # Regionalliga West
-    1048, # Regionalliga North
-
-    # 🇧🇷 Brésil U20
-    1234  # Brasileiro U20 (⚠️ peut varier selon API)
-]
 
 # 🌍 Filtre pays
 leagues_df = leagues_df[leagues_df["country"].isin(important_countries)]
@@ -90,6 +48,44 @@ important_leagues_extra = [
     4,   # Euro
     6    # Africa Cup
 ]
+
+# 🔥 LISTE COMPLETE (TOUT CE QUE TU AS DEMANDÉ)
+LEAGUES = [
+
+    # 🌍 INTERNATIONALES
+    1, 4, 6, 5, 2, 3, 848,
+
+    # 🇬🇧
+    39, 40, 41,
+
+    # 🇪🇺 TOP
+    61, 140, 135, 78, 88, 94, 144, 203, 207, 218,
+
+    # 🌍 AMERIQUE
+    71, 128, 265, 239, 253, 262, 218, 242, 281, 98,
+
+    # 🌏 ASIE / OCEANIE
+    292, 293, 98, 188,
+
+    # 🌍 AFRIQUE
+    201, 202, 233, 288,
+
+    # 🌍 EURO SECOND
+    113, 29, 4, 346, 119, 345,
+
+    # 🌍 AUTRES
+    365, 475, 252, 300, 332,
+
+    # 🇩🇪 REGIONALLIGA
+    1046, 1047, 1048,
+
+    # 🇧🇷 U20
+    1234,
+
+    # 🇺🇸 USL
+    489, 490
+]
+
 
 print("Total ligues sélectionnées :", len(leagues_df))
 
