@@ -31,33 +31,26 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
         home = home_df.iloc[0]
         away = away_df.iloc[0]
 
-        # 🔥 FORCE AVEC AJUSTEMENTS
-        # 🔥 stats de base
-        home_attack = home["GoalsScoredAvg"]
-        home_defense = home["GoalsConcededAvg"]
+        # 🔥 STATS DE BASE
+        home_attack = float(home["GoalsScoredAvg"])
+        home_defense = float(home["GoalsConcededAvg"])
 
-        away_attack = away["GoalsScoredAvg"]
-        away_defense = away["GoalsConcededAvg"]
+        away_attack = float(away["GoalsScoredAvg"])
+        away_defense = float(away["GoalsConcededAvg"])
 
-        # 🔥 FORM BOOST (très important)
-        home_form = home.get("PPG", 1.2)
-        away_form = away.get("PPG", 1.2)
+        # 🔥 FORME (pondérée correctement)
+        home_form = float(home.get("PPG", 1.5))
+        away_form = float(away.get("PPG", 1.5))
 
-        # normalisation (1.0 = moyen)
-        home_form_boost = home_form / 1.5
-        away_form_boost = away_form / 1.5
+        home_attack = home_attack * (1 + (home_form - 1.5) * 0.15)
+        away_attack = away_attack * (1 + (away_form - 1.5) * 0.15)
 
+        # 🔥 sécurité
         home_attack = max(0.5, home_attack)
         away_attack = max(0.5, away_attack)
 
-        # 🔥 forme légère (10-15% max)
-home_attack = home_attack * (1 + (home_form - 1.5) * 0.15)
-away_attack = away_attack * (1 + (away_form - 1.5) * 0.15)
-
-
-
-        # 🔥 avantage domicile réel
-        home_adv = 1.15
+        # 🔥 avantage domicile
+        home_adv = 1.1
 
         home_strength = (home_attack * away_defense) * home_adv
         away_strength = (away_attack * home_defense)
@@ -67,11 +60,11 @@ away_attack = away_attack * (1 + (away_form - 1.5) * 0.15)
         prob_home = home_strength / total
         prob_away = away_strength / total
 
-        # 🔥 draw dynamique (pas fixe)
+        # 🔥 draw réaliste
         prob_draw = 1 - (prob_home + prob_away)
         prob_draw = max(0.20, min(prob_draw, 0.30))
 
-        # 🔥 xG réaliste
+        # 🔥 xG
         home_xg = home_attack * away_defense
         away_xg = away_attack * home_defense
 
