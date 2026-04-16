@@ -20,7 +20,7 @@ important_countries = [
     "Switzerland", "Austria", "Scotland", "Denmark",
     "Norway", "Sweden", "Poland", "Czech Republic",
     "Brazil", "Argentina", "Chile", "Colombia",
-    "USA", "Mexico", "Costa Rica", "Ecuador", "Paraguay",
+    "USA", "Mexico", "Costa-Rica", "Ecuador", "Paraguay",
     "Japan", "South Korea", "Bolivia", "Ireland",
     "Morocco", "Egypt", "Algeria", "South Africa",
     "Australia", "Azerbaijan", "Northern Ireland",
@@ -29,7 +29,7 @@ important_countries = [
     "Serbia", "Slovakia", "Venezuela", "Wales",
     "Belarus", "Russia", "Israel", "Saudi Arabia",
     "Georgia", "Romania", "Uruguay", "China", "Canada", 
-    "Latvia", "Jamaica", "Costa Rica"
+    "Latvia", "Jamaica", "El-Salvador", "Northern-Ireland"
 ]
 
 
