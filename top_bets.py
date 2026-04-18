@@ -37,6 +37,9 @@ def is_trap(result, odds):
 
     return False
 
+    # 🔥 match trop ouvert (chaos)
+    if result["prob_over"] > 0.75 and result["prob_btts"] > 0.70:
+        return True
 
 def get_top_bets():
 
