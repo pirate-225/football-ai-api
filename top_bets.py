@@ -59,8 +59,8 @@ def get_top_bets():
         if result is None:
             continue
 
-if is_trap(result, (odd_home, odd_draw, odd_away)):
-    continue
+        if is_trap(result, (odd_home, odd_draw, odd_away)):
+            continue
 
         match = f"{m['home']} vs {m['away']}"
 
