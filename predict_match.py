@@ -31,12 +31,28 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
         home = home_df.iloc[0]
         away = away_df.iloc[0]
 
-        # 🔥 STATS DE BASE
-        home_attack = float(home["GoalsScoredAvg"])
-        home_defense = float(home["GoalsConcededAvg"])
+        # 🔥 nouvelles variables
+        home_form = float(home.get("Form", 1.5))
+        away_form = float(away.get("Form", 1.5))
 
-        away_attack = float(away["GoalsScoredAvg"])
+        home_elo = float(home.get("ELO", 1000))
+        away_elo = float(away.get("ELO", 1000))
+
+        home_attack = float(home.get("HomeAttack", home["GoalsScoredAvg"]))
+        away_attack = float(away.get("AwayAttack", away["GoalsScoredAvg"]))
+
+        home_defense = float(home["GoalsConcededAvg"])
         away_defense = float(away["GoalsConcededAvg"])
+
+        # 🔥 force réelle
+        home_strength = (home_attack * away_defense) * (1 + (home_form - away_form) * 0.1)
+        away_strength = (away_attack * home_defense) * (1 + (away_form - home_form) * 0.1)
+
+        # 🔥 impact ELO
+        elo_factor = (home_elo - away_elo) / 800
+
+        home_strength *= (1 + elo_factor)
+        away_strength *= (1 - elo_factor)
 
         # 🔥 ELO IMPACT (TRÈS IMPORTANT)
         home_elo = float(home.get("ELO", 1000))

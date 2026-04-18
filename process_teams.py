@@ -1,10 +1,23 @@
 import pandas as pd
 
-print("📊 Loading matches...")
-
-df = pd.read_csv("data_raw/all_matches.csv")
+df = pd.read_csv("data_raw/api_matches_all_leagues.csv")
 
 team_stats = {}
+
+def init_team(team):
+    return {
+        "scored": 0,
+        "conceded": 0,
+        "points": 0,
+        "games": 0,
+        "recent_points": [],
+        "home_scored": 0,
+        "home_conceded": 0,
+        "home_games": 0,
+        "away_scored": 0,
+        "away_conceded": 0,
+        "away_games": 0
+    }
 
 for _, row in df.iterrows():
 
@@ -16,17 +29,12 @@ for _, row in df.iterrows():
     if pd.isna(hg) or pd.isna(ag):
         continue
 
-    # init
-    for team in [home, away]:
-        if team not in team_stats:
-            team_stats[team] = {
-                "scored": 0,
-                "conceded": 0,
-                "points": 0,
-                "games": 0
-            }
+    if home not in team_stats:
+        team_stats[home] = init_team(home)
+    if away not in team_stats:
+        team_stats[away] = init_team(away)
 
-    # update
+    # global stats
     team_stats[home]["scored"] += hg
     team_stats[home]["conceded"] += ag
     team_stats[home]["games"] += 1
@@ -35,17 +43,32 @@ for _, row in df.iterrows():
     team_stats[away]["conceded"] += hg
     team_stats[away]["games"] += 1
 
+    # home/away split
+    team_stats[home]["home_scored"] += hg
+    team_stats[home]["home_conceded"] += ag
+    team_stats[home]["home_games"] += 1
+
+    team_stats[away]["away_scored"] += ag
+    team_stats[away]["away_conceded"] += hg
+    team_stats[away]["away_games"] += 1
+
     # points
     if hg > ag:
-        team_stats[home]["points"] += 3
+        hp, ap = 3, 0
     elif hg < ag:
-        team_stats[away]["points"] += 3
+        hp, ap = 0, 3
     else:
-        team_stats[home]["points"] += 1
-        team_stats[away]["points"] += 1
+        hp, ap = 1, 1
 
+    team_stats[home]["points"] += hp
+    team_stats[away]["points"] += ap
 
-print("⚙️ Building team stats...")
+    # recent form (last 5)
+    team_stats[home]["recent_points"].append(hp)
+    team_stats[away]["recent_points"].append(ap)
+
+    team_stats[home]["recent_points"] = team_stats[home]["recent_points"][-5:]
+    team_stats[away]["recent_points"] = team_stats[away]["recent_points"][-5:]
 
 rows = []
 
@@ -56,22 +79,27 @@ for team, s in team_stats.items():
 
     goals_avg = s["scored"] / s["games"]
     conceded_avg = s["conceded"] / s["games"]
-    ppg = s["points"] / s["games"]
 
-    # 🔥 ELO simple
-    elo = 1000 + (ppg * 100)
+    ppg = s["points"] / s["games"]
+    form = sum(s["recent_points"]) / max(len(s["recent_points"]), 1)
+
+    home_attack = s["home_scored"] / max(s["home_games"], 1)
+    away_attack = s["away_scored"] / max(s["away_games"], 1)
+
+    # 🔥 ELO dynamique
+    elo = 1000 + (ppg * 120) + (form * 20)
 
     rows.append({
         "Team": team,
         "GoalsScoredAvg": round(goals_avg, 2),
         "GoalsConcededAvg": round(conceded_avg, 2),
         "PPG": round(ppg, 2),
+        "Form": round(form, 2),
+        "HomeAttack": round(home_attack, 2),
+        "AwayAttack": round(away_attack, 2),
         "ELO": round(elo, 0)
     })
 
-df_out = pd.DataFrame(rows)
+pd.DataFrame(rows).to_csv("data_processed/team_stats.csv", index=False)
 
-df_out.to_csv("data_processed/team_stats.csv", index=False)
-
-print("✅ DONE")
-print("Teams:", len(df_out))
+print("✅ New advanced dataset ready")

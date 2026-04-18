@@ -9,28 +9,27 @@ headers = {
     "x-apisports-key": API_KEY
 }
 
-print("🚀 Loading leagues...")
+print("Loading leagues...")
 
 leagues_df = pd.read_csv("data_raw/leagues.csv")
 
-
-# 🌍 PAYS (UNIQUEMENT VRAIS PAYS API)
+# 🌍 Pays que TU veux (liste complète)
 important_countries = [
-    "England","France","Spain","Italy","Germany",
-    "Netherlands","Portugal","Belgium","Turkey",
-    "Switzerland","Austria","Scotland","Denmark",
-    "Norway","Sweden","Poland","Czech-Republic",
-    "Brazil","Argentina","Chile","Colombia",
-    "USA","Mexico","Costa-Rica","Ecuador","Paraguay",
-    "Japan","South-Korea","Bolivia","Ireland",
-    "Morocco","Egypt","Algeria","South-Africa",
-    "Australia","Azerbaijan","Northern-Ireland",
-    "Croatia","Greece","Cyprus","Finland",
-    "Faroe-Islands","Iceland","Lithuania","Peru",
-    "Serbia","Slovakia","Venezuela","Wales",
-    "Belarus","Russia","Israel","Saudi-Arabia",
-    "Georgia","Romania","Uruguay","China","Canada",
-    "Latvia","Jamaica","El-Salvador"
+    "England", "France", "Spain", "Italy", "Germany",
+    "Netherlands", "Portugal", "Belgium", "Turkey",
+    "Switzerland", "Austria", "Scotland", "Denmark",
+    "Norway", "Sweden", "Poland", "Czech-Republic",
+    "Brazil", "Argentina", "Chile", "Colombia", 
+    "USA", "Mexico", "Costa-Rica", "Ecuador", "Paraguay",
+    "Japan", "South-Korea", "Bolivia", "Ireland", 
+    "Morocco", "Egypt", "Algeria", "England-League-One",
+    "Australia", "Azerbaijan", "Estonia", "World-Cup", 
+    "Croatia", "Greece", "Cyprus", "Finland",
+    "Faroe-Islands", "Iceland", "Lithuania", "Peru", "Bulgaria",
+    "Serbia", "Slovakia", "Venezuela", "Wales", 
+    "Belarus", "Russia", "Israel", "Saudi-Arabia",
+    "Georgia", "Romania", "Uruguay", "China", "Canada", 
+    "Latvia", "Jamaica", "El-Salvador", "Northern-Ireland"
 ]
 
 
