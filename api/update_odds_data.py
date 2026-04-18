@@ -16,7 +16,7 @@ leagues = {
     188: "Australia"
 }
 
-seasons = [2025, 2024, 2023, 2022, 2021]
+seasons = [2026, 2025]
 
 all_odds = []
 

@@ -9,174 +9,161 @@ headers = {
     "x-apisports-key": API_KEY
 }
 
-print("Loading leagues...")
+print("🚀 Loading leagues...")
 
 leagues_df = pd.read_csv("data_raw/leagues.csv")
 
-# 🌍 Pays que TU veux (liste complète)
+
+# 🌍 PAYS (UNIQUEMENT VRAIS PAYS API)
 important_countries = [
-    "England", "France", "Spain", "Italy", "Germany",
-    "Netherlands", "Portugal", "Belgium", "Turkey",
-    "Switzerland", "Austria", "Scotland", "Denmark",
-    "Norway", "Sweden", "Poland", "Czech-Republic",
-    "Brazil", "Argentina", "Chile", "Colombia", "Africa-Cup-Of-Nations",
-    "USA", "Mexico", "Costa-Rica", "Ecuador", "Paraguay",
-    "Japan", "South-Korea", "Bolivia", "Ireland", "USA-USL-Championship",
-    "Morocco", "Egypt", "Algeria", "England-League-One", "USA-USL-League-One",
-    "Australia", "Azerbaijan", "Estonia", "World-Cup", "Conference-League",
-    "Croatia", "Greece", "Cyprus", "Finland", "Euro", "Europa-League",
-    "Faroe-Islands", "Iceland", "Lithuania", "Peru", "Bulgaria",
-    "Serbia", "Slovakia", "Venezuela", "Wales", "European-Championship",
-    "Belarus", "Russia", "Israel", "Saudi-Arabia",
-    "Georgia", "Romania", "Uruguay", "China", "Canada", 
-    "Latvia", "Jamaica", "El-Salvador", "Northern-Ireland"
+    "England","France","Spain","Italy","Germany",
+    "Netherlands","Portugal","Belgium","Turkey",
+    "Switzerland","Austria","Scotland","Denmark",
+    "Norway","Sweden","Poland","Czech-Republic",
+    "Brazil","Argentina","Chile","Colombia",
+    "USA","Mexico","Costa-Rica","Ecuador","Paraguay",
+    "Japan","South-Korea","Bolivia","Ireland",
+    "Morocco","Egypt","Algeria","South-Africa",
+    "Australia","Azerbaijan","Northern-Ireland",
+    "Croatia","Greece","Cyprus","Finland",
+    "Faroe-Islands","Iceland","Lithuania","Peru",
+    "Serbia","Slovakia","Venezuela","Wales",
+    "Belarus","Russia","Israel","Saudi-Arabia",
+    "Georgia","Romania","Uruguay","China","Canada",
+    "Latvia","Jamaica","El-Salvador"
 ]
 
 
-# 🌍 Filtre pays
+# 🌍 FILTRE
 leagues_df = leagues_df[leagues_df["country"].isin(important_countries)]
 
-# ⚡ Garder seulement 2 ligues max par pays (D1 + D2)
+# ⚡ D1 + D2
 leagues_df = leagues_df.sort_values("league_id").groupby("country").head(2)
 
-# 🌍 Compétitions internationales importantes
-important_leagues_extra = [
-    2,   # Champions League
-    3,   # Europa League
-    848, # Conference League
-    1,   # World Cup
-    4,   # Euro
-    6    # Africa Cup
-]
 
-# 🔥 LISTE COMPLETE (TOUT CE QUE TU AS DEMANDÉ)
-LEAGUES = [
-
-    # 🌍 INTERNATIONALES
-    1, 4, 6, 5, 2, 3, 848,
-
-    # 🇬🇧
-    39, 40, 41,
-
-    # 🇪🇺 TOP
-    61, 140, 135, 78, 88, 94, 144, 203, 207, 218,
-
-    # 🌍 AMERIQUE
-    71, 128, 265, 239, 253, 262, 218, 242, 281, 98,
-
-    # 🌏 ASIE / OCEANIE
-    292, 293, 98, 188,
-
-    # 🌍 AFRIQUE
-    201, 202, 233, 288,
-
-    # 🌍 EURO SECOND
-    113, 29, 4, 346, 119, 345,
-
-    # 🌍 AUTRES
-    365, 475, 252, 300, 332,
-
-    # 🇩🇪 REGIONALLIGA
-    1046, 1047, 1048,
-
-    # 🇧🇷 U20
-    1234,
-
-    # 🇺🇸 USL
-    489, 490
+# 🔥 LIGUES SUPPLÉMENTAIRES (TES DEMANDES EXACTES)
+extra_leagues = [
+    489,  # USL Championship
+    490,  # USL League One
+    2,    # Champions League
+    3,    # Europa League
+    848,  # Conference League
+    1,    # World Cup
+    4,    # Euro
+    5,    # Nations League
+    6,    # Africa Cup
+    41    # England League One
 ]
 
 
-print("Total ligues sélectionnées :", len(leagues_df))
+print("Total ligues nationales :", len(leagues_df))
+
 
 all_matches = []
 
-# 🎯 SAISONS UNIQUEMENT
 seasons = [2025, 2026]
 
-# 1️⃣ Ligues nationales
+
+# 🔥 FONCTION SAFE
+def get_fixtures(league_id, season, name, country):
+
+    url = "https://v3.football.api-sports.io/fixtures"
+
+    params = {
+        "league": league_id,
+        "season": season
+    }
+
+    try:
+        response = requests.get(url, headers=headers, params=params, timeout=10)
+
+        if response.status_code != 200:
+            return []
+
+        data = response.json()
+        return data.get("response", [])
+
+    except:
+        return []
+
+
+# 1️⃣ LIGUES NATIONALES
 for _, row in leagues_df.iterrows():
+
     league_id = row["league_id"]
     league_name = row["league_name"]
     country = row["country"]
 
     for season in seasons:
-        print(f"Downloading {league_name} ({country}) - {season}")
 
-        url = "https://v3.football.api-sports.io/fixtures"
+        print(f"📊 {league_name} ({country}) - {season}")
 
-        params = {
-            "league": league_id,
-            "season": season
-        }
+        fixtures = get_fixtures(league_id, season, league_name, country)
 
-        try:
-            response = requests.get(url, headers=headers, params=params)
-            data = response.json()
+        for f in fixtures:
 
-            fixtures = data.get("response", [])
+            hg = f["goals"]["home"]
+            ag = f["goals"]["away"]
 
-            for f in fixtures:
-                all_matches.append({
-                    "fixture_id": f["fixture"]["id"],
-                    "date": f["fixture"]["date"],
-                    "HomeTeam": f["teams"]["home"]["name"],
-                    "AwayTeam": f["teams"]["away"]["name"],
-                    "FTHG": f["goals"]["home"],
-                    "FTAG": f["goals"]["away"],
-                    "league_id": league_id,
-                    "league_name": league_name,
-                    "country": country,
-                    "season": season
-                })
+            if hg is None or ag is None:
+                continue
 
-            time.sleep(0.5)
+            all_matches.append({
+                "fixture_id": f["fixture"]["id"],
+                "date": f["fixture"]["date"],
+                "HomeTeam": f["teams"]["home"]["name"],
+                "AwayTeam": f["teams"]["away"]["name"],
+                "FTHG": hg,
+                "FTAG": ag,
+                "league_id": league_id,
+                "league_name": league_name,
+                "country": country,
+                "season": season
+            })
 
-        except Exception as e:
-            print("Erreur:", league_name, e)
+        time.sleep(0.4)
 
-# 2️⃣ Compétitions internationales
-for league_id in important_leagues_extra:
+
+# 2️⃣ TES LIGUES SPÉCIALES
+print("🌍 EXTRA LEAGUES")
+
+for league_id in extra_leagues:
+
     for season in seasons:
-        print(f"Downloading INTERNATIONAL league {league_id} - {season}")
 
-        url = "https://v3.football.api-sports.io/fixtures"
+        print(f"📊 Extra League {league_id} - {season}")
 
-        params = {
-            "league": league_id,
-            "season": season
-        }
+        fixtures = get_fixtures(league_id, season, f"League {league_id}", "Custom")
 
-        try:
-            response = requests.get(url, headers=headers, params=params)
-            data = response.json()
+        for f in fixtures:
 
-            fixtures = data.get("response", [])
+            hg = f["goals"]["home"]
+            ag = f["goals"]["away"]
 
-            for f in fixtures:
-                all_matches.append({
-                    "fixture_id": f["fixture"]["id"],
-                    "date": f["fixture"]["date"],
-                    "HomeTeam": f["teams"]["home"]["name"],
-                    "AwayTeam": f["teams"]["away"]["name"],
-                    "FTHG": f["goals"]["home"],
-                    "FTAG": f["goals"]["away"],
-                    "league_id": league_id,
-                    "league_name": "International",
-                    "country": "World",
-                    "season": season
-                })
+            if hg is None or ag is None:
+                continue
 
-            time.sleep(0.5)
+            all_matches.append({
+                "fixture_id": f["fixture"]["id"],
+                "date": f["fixture"]["date"],
+                "HomeTeam": f["teams"]["home"]["name"],
+                "AwayTeam": f["teams"]["away"]["name"],
+                "FTHG": hg,
+                "FTAG": ag,
+                "league_id": league_id,
+                "league_name": f["league"]["name"],
+                "country": f["league"]["country"],
+                "season": season
+            })
 
-        except Exception as e:
-            print("Erreur international:", e)
+        time.sleep(0.4)
 
-# 💾 Sauvegarde
+
+# 💾 SAVE
 df = pd.DataFrame(all_matches)
 
 os.makedirs("data_raw", exist_ok=True)
 df.to_csv("data_raw/api_matches_all_leagues.csv", index=False)
 
-print("✅ Download terminé")
+print("✅ DONE")
 print("Matchs total :", len(df))
