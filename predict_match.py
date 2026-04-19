@@ -74,9 +74,16 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
     implied_draw = 1 / odd_draw
     implied_away = 1 / odd_away
 
-    edge_home = prob_home - implied_home
-    edge_draw = prob_draw - implied_draw
-    edge_away = prob_away - implied_away
+    # 🔥 calibration (IMPORTANT)
+    confidence_factor = 0.85
+
+    edge_home = (prob_home * confidence_factor) - implied_home
+    edge_draw = (prob_draw * confidence_factor) - implied_draw
+    edge_away = (prob_away * confidence_factor) - implied_away
+
+    # 🔥 éviter extrêmes irréalistes
+    prob_home = min(max(prob_home, 0.05), 0.85)
+    prob_away = min(max(prob_away, 0.05), 0.85)
 
     return {
         "prob_home": round(prob_home, 3),
