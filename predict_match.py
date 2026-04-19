@@ -1,8 +1,19 @@
 import pandas as pd
 import numpy as np
 
-# 🔥 charger les données
+try:
+    injuries = pd.read_csv("data_processed/injuries.csv")
+except:
+    injuries = pd.DataFrame()
+
+# 🔥 chargement données
 team_data = pd.read_csv("data_processed/team_stats.csv")
+
+# 🔥 standings safe
+try:
+    standings = pd.read_csv("data_processed/standings.csv")
+except:
+    standings = pd.DataFrame()
 
 
 def sigmoid(x):
@@ -44,6 +55,26 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
     home_strength *= (1 + elo_diff)
     away_strength *= (1 - elo_diff)
 
+    # 🔥 impact classement (IMPORTANT)
+    home_rank = standings.loc[standings["Team"] == home_team]["Rank"]
+    away_rank = standings.loc[standings["Team"] == away_team]["Rank"]
+
+    if not home_rank.empty and not away_rank.empty:
+        rank_diff = (away_rank.values[0] - home_rank.values[0]) / 20
+        home_strength *= (1 + rank_diff)
+        away_strength *= (1 - rank_diff)
+
+    # 🔥 impact blessures
+    if not injuries.empty:
+        home_inj = injuries.loc[injuries["Team"] == home_team]["Injuries"]
+        away_inj = injuries.loc[injuries["Team"] == away_team]["Injuries"]
+
+        if not home_inj.empty:
+            home_strength *= (1 - min(home_inj.values[0] * 0.03, 0.15))
+
+        if not away_inj.empty:
+            away_strength *= (1 - min(away_inj.values[0] * 0.03, 0.15))
+
     # 🔥 éviter valeurs extrêmes
     home_strength = max(home_strength, 0.01)
     away_strength = max(away_strength, 0.01)
@@ -78,6 +109,19 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
 
     prob_over = sigmoid(goal_expectation - 2.4)
     prob_btts = sigmoid((home_attack * away_attack) - 1.2)
+
+    # 🔥 signal marché (simple)
+    market_confidence = (1/odd_home + 1/odd_away)
+
+    if market_confidence > 1.1:
+        prob_home *= 0.95
+        prob_away *= 0.95
+
+    # 🔥 renormalisation après marché
+    total = prob_home + prob_draw + prob_away
+    prob_home /= total
+    prob_draw /= total
+    prob_away /= total
 
     # 🔥 edge
     implied_home = 1 / odd_home
