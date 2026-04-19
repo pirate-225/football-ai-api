@@ -63,6 +63,16 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
     prob_draw /= total
     prob_away /= total
 
+    # 🔥 éviter extrêmes irréalistes
+    prob_home = min(max(prob_home, 0.05), 0.85)
+    prob_away = min(max(prob_away, 0.05), 0.85)
+
+    # 🔥 renormalisation après clamp
+    total = prob_home + prob_draw + prob_away
+    prob_home /= total
+    prob_draw /= total
+    prob_away /= total
+
     # 🔥 over / btts
     goal_expectation = (home_attack + away_attack) / 2
 
@@ -80,10 +90,6 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
     edge_home = (prob_home * confidence_factor) - implied_home
     edge_draw = (prob_draw * confidence_factor) - implied_draw
     edge_away = (prob_away * confidence_factor) - implied_away
-
-    # 🔥 éviter extrêmes irréalistes
-    prob_home = min(max(prob_home, 0.05), 0.85)
-    prob_away = min(max(prob_away, 0.05), 0.85)
 
     return {
         "prob_home": round(prob_home, 3),
