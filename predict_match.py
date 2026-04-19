@@ -46,12 +46,12 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
     away_strength = (away_attack / max(home_def, 0.1))
 
     # 🔥 impact forme
-    form_diff = (home_form - away_form) / 3
+    form_diff = (home_form - away_form) / 8
     home_strength *= (1 + form_diff)
     away_strength *= (1 - form_diff)
 
     # 🔥 impact elo
-    elo_diff = (home_elo - away_elo) / 400
+    elo_diff = (home_elo - away_elo) / 600
     home_strength *= (1 + elo_diff)
     away_strength *= (1 - elo_diff)
 
@@ -60,7 +60,7 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
     away_rank = standings.loc[standings["Team"] == away_team]["Rank"]
 
     if not home_rank.empty and not away_rank.empty:
-        rank_diff = (away_rank.values[0] - home_rank.values[0]) / 20
+        rank_diff = (away_rank.values[0] - home_rank.values[0]) / 35
         home_strength *= (1 + rank_diff)
         away_strength *= (1 - rank_diff)
 
@@ -99,6 +99,28 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
     prob_away = min(max(prob_away, 0.05), 0.85)
 
     # 🔥 renormalisation après clamp
+    total = prob_home + prob_draw + prob_away
+    prob_home /= total
+    prob_draw /= total
+    prob_away /= total
+
+    # 🔥 calibration globale (CRUCIAL)
+    prob_home = prob_home * 0.9 + 0.05
+    prob_away = prob_away * 0.9 + 0.05
+
+    # 🔥 correction favoris moyens (CRUCIAL)
+    if 0.55 < prob_home < 0.75:
+        prob_home *= 0.9
+
+    if 0.55 < prob_away < 0.75:
+        prob_away *= 0.9
+
+    total = prob_home + prob_draw + prob_away
+    prob_home /= total
+    prob_draw /= total
+    prob_away /= total
+
+    # 🔥 renormalisation après calibration
     total = prob_home + prob_draw + prob_away
     prob_home /= total
     prob_draw /= total
