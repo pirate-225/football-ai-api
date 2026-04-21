@@ -85,7 +85,7 @@ for team, s in team_stats.items():
     recent = s["recent_points"]
 
     weighted = sum(p * w for p, w in zip(recent, weights[-len(recent):]))
-    form = weighted / sum(weights[-len(recent):]), 1)
+    form = weighted / sum(weights[-len(recent):])
 
     home_attack = s["home_scored"] / max(s["home_games"], 1)
     away_attack = s["away_scored"] / max(s["away_games"], 1)

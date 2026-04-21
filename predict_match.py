@@ -1,5 +1,48 @@
+
 import pandas as pd
 import numpy as np
+import requests
+
+def get_recent_form(team_name):
+
+    try:
+        url = "https://v3.football.api-sports.io/fixtures"
+        headers = {"x-apisports-key": "3b63a56a290a3bd3d4b00c5b232d37d3"}
+
+        params = {
+            "team": team_name,
+            "last": 5
+        }
+
+        res = requests.get(url, headers=headers, params=params).json()
+
+        points = 0
+
+        for f in res.get("response", []):
+            home = f["teams"]["home"]["name"]
+            away = f["teams"]["away"]["name"]
+
+            goals_home = f["goals"]["home"]
+            goals_away = f["goals"]["away"]
+
+            if goals_home is None:
+                continue
+
+            if team_name == home:
+                if goals_home > goals_away:
+                    points += 3
+                elif goals_home == goals_away:
+                    points += 1
+            else:
+                if goals_away > goals_home:
+                    points += 3
+                elif goals_home == goals_away:
+                    points += 1
+
+        return points / 5
+
+    except:
+        return 1.5
 
 try:
     injuries = pd.read_csv("data_processed/injuries.csv")
@@ -35,6 +78,10 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
     home_def = float(home["GoalsConcededAvg"])
     away_def = float(away["GoalsConcededAvg"])
 
+try:
+    home_form = get_recent_form(home_team)
+    away_form = get_recent_form(away_team)
+except:
     home_form = float(home.get("Form", 1.5))
     away_form = float(away.get("Form", 1.5))
 
