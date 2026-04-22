@@ -85,13 +85,13 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
     home_strength = home_attack / max(away_def, 0.1)
     away_strength = away_attack / max(home_def, 0.1)
 
-    # 🔥 forme (réduite pour éviter biais)
-    form_diff = (home_form - away_form) / 5
+    # 🔥 forme (adoucie)
+    form_diff = (home_form - away_form) / 6
     home_strength *= (1 + form_diff)
     away_strength *= (1 - form_diff)
 
-    # 🔥 elo (réduit)
-    elo_diff = (home_elo - away_elo) / 400
+    # 🔥 elo (adouci)
+    elo_diff = (home_elo - away_elo) / 600
     home_strength *= (1 + elo_diff)
     away_strength *= (1 - elo_diff)
 
@@ -100,7 +100,7 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
     away_rank = standings.loc[standings["Team"] == away_team]["Rank"]
 
     if not home_rank.empty and not away_rank.empty:
-        rank_diff = (away_rank.values[0] - home_rank.values[0]) / 30
+        rank_diff = (away_rank.values[0] - home_rank.values[0]) / 40
         home_strength *= (1 + rank_diff)
         away_strength *= (1 - rank_diff)
 
@@ -110,9 +110,9 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
         away_inj = injuries.loc[injuries["Team"] == away_team]["Injuries"]
 
         if not home_inj.empty:
-            home_strength *= (1 - min(home_inj.values[0] * 0.03, 0.15))
+            home_strength *= (1 - min(home_inj.values[0] * 0.02, 0.10))
         if not away_inj.empty:
-            away_strength *= (1 - min(away_inj.values[0] * 0.03, 0.15))
+            away_strength *= (1 - min(away_inj.values[0] * 0.02, 0.10))
 
     # 🔥 probas
     home_strength = max(home_strength, 0.01)
@@ -122,44 +122,33 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
     prob_home = home_strength / total
     prob_away = away_strength / total
 
-    prob_draw = (1 - abs(prob_home - prob_away)) * 0.25
+    prob_draw = (1 - abs(prob_home - prob_away)) * 0.22
 
     total = prob_home + prob_draw + prob_away
     prob_home /= total
     prob_draw /= total
     prob_away /= total
 
-    # 🔥 calibration réaliste
-    prob_home = prob_home * 0.9 + 0.05
-    prob_away = prob_away * 0.9 + 0.05
+    # 🔥 calibration plus douce
+    prob_home = prob_home * 0.85 + 0.075
+    prob_away = prob_away * 0.85 + 0.075
 
     total = prob_home + prob_draw + prob_away
     prob_home /= total
     prob_draw /= total
     prob_away /= total
 
-    # 🔥 éviter probas trop faibles
-    prob_home = max(prob_home, 0.05)
-    prob_away = max(prob_away, 0.05)
-
-    total = prob_home + prob_draw + prob_away
-    prob_home /= total
-    prob_draw /= total
-    prob_away /= total
-
-    # 🔥 over / btts
-    # 🔥 expected goals réalistes
+    # 🔥 over (corrigé)
     lambda_home = home_attack * (away_def + 1) / 2
     lambda_away = away_attack * (home_def + 1) / 2
-
     expected_goals = lambda_home + lambda_away
 
-    # 🔥 probabilité Over 2.5 (approximation Poisson)
     prob_over = 1 - (
         np.exp(-expected_goals) * (
             1 + expected_goals + (expected_goals**2)/2
         )
     )
+
     prob_btts = sigmoid((home_attack * away_attack) - 1.2)
 
     # 🔥 marché
@@ -167,40 +156,32 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
     implied_draw = 1 / odd_draw
     implied_away = 1 / odd_away
 
-    # 🔥 edge
-    confidence_factor = 0.75
+    # 🔥 edge (moins agressif)
+    confidence_factor = 0.70
     edge_home = (prob_home * confidence_factor) - implied_home
     edge_draw = (prob_draw * confidence_factor) - implied_draw
     edge_away = (prob_away * confidence_factor) - implied_away
 
-    # 🔥 ignorer faux edges
-    if max(edge_home, edge_away) < 0.03:
-        return None
-
     # ==============================
-    # 🔥 FILTRES INTELLIGENTS
+    # 🔥 FILTRES SIMPLES ET UTILES
     # ==============================
 
-    # ❌ match trop équilibré
-    if abs(prob_home - prob_away) < 0.08:
+    # ❌ éviter matchs trop équilibrés
+    if abs(prob_home - prob_away) < 0.05:
         return None
 
-    # ❌ trop de draw
-    if prob_draw > 0.30:
+    # ❌ éviter faux favoris (le vrai problème)
+    if 0.55 < prob_home < 0.70:
         return None
 
-    # ❌ faux favori
-    if prob_home > 0.60 and edge_home < 0.03:
+    # ❌ éviter edge trop faible
+    if max(edge_home, edge_away) < 0.02:
         return None
 
-    # ❌ incohérence marché
-    if abs(prob_home - implied_home) > 0.25:
-        return None
-
-    # 🔥 score confiance
+    # 🔥 confiance (plus réaliste)
     confidence = (
         (abs(prob_home - prob_away) * 2)
-        + (max(edge_home, edge_away) * 2)
+        + (max(edge_home, edge_away))
         + (1 - prob_draw)
     )
 
