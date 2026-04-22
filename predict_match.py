@@ -91,7 +91,7 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
     away_strength *= (1 - form_diff)
 
     # 🔥 elo (réduit)
-    elo_diff = (home_elo - away_elo) / 600
+    elo_diff = (home_elo - away_elo) / 400
     home_strength *= (1 + elo_diff)
     away_strength *= (1 - elo_diff)
 
@@ -129,9 +129,37 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
     prob_draw /= total
     prob_away /= total
 
+    # 🔥 calibration réaliste
+    prob_home = prob_home * 0.9 + 0.05
+    prob_away = prob_away * 0.9 + 0.05
+
+    total = prob_home + prob_draw + prob_away
+    prob_home /= total
+    prob_draw /= total
+    prob_away /= total
+
+    # 🔥 éviter probas trop faibles
+    prob_home = max(prob_home, 0.05)
+    prob_away = max(prob_away, 0.05)
+
+    total = prob_home + prob_draw + prob_away
+    prob_home /= total
+    prob_draw /= total
+    prob_away /= total
+
     # 🔥 over / btts
-    goal_expectation = (home_attack + away_attack) / 2
-    prob_over = sigmoid(goal_expectation - 2.4)
+    # 🔥 expected goals réalistes
+    lambda_home = home_attack * (away_def + 1) / 2
+    lambda_away = away_attack * (home_def + 1) / 2
+
+    expected_goals = lambda_home + lambda_away
+
+    # 🔥 probabilité Over 2.5 (approximation Poisson)
+    prob_over = 1 - (
+        np.exp(-expected_goals) * (
+            1 + expected_goals + (expected_goals**2)/2
+        )
+    )
     prob_btts = sigmoid((home_attack * away_attack) - 1.2)
 
     # 🔥 marché
@@ -140,10 +168,14 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
     implied_away = 1 / odd_away
 
     # 🔥 edge
-    confidence_factor = 0.85
+    confidence_factor = 0.75
     edge_home = (prob_home * confidence_factor) - implied_home
     edge_draw = (prob_draw * confidence_factor) - implied_draw
     edge_away = (prob_away * confidence_factor) - implied_away
+
+    # 🔥 ignorer faux edges
+    if max(edge_home, edge_away) < 0.03:
+        return None
 
     # ==============================
     # 🔥 FILTRES INTELLIGENTS
@@ -172,7 +204,7 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
         + (1 - prob_draw)
     )
 
-    confidence = min(max(confidence, 0), 1)
+    confidence = min(max(confidence, 0), 0.85)
 
     return {
         "prob_home": round(prob_home, 3),
