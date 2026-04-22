@@ -4,43 +4,36 @@ import requests
 
 # 🔥 FORM LIVE
 def get_recent_form(team_name):
-
     try:
         url = "https://v3.football.api-sports.io/fixtures"
         headers = {"x-apisports-key": "3b63a56a290a3bd3d4b00c5b232d37d3"}
 
-        params = {
-            "team": team_name,
-            "last": 5
-        }
-
-        res = requests.get(url, headers=headers, params=params).json()
+        params = {"team": team_name, "last": 5}
+        res = requests.get(url, headers=headers, params=params, timeout=5).json()
 
         points = 0
-
         for f in res.get("response", []):
             home = f["teams"]["home"]["name"]
             away = f["teams"]["away"]["name"]
 
-            goals_home = f["goals"]["home"]
-            goals_away = f["goals"]["away"]
+            gh = f["goals"]["home"]
+            ga = f["goals"]["away"]
 
-            if goals_home is None:
+            if gh is None:
                 continue
 
             if team_name == home:
-                if goals_home > goals_away:
+                if gh > ga:
                     points += 3
-                elif goals_home == goals_away:
+                elif gh == ga:
                     points += 1
             else:
-                if goals_away > goals_home:
+                if ga > gh:
                     points += 3
-                elif goals_home == goals_away:
+                elif gh == ga:
                     points += 1
 
         return points / 5
-
     except:
         return 1.5
 
@@ -63,7 +56,6 @@ def sigmoid(x):
     return 1 / (1 + np.exp(-x))
 
 
-# 🔥 MAIN FUNCTION
 def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
 
     try:
@@ -75,11 +67,10 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
     # 🔥 stats
     home_attack = float(home.get("HomeAttack", home["GoalsScoredAvg"]))
     away_attack = float(away.get("AwayAttack", away["GoalsScoredAvg"]))
-
     home_def = float(home["GoalsConcededAvg"])
     away_def = float(away["GoalsConcededAvg"])
 
-    # 🔥 FORM (CORRECTEMENT ICI)
+    # 🔥 FORM
     try:
         home_form = get_recent_form(home_team)
         away_form = get_recent_form(away_team)
@@ -94,13 +85,13 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
     home_strength = home_attack / max(away_def, 0.1)
     away_strength = away_attack / max(home_def, 0.1)
 
-    # 🔥 forme
-    form_diff = (home_form - away_form) / 3
+    # 🔥 forme (réduite pour éviter biais)
+    form_diff = (home_form - away_form) / 5
     home_strength *= (1 + form_diff)
     away_strength *= (1 - form_diff)
 
-    # 🔥 elo
-    elo_diff = (home_elo - away_elo) / 400
+    # 🔥 elo (réduit)
+    elo_diff = (home_elo - away_elo) / 600
     home_strength *= (1 + elo_diff)
     away_strength *= (1 - elo_diff)
 
@@ -109,7 +100,7 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
     away_rank = standings.loc[standings["Team"] == away_team]["Rank"]
 
     if not home_rank.empty and not away_rank.empty:
-        rank_diff = (away_rank.values[0] - home_rank.values[0]) / 20
+        rank_diff = (away_rank.values[0] - home_rank.values[0]) / 30
         home_strength *= (1 + rank_diff)
         away_strength *= (1 - rank_diff)
 
@@ -120,7 +111,6 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
 
         if not home_inj.empty:
             home_strength *= (1 - min(home_inj.values[0] * 0.03, 0.15))
-
         if not away_inj.empty:
             away_strength *= (1 - min(away_inj.values[0] * 0.03, 0.15))
 
@@ -139,21 +129,50 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
     prob_draw /= total
     prob_away /= total
 
-    # 🔥 over/btts
+    # 🔥 over / btts
     goal_expectation = (home_attack + away_attack) / 2
     prob_over = sigmoid(goal_expectation - 2.4)
     prob_btts = sigmoid((home_attack * away_attack) - 1.2)
 
-    # 🔥 edge
+    # 🔥 marché
     implied_home = 1 / odd_home
     implied_draw = 1 / odd_draw
     implied_away = 1 / odd_away
 
+    # 🔥 edge
     confidence_factor = 0.85
-
     edge_home = (prob_home * confidence_factor) - implied_home
     edge_draw = (prob_draw * confidence_factor) - implied_draw
     edge_away = (prob_away * confidence_factor) - implied_away
+
+    # ==============================
+    # 🔥 FILTRES INTELLIGENTS
+    # ==============================
+
+    # ❌ match trop équilibré
+    if abs(prob_home - prob_away) < 0.08:
+        return None
+
+    # ❌ trop de draw
+    if prob_draw > 0.30:
+        return None
+
+    # ❌ faux favori
+    if prob_home > 0.60 and edge_home < 0.03:
+        return None
+
+    # ❌ incohérence marché
+    if abs(prob_home - implied_home) > 0.25:
+        return None
+
+    # 🔥 score confiance
+    confidence = (
+        (abs(prob_home - prob_away) * 2)
+        + (max(edge_home, edge_away) * 2)
+        + (1 - prob_draw)
+    )
+
+    confidence = min(max(confidence, 0), 1)
 
     return {
         "prob_home": round(prob_home, 3),
@@ -163,5 +182,6 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
         "prob_btts": round(prob_btts, 3),
         "edge_home": round(edge_home, 3),
         "edge_draw": round(edge_draw, 3),
-        "edge_away": round(edge_away, 3)
+        "edge_away": round(edge_away, 3),
+        "confidence": round(confidence, 3)
     }
