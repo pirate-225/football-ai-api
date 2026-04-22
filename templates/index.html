@@ -137,6 +137,10 @@ button {
 
 <h3>📊 Prediction</h3>
 
+<p style="font-size:18px;">
+    🎯 <strong>Prediction: {{ result.prediction }}</strong>
+</p>
+
 {% if result.low_confidence %}
     <p style="color:red;">⚠️ Match risqué</p>
 {% endif %}
@@ -160,22 +164,6 @@ button {
 <hr>
 
 <p><strong>🎯 Confidence: {{ result.confidence }}</strong></p>
-
-<hr>
-
-<h3>📈 Edge Analysis</h3>
-
-<p class="{{ 'edge-pos' if result.edge_home > 0 else 'edge-neg' }}">
-Home: {{ result.edge_home }}
-</p>
-
-<p class="{{ 'edge-pos' if result.edge_draw > 0 else 'edge-neg' }}">
-Draw: {{ result.edge_draw }}
-</p>
-
-<p class="{{ 'edge-pos' if result.edge_away > 0 else 'edge-neg' }}">
-Away: {{ result.edge_away }}
-</p>
 
 </div>
 {% endif %}

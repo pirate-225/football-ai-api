@@ -85,12 +85,12 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
     home_strength = home_attack / max(away_def, 0.1)
     away_strength = away_attack / max(home_def, 0.1)
 
-    # 🔥 forme (adoucie)
+    # 🔥 forme
     form_diff = (home_form - away_form) / 6
     home_strength *= (1 + form_diff)
     away_strength *= (1 - form_diff)
 
-    # 🔥 elo (adouci)
+    # 🔥 elo
     elo_diff = (home_elo - away_elo) / 600
     home_strength *= (1 + elo_diff)
     away_strength *= (1 - elo_diff)
@@ -129,7 +129,7 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
     prob_draw /= total
     prob_away /= total
 
-    # 🔥 calibration plus douce
+    # 🔥 calibration
     prob_home = prob_home * 0.85 + 0.075
     prob_away = prob_away * 0.85 + 0.075
 
@@ -138,7 +138,7 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
     prob_draw /= total
     prob_away /= total
 
-    # 🔥 over (corrigé)
+    # 🔥 OVER
     lambda_home = home_attack * (away_def + 1) / 2
     lambda_away = away_attack * (home_def + 1) / 2
     expected_goals = lambda_home + lambda_away
@@ -151,51 +151,36 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
 
     prob_btts = sigmoid((home_attack * away_attack) - 1.2)
 
-    # 🔥 marché
-    implied_home = 1 / odd_home
-    implied_draw = 1 / odd_draw
-    implied_away = 1 / odd_away
-
-    # 🔥 edge (moins agressif)
-    confidence_factor = 0.70
-    edge_home = (prob_home * confidence_factor) - implied_home
-    edge_draw = (prob_draw * confidence_factor) - implied_draw
-    edge_away = (prob_away * confidence_factor) - implied_away
-
     # ==============================
-    # 🔥 FILTRES SIMPLES ET UTILES
+    # 🔥 PRÉDICTION CLAIRE
     # ==============================
 
-    # 🔥 flags au lieu de bloquer
+    if prob_home > prob_away and prob_home > prob_draw:
+        prediction = "HOME"
+    elif prob_away > prob_home and prob_away > prob_draw:
+        prediction = "AWAY"
+    else:
+        prediction = "DRAW"
+
+    # 🔥 confiance réelle
+    confidence = max(prob_home, prob_draw, prob_away)
+
+    # 🔥 match risqué
     low_confidence = False
 
-    if abs(prob_home - prob_away) < 0.05:
+    if confidence < 0.55:
         low_confidence = True
 
-    if 0.55 < prob_home < 0.70:
+    if abs(prob_home - prob_away) < 0.08:
         low_confidence = True
-
-    if max(edge_home, edge_away) < 0.02:
-        low_confidence = True
-
-    # 🔥 confiance (plus réaliste)
-    confidence = (
-        (abs(prob_home - prob_away) * 2)
-        + (max(edge_home, edge_away))
-        + (1 - prob_draw)
-    )
-
-    confidence = min(max(confidence, 0), 0.85)
 
     return {
-    "prob_home": round(prob_home, 3),
-    "prob_draw": round(prob_draw, 3),
-    "prob_away": round(prob_away, 3),
-    "prob_over": round(prob_over, 3),
-    "prob_btts": round(prob_btts, 3),
-    "edge_home": round(edge_home, 3),
-    "edge_draw": round(edge_draw, 3),
-    "edge_away": round(edge_away, 3),
-    "confidence": round(confidence, 3),
-    "low_confidence": low_confidence  # 🔥 AJOUT ICI
-}
+        "prediction": prediction,
+        "prob_home": round(prob_home, 3),
+        "prob_draw": round(prob_draw, 3),
+        "prob_away": round(prob_away, 3),
+        "prob_over": round(prob_over, 3),
+        "prob_btts": round(prob_btts, 3),
+        "confidence": round(confidence, 3),
+        "low_confidence": low_confidence
+    }
