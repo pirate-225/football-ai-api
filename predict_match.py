@@ -166,17 +166,17 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
     # 🔥 FILTRES SIMPLES ET UTILES
     # ==============================
 
-    # ❌ éviter matchs trop équilibrés
+    # 🔥 flags au lieu de bloquer
+    low_confidence = False
+
     if abs(prob_home - prob_away) < 0.05:
-        return None
+        low_confidence = True
 
-    # ❌ éviter faux favoris (le vrai problème)
     if 0.55 < prob_home < 0.70:
-        return None
+        low_confidence = True
 
-    # ❌ éviter edge trop faible
     if max(edge_home, edge_away) < 0.02:
-        return None
+        low_confidence = True
 
     # 🔥 confiance (plus réaliste)
     confidence = (
@@ -188,13 +188,14 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
     confidence = min(max(confidence, 0), 0.85)
 
     return {
-        "prob_home": round(prob_home, 3),
-        "prob_draw": round(prob_draw, 3),
-        "prob_away": round(prob_away, 3),
-        "prob_over": round(prob_over, 3),
-        "prob_btts": round(prob_btts, 3),
-        "edge_home": round(edge_home, 3),
-        "edge_draw": round(edge_draw, 3),
-        "edge_away": round(edge_away, 3),
-        "confidence": round(confidence, 3)
-    }
+    "prob_home": round(prob_home, 3),
+    "prob_draw": round(prob_draw, 3),
+    "prob_away": round(prob_away, 3),
+    "prob_over": round(prob_over, 3),
+    "prob_btts": round(prob_btts, 3),
+    "edge_home": round(edge_home, 3),
+    "edge_draw": round(edge_draw, 3),
+    "edge_away": round(edge_away, 3),
+    "confidence": round(confidence, 3),
+    "low_confidence": low_confidence  # 🔥 AJOUT ICI
+}
