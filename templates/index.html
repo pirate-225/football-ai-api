@@ -125,6 +125,12 @@ button {
 
 </div>
 
+{% if message %}
+    <div style="background:#222; padding:10px; border-radius:8px; color:orange;">
+        {{ message }}
+    </div>
+{% endif %}
+
 <!-- 📊 RESULT -->
 {% if result %}
 <div class="card">

@@ -17,6 +17,7 @@ except:
 def index():
 
     result = None
+    message = None  # 🔥 ajout message utilisateur
 
     # 🔥 TOP BETS API
     try:
@@ -37,7 +38,10 @@ def index():
 
             result = predict_match(home, away, odd_home, odd_draw, odd_away)
 
-            if result:
+            # 🔥 CAS IMPORTANT : modèle rejette le match
+            if result is None:
+                message = "⚠️ Match ignoré : pas assez fiable selon le modèle"
+            else:
                 result["odd_home"] = odd_home
                 result["odd_draw"] = odd_draw
                 result["odd_away"] = odd_away
@@ -45,12 +49,14 @@ def index():
         except Exception as e:
             print("INPUT ERROR:", e)
             result = None
+            message = "❌ Erreur dans les données entrées"
 
     return render_template(
         "index.html",
         teams=teams,
         result=result,
-        top_bets=top_bets
+        top_bets=top_bets,
+        message=message  # 🔥 on envoie au front
     )
 
 
