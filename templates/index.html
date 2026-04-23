@@ -133,21 +133,23 @@ button {
 
 <!-- 📊 RESULT -->
 {% if result %}
+{% if result %}
 <div class="card">
 
 <h3>📊 Prediction</h3>
 
 <p style="font-size:18px;">
-    🎯 <strong>Prediction: {{ result.prediction }}</strong>
+    🎯 <strong>{{ result.prediction }}</strong>
 </p>
 
-{% if result.low_confidence %}
-    <p style="color:red;">⚠️ Match risqué</p>
-{% endif %}
+<p><strong>🔥 Confidence: {{ result.confidence }}</strong></p>
+
+<hr>
 
 <p>🏠 Home: {{ result.prob_home }}</p>
 <p>🤝 Draw: {{ result.prob_draw }}</p>
 <p>✈️ Away: {{ result.prob_away }}</p>
+
 {% if result and result.odd_home %}
 <hr>
 <h3>💰 Cotes</h3>
@@ -156,10 +158,10 @@ button {
 <p>Draw: {{ result.odd_draw }}</p>
 <p>Away: {{ result.odd_away }}</p>
 {% endif %}
-<hr>
 
-<p>⚽ Over 2.5: {{ result.prob_over }}</p>
-<p>🥅 BTTS: {{ result.prob_btts }}</p>
+</div>
+{% endif %}
+
 
 <hr>
 
@@ -245,50 +247,3 @@ setupSearch("away", "away_suggestions");
 
 </body>
 </html>
-<script>
-
-const teams = {{ teams["Team"].tolist() | tojson | safe }};
-
-function setupSearch(inputId, suggestionId) {
-
-    const input = document.getElementById(inputId);
-    const box = document.getElementById(suggestionId);
-
-    input.addEventListener("input", function() {
-
-        const value = this.value.toLowerCase();
-        box.innerHTML = "";
-
-        if (value.length < 1) return;
-
-        const filtered = teams
-            .filter(t => t.toLowerCase().includes(value))
-            .slice(0, 6);
-
-        filtered.forEach(team => {
-
-            const div = document.createElement("div");
-            div.textContent = team;
-
-            div.onclick = () => {
-                input.value = team;
-                box.innerHTML = "";
-            };
-
-            box.appendChild(div);
-
-        });
-    });
-
-    // 🔥 fermer si clic ailleurs
-    document.addEventListener("click", (e) => {
-        if (!box.contains(e.target) && e.target !== input) {
-            box.innerHTML = "";
-        }
-    });
-}
-
-setupSearch("home", "home_suggestions");
-setupSearch("away", "away_suggestions");
-
-</script>

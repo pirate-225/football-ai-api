@@ -1,59 +1,8 @@
 import pandas as pd
 import numpy as np
-import requests
-
-# 🔥 FORM LIVE
-def get_recent_form(team_name):
-    try:
-        url = "https://v3.football.api-sports.io/fixtures"
-        headers = {"x-apisports-key": "3b63a56a290a3bd3d4b00c5b232d37d3"}
-
-        params = {"team": team_name, "last": 5}
-        res = requests.get(url, headers=headers, params=params, timeout=5).json()
-
-        points = 0
-        for f in res.get("response", []):
-            home = f["teams"]["home"]["name"]
-            away = f["teams"]["away"]["name"]
-
-            gh = f["goals"]["home"]
-            ga = f["goals"]["away"]
-
-            if gh is None:
-                continue
-
-            if team_name == home:
-                if gh > ga:
-                    points += 3
-                elif gh == ga:
-                    points += 1
-            else:
-                if ga > gh:
-                    points += 3
-                elif gh == ga:
-                    points += 1
-
-        return points / 5
-    except:
-        return 1.5
-
 
 # 🔥 DATA
-try:
-    injuries = pd.read_csv("data_processed/injuries.csv")
-except:
-    injuries = pd.DataFrame()
-
 team_data = pd.read_csv("data_processed/team_stats.csv")
-
-try:
-    standings = pd.read_csv("data_processed/standings.csv")
-except:
-    standings = pd.DataFrame()
-
-
-def sigmoid(x):
-    return 1 / (1 + np.exp(-x))
 
 
 def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
@@ -64,97 +13,42 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
     except:
         return None
 
-    # 🔥 stats
-    home_attack = float(home.get("HomeAttack", home["GoalsScoredAvg"]))
-    away_attack = float(away.get("AwayAttack", away["GoalsScoredAvg"]))
+    # =========================
+    # 🔥 BASE STATS
+    # =========================
+    home_attack = float(home["GoalsScoredAvg"])
     home_def = float(home["GoalsConcededAvg"])
+
+    away_attack = float(away["GoalsScoredAvg"])
     away_def = float(away["GoalsConcededAvg"])
 
-    # 🔥 FORM
-    try:
-        home_form = get_recent_form(home_team)
-        away_form = get_recent_form(away_team)
-    except:
-        home_form = float(home.get("Form", 1.5))
-        away_form = float(away.get("Form", 1.5))
+    # =========================
+    # 🔥 FORCE DES ÉQUIPES
+    # =========================
+    home_strength = (home_attack / max(away_def, 0.1)) * 1.10  # avantage domicile
+    away_strength = (away_attack / max(home_def, 0.1))
 
-    home_elo = float(home.get("ELO", 1000))
-    away_elo = float(away.get("ELO", 1000))
-
-    # 🔥 force
-    home_strength = home_attack / max(away_def, 0.1)
-    away_strength = away_attack / max(home_def, 0.1)
-
-    # 🔥 forme
-    form_diff = (home_form - away_form) / 6
-    home_strength *= (1 + form_diff)
-    away_strength *= (1 - form_diff)
-
-    # 🔥 elo
-    elo_diff = (home_elo - away_elo) / 600
-    home_strength *= (1 + elo_diff)
-    away_strength *= (1 - elo_diff)
-
-    # 🔥 classement
-    home_rank = standings.loc[standings["Team"] == home_team]["Rank"]
-    away_rank = standings.loc[standings["Team"] == away_team]["Rank"]
-
-    if not home_rank.empty and not away_rank.empty:
-        rank_diff = (away_rank.values[0] - home_rank.values[0]) / 40
-        home_strength *= (1 + rank_diff)
-        away_strength *= (1 - rank_diff)
-
-    # 🔥 blessures
-    if not injuries.empty:
-        home_inj = injuries.loc[injuries["Team"] == home_team]["Injuries"]
-        away_inj = injuries.loc[injuries["Team"] == away_team]["Injuries"]
-
-        if not home_inj.empty:
-            home_strength *= (1 - min(home_inj.values[0] * 0.02, 0.10))
-        if not away_inj.empty:
-            away_strength *= (1 - min(away_inj.values[0] * 0.02, 0.10))
-
-    # 🔥 probas
-    home_strength = max(home_strength, 0.01)
-    away_strength = max(away_strength, 0.01)
-
+    # =========================
+    # 🔥 PROBABILITÉS
+    # =========================
     total = home_strength + away_strength
+
     prob_home = home_strength / total
     prob_away = away_strength / total
 
-    prob_draw = (1 - abs(prob_home - prob_away)) * 0.22
+    # draw simple mais stable
+    prob_draw = 1 - abs(prob_home - prob_away)
+    prob_draw *= 0.25
 
+    # normalisation
     total = prob_home + prob_draw + prob_away
     prob_home /= total
     prob_draw /= total
     prob_away /= total
 
-    # 🔥 calibration
-    prob_home = prob_home * 0.85 + 0.075
-    prob_away = prob_away * 0.85 + 0.075
-
-    total = prob_home + prob_draw + prob_away
-    prob_home /= total
-    prob_draw /= total
-    prob_away /= total
-
-    # 🔥 OVER
-    lambda_home = home_attack * (away_def + 1) / 2
-    lambda_away = away_attack * (home_def + 1) / 2
-    expected_goals = lambda_home + lambda_away
-
-    prob_over = 1 - (
-        np.exp(-expected_goals) * (
-            1 + expected_goals + (expected_goals**2)/2
-        )
-    )
-
-    prob_btts = sigmoid((home_attack * away_attack) - 1.2)
-
-    # ==============================
-    # 🔥 PRÉDICTION CLAIRE
-    # ==============================
-
+    # =========================
+    # 🔥 PRÉDICTION
+    # =========================
     if prob_home > prob_away and prob_home > prob_draw:
         prediction = "HOME"
     elif prob_away > prob_home and prob_away > prob_draw:
@@ -162,25 +56,15 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
     else:
         prediction = "DRAW"
 
-    # 🔥 confiance réelle
+    # =========================
+    # 🔥 CONFIANCE SIMPLE
+    # =========================
     confidence = max(prob_home, prob_draw, prob_away)
-
-    # 🔥 match risqué
-    low_confidence = False
-
-    if confidence < 0.55:
-        low_confidence = True
-
-    if abs(prob_home - prob_away) < 0.08:
-        low_confidence = True
 
     return {
         "prediction": prediction,
         "prob_home": round(prob_home, 3),
         "prob_draw": round(prob_draw, 3),
         "prob_away": round(prob_away, 3),
-        "prob_over": round(prob_over, 3),
-        "prob_btts": round(prob_btts, 3),
-        "confidence": round(confidence, 3),
-        "low_confidence": low_confidence
+        "confidence": round(confidence, 3)
     }
