@@ -2,13 +2,13 @@ import pandas as pd
 import numpy as np
 import requests
 
+# 🔥 FORM LIVE
 def get_recent_form(team_name):
     try:
         url = "https://v3.football.api-sports.io/fixtures"
         headers = {"x-apisports-key": "3b63a56a290a3bd3d4b00c5b232d37d3"}
 
         params = {"team": team_name, "last": 5}
-
         res = requests.get(url, headers=headers, params=params, timeout=5).json()
 
         points = 0
@@ -39,6 +39,7 @@ def get_recent_form(team_name):
     except:
         return 1.5
 
+
 # 🔥 DATA
 team_data = pd.read_csv("data_processed/team_stats.csv")
 
@@ -61,15 +62,7 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
     away_def = float(away["GoalsConcededAvg"])
 
     # =========================
-    # 🔥 FORCE DES ÉQUIPES
-    # =========================
-    home_advantage = 1.15
-
-    home_strength = (home_attack / max(away_def, 0.1)) * home_advantage
-    away_strength = (away_attack / max(home_def, 0.1))
-
-    # =========================
-    # 🔥 FORME (léger)
+    # 🔥 FORM (d'abord)
     # =========================
     try:
         home_form = get_recent_form(home_team)
@@ -78,10 +71,26 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
         home_form = float(home.get("Form", 1.5))
         away_form = float(away.get("Form", 1.5))
 
-    form_diff = (home_form - away_form) / 10
+    # =========================
+    # 🔥 FORCE AVEC PONDÉRATION
+    # =========================
+    home_advantage = 1.15
 
-    home_strength *= (1 + form_diff)
-    away_strength *= (1 - form_diff)
+    alpha = 0.75
+    beta = 0.25
+
+    home_form_factor = home_form / 1.5
+    away_form_factor = away_form / 1.5
+
+    home_strength = (
+        (home_attack / max(away_def, 0.1)) * alpha +
+        home_form_factor * beta
+    ) * home_advantage
+
+    away_strength = (
+        (away_attack / max(home_def, 0.1)) * alpha +
+        away_form_factor * beta
+    )
 
     # =========================
     # 🔥 DRAW
@@ -99,9 +108,20 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
     prob_home = home_strength / total_strength
     prob_away = away_strength / total_strength
 
-    # 🔥 normalisation finale
+    # normalisation
     total = prob_home + prob_draw + prob_away
 
+    prob_home /= total
+    prob_draw /= total
+    prob_away /= total
+
+    # =========================
+    # 🔥 CALIBRATION
+    # =========================
+    prob_home = prob_home * 0.9 + 0.05
+    prob_away = prob_away * 0.9 + 0.05
+
+    total = prob_home + prob_draw + prob_away
     prob_home /= total
     prob_draw /= total
     prob_away /= total
