@@ -25,23 +25,41 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
     # =========================
     # 🔥 FORCE DES ÉQUIPES
     # =========================
-    home_strength = (home_attack / max(away_def, 0.1)) * 1.10  # avantage domicile
+    home_advantage = 1.15
+
+    home_strength = (home_attack / max(away_def, 0.1)) * home_advantage
     away_strength = (away_attack / max(home_def, 0.1))
+
+    # =========================
+    # 🔥 FORME (léger)
+    # =========================
+    home_form = float(home.get("Form", 1.5))
+    away_form = float(away.get("Form", 1.5))
+
+    form_diff = (home_form - away_form) / 10
+
+    home_strength *= (1 + form_diff)
+    away_strength *= (1 - form_diff)
+
+    # =========================
+    # 🔥 DRAW
+    # =========================
+    diff = abs(home_strength - away_strength)
+
+    prob_draw = 0.28 - (diff * 0.10)
+    prob_draw = max(0.15, min(prob_draw, 0.30))
 
     # =========================
     # 🔥 PROBABILITÉS
     # =========================
-    total = home_strength + away_strength
+    total_strength = home_strength + away_strength
 
-    prob_home = home_strength / total
-    prob_away = away_strength / total
+    prob_home = home_strength / total_strength
+    prob_away = away_strength / total_strength
 
-    # draw simple mais stable
-    prob_draw = 1 - abs(prob_home - prob_away)
-    prob_draw *= 0.25
-
-    # normalisation
+    # 🔥 normalisation finale
     total = prob_home + prob_draw + prob_away
+
     prob_home /= total
     prob_draw /= total
     prob_away /= total
@@ -57,7 +75,7 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
         prediction = "DRAW"
 
     # =========================
-    # 🔥 CONFIANCE SIMPLE
+    # 🔥 CONFIANCE
     # =========================
     confidence = max(prob_home, prob_draw, prob_away)
 
