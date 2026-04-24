@@ -36,7 +36,11 @@ def index():
             odd_draw = float(request.form.get("odd_draw"))
             odd_away = float(request.form.get("odd_away"))
 
-            result = predict_match(home, away, odd_home, odd_draw, odd_away)
+try:
+    result = predict_match(home, away, odd_home, odd_draw, odd_away)
+except Exception as e:
+    print("ERROR PREDICT:", e)
+    result = None
 
             # 🔥 CAS IMPORTANT : modèle rejette le match
             if result is None:

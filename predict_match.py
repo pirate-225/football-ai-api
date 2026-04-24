@@ -132,6 +132,9 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
     # 🔥 normalisation
     total = prob_home + prob_draw + prob_away
 
+    if total == 0:
+        return None
+
     prob_home /= total
     prob_draw /= total
     prob_away /= total
