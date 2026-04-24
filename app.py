@@ -17,7 +17,7 @@ except:
 def index():
 
     result = None
-    message = None  # 🔥 message utilisateur
+    message = None
 
     # 🔥 TOP BETS API
     try:
@@ -36,16 +36,14 @@ def index():
             odd_draw = float(request.form.get("odd_draw"))
             odd_away = float(request.form.get("odd_away"))
 
-            # 🔥 CORRECTION ICI (bien indenté)
             try:
                 result = predict_match(home, away, odd_home, odd_draw, odd_away)
             except Exception as e:
                 print("ERROR PREDICT:", e)
                 result = None
 
-            # 🔥 gestion résultat
             if result is None:
-                message = "⚠️ Match ignoré : pas assez fiable selon le modèle"
+                message = "⚠️ Match ignoré"
             else:
                 result["odd_home"] = odd_home
                 result["odd_draw"] = odd_draw
@@ -53,20 +51,20 @@ def index():
 
         except Exception as e:
             print("INPUT ERROR:", e)
-            result = None
             message = "❌ Erreur dans les données entrées"
 
-try:
-    return render_template(
-        "index.html",
-        teams=teams,
-        result=result,
-        top_bets=top_bets,
-        message=message
-    )
-except Exception as e:
-    print("RENDER ERROR:", e)
-    return "Erreur serveur"
+    # ✅ DOIT ÊTRE DANS LA FONCTION
+    try:
+        return render_template(
+            "index.html",
+            teams=teams,
+            result=result,
+            top_bets=top_bets,
+            message=message
+        )
+    except Exception as e:
+        print("RENDER ERROR:", e)
+        return "Erreur serveur"
 
 
 if __name__ == "__main__":
