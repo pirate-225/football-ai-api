@@ -42,8 +42,6 @@ def index():
                 print("ERROR PREDICT:", e)
                 result = None
 
-            if result is None:
-                message = "⚠️ Match ignoré"
             else:
                 result["odd_home"] = odd_home
                 result["odd_draw"] = odd_draw
