@@ -133,7 +133,9 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
     total = prob_home + prob_draw + prob_away
 
     if total == 0:
-        return None
+        prob_home = 0.33
+        prob_draw = 0.34
+        prob_away = 0.33
 
     prob_home /= total
     prob_draw /= total
