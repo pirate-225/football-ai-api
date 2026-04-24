@@ -143,11 +143,10 @@ button {
 
 <p><strong>🔥 Confidence: {{ result.confidence }}</strong></p>
 
-{% if result and result.score %}
-{% if result and result.score %}
+{% if result.score %}
 <p>📊 Score probable: {{ result.score }}</p>
 {% endif %}
-{% endif %}
+
 <hr>
 
 <p>🏠 Home: {{ result.prob_home }}</p>
@@ -165,7 +164,6 @@ button {
 
 </div>
 {% endif %}
-
 
 <hr>
 
