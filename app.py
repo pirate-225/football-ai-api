@@ -56,6 +56,7 @@ def index():
             result = None
             message = "❌ Erreur dans les données entrées"
 
+try:
     return render_template(
         "index.html",
         teams=teams,
@@ -63,6 +64,9 @@ def index():
         top_bets=top_bets,
         message=message
     )
+except Exception as e:
+    print("RENDER ERROR:", e)
+    return "Erreur serveur"
 
 
 if __name__ == "__main__":

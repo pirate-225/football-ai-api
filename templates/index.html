@@ -144,7 +144,9 @@ button {
 <p><strong>🔥 Confidence: {{ result.confidence }}</strong></p>
 
 {% if result and result.score %}
+{% if result and result.score %}
 <p>📊 Score probable: {{ result.score }}</p>
+{% endif %}
 {% endif %}
 <hr>
 
