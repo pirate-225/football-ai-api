@@ -47,13 +47,13 @@ team_data = pd.read_csv("data_processed/team_stats.csv")
 def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
 
     try:
-home = team_data[
-    team_data["Team"].str.lower().str.contains(home_team.lower())
-].iloc[0]
+    home = team_data[
+        team_data["Team"].str.lower().str.contains(home_team.lower())
+    ].iloc[0]
 
-away = team_data[
-    team_data["Team"].str.lower().str.contains(away_team.lower())
-].iloc[0]
+    away = team_data[
+        team_data["Team"].str.lower().str.contains(away_team.lower())
+    ].iloc[0]
     except:
         return None
 
