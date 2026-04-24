@@ -5,15 +5,12 @@
 <title>Football AI Pro</title>
 
 <style>
-
 body {
     font-family: Arial, sans-serif;
     background: #020617;
     color: white;
     margin: 0;
 }
-
-/* HEADER */
 header {
     padding: 15px;
     text-align: center;
@@ -22,23 +19,17 @@ header {
     color: #38bdf8;
     border-bottom: 1px solid #1e293b;
 }
-
-/* CONTAINER */
 .container {
     max-width: 650px;
     margin: auto;
     padding: 15px;
 }
-
-/* CARD */
 .card {
     background: #0f172a;
     padding: 15px;
     border-radius: 12px;
     margin-bottom: 15px;
 }
-
-/* INPUT */
 input {
     width: 100%;
     padding: 12px;
@@ -48,8 +39,6 @@ input {
     background: #1e293b;
     color: white;
 }
-
-/* BUTTON */
 button {
     width: 100%;
     padding: 12px;
@@ -60,41 +49,6 @@ button {
     font-weight: bold;
     cursor: pointer;
 }
-
-/* BET TAG */
-.bet {
-    background: #38bdf8;
-    color: black;
-    padding: 4px 8px;
-    border-radius: 6px;
-    display: inline-block;
-    margin-top: 5px;
-}
-
-/* EDGE COLORS */
-.edge-pos {
-    color: #22c55e;
-}
-.edge-neg {
-    color: #ef4444;
-}
-
-/* AUTOCOMPLETE */
-.suggestions {
-    background: #1e293b;
-    border-radius: 8px;
-    max-height: 150px;
-    overflow-y: auto;
-}
-.suggestions div {
-    padding: 8px;
-    cursor: pointer;
-}
-.suggestions div:hover {
-    background: #38bdf8;
-    color: black;
-}
-
 </style>
 </head>
 
@@ -104,16 +58,11 @@ button {
 
 <div class="container">
 
-<!-- 🔍 SEARCH -->
 <div class="card">
-
 <form method="POST">
 
-<input type="text" id="home" name="home_team" placeholder="Equipe domicile" autocomplete="off">
-<div id="home_suggestions" class="suggestions"></div>
-
-<input type="text" id="away" name="away_team" placeholder="Equipe extérieur" autocomplete="off">
-<div id="away_suggestions" class="suggestions"></div>
+<input type="text" name="home_team" placeholder="Equipe domicile">
+<input type="text" name="away_team" placeholder="Equipe extérieur">
 
 <input type="number" step="0.01" name="odd_home" placeholder="Cote Home">
 <input type="number" step="0.01" name="odd_draw" placeholder="Cote Draw">
@@ -122,26 +71,21 @@ button {
 <button type="submit">Analyser</button>
 
 </form>
-
 </div>
 
 {% if message %}
-    <div style="background:#222; padding:10px; border-radius:8px; color:orange;">
-        {{ message }}
-    </div>
+<div class="card" style="color: orange;">
+    {{ message }}
+</div>
 {% endif %}
 
-<!-- 📊 RESULT -->
 {% if result %}
 <div class="card">
 
 <h3>📊 Prediction</h3>
 
-<p style="font-size:18px;">
-    🎯 <strong>{{ result.prediction }}</strong>
-</p>
-
-<p><strong>🔥 Confidence: {{ result.confidence }}</strong></p>
+<p>🎯 {{ result.prediction }}</p>
+<p>🔥 Confidence: {{ result.confidence }}</p>
 
 {% if result.score %}
 <p>📊 Score probable: {{ result.score }}</p>
@@ -155,97 +99,15 @@ button {
 
 {% if result.odd_home %}
 <hr>
-<h3>💰 Cotes</h3>
-
-<p>Home: {{ result.odd_home }}</p>
-<p>Draw: {{ result.odd_draw }}</p>
-<p>Away: {{ result.odd_away }}</p>
+<p>💰 Home: {{ result.odd_home }}</p>
+<p>💰 Draw: {{ result.odd_draw }}</p>
+<p>💰 Away: {{ result.odd_away }}</p>
 {% endif %}
 
 </div>
 {% endif %}
 
-<hr>
-
-<p><strong>🎯 Confidence: {{ result.confidence }}</strong></p>
-
 </div>
-{% endif %}
-
-<!-- 🔥 TOP BETS -->
-<div class="card">
-
-<h3>🔥 Top Bets Today</h3>
-
-{% if top_bets %}
-    {% for bet in top_bets %}
-        <div style="margin-bottom: 10px;">
-
-            <strong>{{ bet.match }}</strong><br>
-
-            <span class="bet">{{ bet.bet }}</span>
-
-            {% if bet.odds %}
-            <br>💰 Cote: {{ bet.odds }}
-            {% endif %}
-
-            <br>📊 Probabilité: {{ bet.value }}
-
-            {% if bet.edge %}
-            <br>📈 Edge: {{ bet.edge }}
-            {% endif %}
-
-        </div>
-    {% endfor %}
-{% else %}
-    <p>❌ Aucun bet intéressant aujourd’hui</p>
-{% endif %}
-
-</div>
-
-</div>
-
-<!-- 🔥 AUTOCOMPLETE SCRIPT -->
-<script>
-
-const teams = {{ teams["Team"].tolist() | tojson }};
-
-function setupSearch(inputId, suggestionId) {
-
-    const input = document.getElementById(inputId);
-    const box = document.getElementById(suggestionId);
-
-    input.addEventListener("input", function() {
-
-        const value = this.value.toLowerCase();
-        box.innerHTML = "";
-
-        if (value.length < 2) return;
-
-        const filtered = teams
-            .filter(t => t.toLowerCase().includes(value))
-            .slice(0, 5);
-
-        filtered.forEach(team => {
-
-            const div = document.createElement("div");
-            div.textContent = team;
-
-            div.onclick = () => {
-                input.value = team;
-                box.innerHTML = "";
-            };
-
-            box.appendChild(div);
-
-        });
-    });
-}
-
-setupSearch("home", "home_suggestions");
-setupSearch("away", "away_suggestions");
-
-</script>
 
 </body>
 </html>
