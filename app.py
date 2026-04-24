@@ -42,16 +42,18 @@ def index():
                 print("ERROR PREDICT:", e)
                 result = None
 
-                        else:
+            # ✅ logique propre
+            if result is not None:
                 result["odd_home"] = odd_home
                 result["odd_draw"] = odd_draw
                 result["odd_away"] = odd_away
+            else:
+                message = "❌ Équipe introuvable ou erreur"
 
         except Exception as e:
             print("INPUT ERROR:", e)
             message = "❌ Erreur dans les données entrées"
 
-    # ✅ DOIT ÊTRE DANS LA FONCTION
     try:
         return render_template(
             "index.html",
