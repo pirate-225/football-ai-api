@@ -93,35 +93,50 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
     )
 
     # =========================
-    # 🔥 DRAW
+    # 🔥 EXPECTED GOALS (xG)
     # =========================
-    diff = abs(home_strength - away_strength)
+    lambda_home = home_strength
+    lambda_away = away_strength
 
-    prob_draw = 0.28 - (diff * 0.10)
-    prob_draw = max(0.15, min(prob_draw, 0.30))
 
     # =========================
-    # 🔥 PROBABILITÉS
+    # 🔥 POISSON
     # =========================
-    total_strength = home_strength + away_strength
+    def poisson_prob(lmbda, k):
+        return (np.exp(-lmbda) * (lmbda ** k)) / np.math.factorial(k)
 
-    prob_home = home_strength / total_strength
-    prob_away = away_strength / total_strength
 
-    # normalisation
+    max_goals = 5
+
+    prob_home = 0
+    prob_draw = 0
+    prob_away = 0
+
+    best_score = (0, 0)
+    best_prob = 0
+
+    for i in range(max_goals + 1):
+        for j in range(max_goals + 1):
+
+            p = poisson_prob(lambda_home, i) * poisson_prob(lambda_away, j)
+
+    # 🔥 score le plus probable
+    if p > best_prob:
+        best_prob = p
+        best_score = (i, j)
+
+            if i > j:
+                prob_home += p
+            elif i == j:
+                prob_draw += p
+            else:
+                prob_away += p
+
+    score_home, score_away = best_score
+
+    # 🔥 normalisation finale
     total = prob_home + prob_draw + prob_away
 
-    prob_home /= total
-    prob_draw /= total
-    prob_away /= total
-
-    # =========================
-    # 🔥 CALIBRATION
-    # =========================
-    prob_home = prob_home * 0.9 + 0.05
-    prob_away = prob_away * 0.9 + 0.05
-
-    total = prob_home + prob_draw + prob_away
     prob_home /= total
     prob_draw /= total
     prob_away /= total
@@ -147,4 +162,5 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
         "prob_draw": round(prob_draw, 3),
         "prob_away": round(prob_away, 3),
         "confidence": round(confidence, 3)
+        "score": f"{score_home}-{score_away}",
     }
