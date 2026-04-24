@@ -62,7 +62,7 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
     away_def = float(away["GoalsConcededAvg"])
 
     # =========================
-    # 🔥 FORM (d'abord)
+    # 🔥 FORM
     # =========================
     try:
         home_form = get_recent_form(home_team)
@@ -72,7 +72,7 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
         away_form = float(away.get("Form", 1.5))
 
     # =========================
-    # 🔥 FORCE AVEC PONDÉRATION
+    # 🔥 FORCE
     # =========================
     home_advantage = 1.15
 
@@ -93,18 +93,13 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
     )
 
     # =========================
-    # 🔥 EXPECTED GOALS (xG)
+    # 🔥 POISSON
     # =========================
     lambda_home = home_strength
     lambda_away = away_strength
 
-
-    # =========================
-    # 🔥 POISSON
-    # =========================
     def poisson_prob(lmbda, k):
         return (np.exp(-lmbda) * (lmbda ** k)) / np.math.factorial(k)
-
 
     max_goals = 5
 
@@ -120,10 +115,10 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
 
             p = poisson_prob(lambda_home, i) * poisson_prob(lambda_away, j)
 
-    # 🔥 score le plus probable
-    if p > best_prob:
-        best_prob = p
-        best_score = (i, j)
+            # 🔥 score le plus probable
+            if p > best_prob:
+                best_prob = p
+                best_score = (i, j)
 
             if i > j:
                 prob_home += p
@@ -134,7 +129,7 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
 
     score_home, score_away = best_score
 
-    # 🔥 normalisation finale
+    # 🔥 normalisation
     total = prob_home + prob_draw + prob_away
 
     prob_home /= total
@@ -161,6 +156,6 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
         "prob_home": round(prob_home, 3),
         "prob_draw": round(prob_draw, 3),
         "prob_away": round(prob_away, 3),
-        "confidence": round(confidence, 3)
+        "confidence": round(confidence, 3),
         "score": f"{score_home}-{score_away}",
     }

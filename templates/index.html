@@ -133,9 +133,7 @@ button {
 
 <!-- 📊 RESULT -->
 {% if result %}
-{% if result %}
 <div class="card">
-<p>📊 Score probable: {{ result.score }}</p>
 
 <h3>📊 Prediction</h3>
 
@@ -145,13 +143,15 @@ button {
 
 <p><strong>🔥 Confidence: {{ result.confidence }}</strong></p>
 
+<p>📊 Score probable: {{ result.score }}</p>
+
 <hr>
 
 <p>🏠 Home: {{ result.prob_home }}</p>
 <p>🤝 Draw: {{ result.prob_draw }}</p>
 <p>✈️ Away: {{ result.prob_away }}</p>
 
-{% if result and result.odd_home %}
+{% if result.odd_home %}
 <hr>
 <h3>💰 Cotes</h3>
 
