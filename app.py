@@ -46,9 +46,9 @@ except:
 
 @app.route("/", methods=["GET", "POST"])
 def index():
-    live_matches = []
-    result = None
-    message = None
+
+    return "OK"
+
     try:
         top_bets = get_top_bets()
     except Exception as e:
