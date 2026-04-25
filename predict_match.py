@@ -1,3 +1,4 @@
+import math
 import pandas as pd
 import numpy as np
 import requests
@@ -46,16 +47,44 @@ team_data = pd.read_csv("data_processed/team_stats.csv")
 
 def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
 
-    try:
-        home = team_data[
-            team_data["Team"].str.lower().str.contains(home_team.lower())
-        ].iloc[0]
+    print("HOME INPUT:", home_team)
+    print("AWAY INPUT:", away_team)
+    print("DATA TEAMS:", team_data["Team"].head(10).tolist())
+    print("------ FULL TEAMS LIST ------")
+    print(team_data["Team"].tolist()[:30])
+    print("DATA SIZE:", team_data.shape)
+    print("ALL TEAMS:", team_data["Team"].tolist())
 
-        away = team_data[
-            team_data["Team"].str.lower().str.contains(away_team.lower())
-        ].iloc[0]
+    # =========================
+    # 🔥 MATCHING ÉQUIPES
+    # =========================
+    def normalize(name):
+        return name.lower().strip()
 
-    except:
+    def find_team(name):
+        name = name.lower().strip()
+
+        for _, row in team_data.iterrows():
+            team = str(row["Team"]).lower().strip()
+
+            if name == team:
+                return row
+
+        # fallback
+        for _, row in team_data.iterrows():
+            team = str(row["Team"]).lower().strip()
+
+            if name in team or team in name:
+                return row
+
+        print("NOT FOUND:", name)
+        return None
+
+    # 🔥 AJOUT MANQUANT
+    home = find_team(home_team)
+    away = find_team(away_team)
+
+    if home is None or away is None:
         return None
 
     # =========================
@@ -80,13 +109,13 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
     # =========================
     # 🔥 FORCE
     # =========================
-    home_advantage = 1.15
+    home_advantage = 1.2
 
     alpha = 0.75
     beta = 0.25
 
-    home_form_factor = home_form / 1.5
-    away_form_factor = away_form / 1.5
+    home_form_factor = (home_form - 1.5) * 0.2
+    away_form_factor = (away_form - 1.5) * 0.2
 
     home_strength = (
         (home_attack / max(away_def, 0.1)) * alpha +
@@ -101,13 +130,14 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
     # =========================
     # 🔥 POISSON
     # =========================
-    lambda_home = home_strength
-    lambda_away = away_strength
+    lambda_home = home_strength * 0.9
+    lambda_away = away_strength * 0.9
 
     def poisson_prob(lmbda, k):
-        return (np.exp(-lmbda) * (lmbda ** k)) / np.math.factorial(k)
+        return (np.exp(-lmbda) * (lmbda ** k)) / math.factorial(k)
+    
 
-    max_goals = 5
+    max_goals = 4
 
     prob_home = 0
     prob_draw = 0
@@ -121,7 +151,6 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
 
             p = poisson_prob(lambda_home, i) * poisson_prob(lambda_away, j)
 
-            # 🔥 score le plus probable
             if p > best_prob:
                 best_prob = p
                 best_score = (i, j)
@@ -135,14 +164,26 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
 
     score_home, score_away = best_score
 
-    # 🔥 normalisation
+    # =========================
+    # 🔥 NORMALISATION
+    # =========================
     total = prob_home + prob_draw + prob_away
 
     if total == 0:
         prob_home = 0.33
         prob_draw = 0.34
         prob_away = 0.33
+    else:
+        prob_home /= total
+        prob_draw /= total
+        prob_away /= total
 
+    # 🔥 calibration douce
+    prob_home = prob_home * 0.9 + 0.05
+    prob_away = prob_away * 0.9 + 0.05
+
+    # 🔥 renormalisation
+    total = prob_home + prob_draw + prob_away
     prob_home /= total
     prob_draw /= total
     prob_away /= total
@@ -163,6 +204,8 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
     confidence = max(prob_home, prob_draw, prob_away)
 
     return {
+        "xg_home": round(lambda_home, 2),
+        "xg_away": round(lambda_away, 2),
         "prediction": prediction,
         "prob_home": round(prob_home, 3),
         "prob_draw": round(prob_draw, 3),

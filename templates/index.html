@@ -89,6 +89,20 @@ button {
 </form>
 </div>
 
+<div class="card">
+<h3>📅 Matchs du jour</h3>
+
+{% for m in live_matches %}
+    <div style="margin-bottom:10px; cursor:pointer;"
+         onclick="fillMatch('{{ m.home }}', '{{ m.away }}')">
+
+        {{ m.home }} vs {{ m.away }}
+
+    </div>
+{% endfor %}
+
+</div>
+
 {% if message %}
 <div class="card" style="color: orange;">
     {{ message }}
@@ -107,7 +121,7 @@ button {
 {% if result.score %}
 <p>📊 Score probable: {{ result.score }}</p>
 {% endif %}
-
+<p>📊 xG: {{ result.xg_home }} - {{ result.xg_away }}</p>
 <hr>
 
 <p>🏠 Home: {{ result.prob_home }}</p>
@@ -185,6 +199,10 @@ setupSearch("home", "home_suggestions");
 setupSearch("away", "away_suggestions");
 
 </script>
-
+function fillMatch(home, away) {
+    document.getElementById("home").value = home;
+    document.getElementById("away").value = away;
+}
+</script>
 </body>
 </html>

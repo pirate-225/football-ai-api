@@ -2,6 +2,28 @@ from flask import Flask, render_template, request
 import pandas as pd
 import os
 
+def get_live_matches():
+    try:
+        url = "https://v3.football.api-sports.io/fixtures"
+        headers = {"x-apisports-key": "3b63a56a290a3bd3d4b00c5b232d37d3"}
+
+        params = {"date": pd.Timestamp.today().strftime("%Y-%m-%d")}
+
+        res = requests.get(url, headers=headers, params=params).json()
+
+        matches = []
+
+        for f in res.get("response", []):
+            matches.append({
+                "home": f["teams"]["home"]["name"],
+                "away": f["teams"]["away"]["name"]
+            })
+
+        return matches
+
+    except:
+        return []
+
 from predict_match import predict_match
 from top_bets import get_top_bets
 
@@ -22,6 +44,7 @@ def index():
     # 🔥 TOP BETS API
     try:
         top_bets = get_top_bets()
+        live_matches = get_live_matches()
     except:
         top_bets = []
 
@@ -60,7 +83,8 @@ def index():
             teams=teams,
             result=result,
             top_bets=top_bets,
-            message=message
+            message=message,
+            live_matches=live_matches
         )
     except Exception as e:
         print("RENDER ERROR:", e)
