@@ -37,9 +37,14 @@ except:
 
 @app.route("/", methods=["GET", "POST"])
 def index():
-
+    live_matches = []
     result = None
     message = None
+
+    try:
+        live_matches = get_live_matches()
+    except:
+        live_matches = []
 
     # 🔥 TOP BETS API
     try:

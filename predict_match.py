@@ -9,8 +9,9 @@ def get_recent_form(team_name):
         url = "https://v3.football.api-sports.io/fixtures"
         headers = {"x-apisports-key": "3b63a56a290a3bd3d4b00c5b232d37d3"}
 
-        params = {"team": team_name, "last": 5}
-        res = requests.get(url, headers=headers, params=params, timeout=5).json()
+        params = {
+            "date": pd.Timestamp.today().strftime("%Y-%m-%d")
+        }
 
         points = 0
 
