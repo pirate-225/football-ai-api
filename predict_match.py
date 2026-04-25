@@ -9,9 +9,9 @@ def get_recent_form(team_name):
         url = "https://v3.football.api-sports.io/fixtures"
         headers = {"x-apisports-key": "3b63a56a290a3bd3d4b00c5b232d37d3"}
 
-        params = {
-            "date": pd.Timestamp.today().strftime("%Y-%m-%d")
-        }
+        params = {"team": team_name, "last": 5}
+
+        res = requests.get(url, headers=headers, params=params).json()
 
         points = 0
 
@@ -48,40 +48,28 @@ team_data = pd.read_csv("data_processed/team_stats.csv")
 
 def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
 
-    print("HOME INPUT:", home_team)
-    print("AWAY INPUT:", away_team)
-    print("DATA TEAMS:", team_data["Team"].head(10).tolist())
-    print("------ FULL TEAMS LIST ------")
-    print(team_data["Team"].tolist()[:30])
-    print("DATA SIZE:", team_data.shape)
-    print("ALL TEAMS:", team_data["Team"].tolist())
-
     # =========================
     # 🔥 MATCHING ÉQUIPES
     # =========================
     def normalize(name):
-        return name.lower().strip()
+        return str(name).lower().strip()
 
     def find_team(name):
-        name = name.lower().strip()
+        name = normalize(name)
 
         for _, row in team_data.iterrows():
-            team = str(row["Team"]).lower().strip()
-
+            team = normalize(row["Team"])
             if name == team:
                 return row
 
         # fallback
         for _, row in team_data.iterrows():
-            team = str(row["Team"]).lower().strip()
-
+            team = normalize(row["Team"])
             if name in team or team in name:
                 return row
 
-        print("NOT FOUND:", name)
         return None
 
-    # 🔥 AJOUT MANQUANT
     home = find_team(home_team)
     away = find_team(away_team)
 
@@ -104,8 +92,8 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
         home_form = get_recent_form(home_team)
         away_form = get_recent_form(away_team)
     except:
-        home_form = float(home.get("Form", 1.5))
-        away_form = float(away.get("Form", 1.5))
+        home_form = 1.5
+        away_form = 1.5
 
     # =========================
     # 🔥 FORCE
@@ -128,17 +116,42 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
         away_form_factor * beta
     )
 
+    # 🔥 amplification des écarts (clé)
+    home_strength = home_strength ** 1.3
+    away_strength = away_strength ** 1.3
+
+    # =========================
+    # 🔥 xG RÉALISTES
+    # =========================
+    league_avg_goals = 2.6
+
+    lambda_home = home_strength * 1.4
+    lambda_away = away_strength * 1.2
+
+    lambda_home = max(lambda_home, 0.8)
+    lambda_away = max(lambda_away, 0.8)
+
+    lambda_home *= np.random.uniform(0.8, 1.3)
+    lambda_away *= np.random.uniform(0.8, 1.3)
+
+    scale = league_avg_goals / (lambda_home + lambda_away)
+
+    lambda_home *= scale
+    lambda_away *= scale
+
+    # 🔥 DIFFÉRENCE DE NIVEAU
+    strength_diff = home_strength - away_strength
+
+    lambda_home *= (1 + strength_diff * 0.3)
+    lambda_away *= (1 - strength_diff * 0.3)
+
     # =========================
     # 🔥 POISSON
     # =========================
-    lambda_home = home_strength * 0.9
-    lambda_away = away_strength * 0.9
-
     def poisson_prob(lmbda, k):
         return (np.exp(-lmbda) * (lmbda ** k)) / math.factorial(k)
-    
 
-    max_goals = 4
+    max_goals = 6
 
     prob_home = 0
     prob_draw = 0
@@ -183,7 +196,6 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
     prob_home = prob_home * 0.9 + 0.05
     prob_away = prob_away * 0.9 + 0.05
 
-    # 🔥 renormalisation
     total = prob_home + prob_draw + prob_away
     prob_home /= total
     prob_draw /= total
@@ -202,7 +214,7 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
     # =========================
     # 🔥 CONFIANCE
     # =========================
-    confidence = max(prob_home, prob_draw, prob_away)
+    confidence = abs(prob_home - prob_away)
 
     return {
         "xg_home": round(lambda_home, 2),
