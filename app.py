@@ -1,27 +1,36 @@
 from flask import Flask, render_template, request
 import pandas as pd
 import os
+import requests
 
 def get_live_matches():
     try:
         url = "https://v3.football.api-sports.io/fixtures"
-        headers = {"x-apisports-key": "3b63a56a290a3bd3d4b00c5b232d37d3"}
 
-        params = {"date": pd.Timestamp.today().strftime("%Y-%m-%d")}
+        headers = {
+            "x-apisports-key": "3b63a56a290a3bd3d4b00c5b232d37d3"
+        }
+
+        params = {
+            "date": pd.Timestamp.today().strftime("%Y-%m-%d"),
+            "league": "39,61,78,140,135,2,3,848"  
+        }
 
         res = requests.get(url, headers=headers, params=params).json()
 
         matches = []
 
-        for f in res.get("response", []):
+        for f in res.get("response", [])[:20]:
             matches.append({
                 "home": f["teams"]["home"]["name"],
-                "away": f["teams"]["away"]["name"]
+                "away": f["teams"]["away"]["name"],
+                "league": f["league"]["name"]
             })
 
         return matches
 
-    except:
+    except Exception as e:
+        print("API ERROR:", e)
         return []
 
 from predict_match import predict_match
@@ -46,6 +55,8 @@ def index():
         live_matches = get_live_matches()
     except:
         live_matches = []
+
+    print("LIVE MATCHES:", live_matches)
 
     # 🔥 TOP BETS API
     try:
