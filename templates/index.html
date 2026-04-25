@@ -89,15 +89,14 @@ button {
 </form>
 </div>
 
+<!-- 📅 MATCHS -->
 <div class="card">
 <h3>📅 Matchs du jour</h3>
 
 {% for m in live_matches %}
     <div style="margin-bottom:10px; cursor:pointer;"
          onclick="fillMatch('{{ m.home }}', '{{ m.away }}')">
-
         {{ m.home }} vs {{ m.away }}
-
     </div>
 {% endfor %}
 
@@ -115,18 +114,22 @@ button {
 
 <h3>📊 Prediction</h3>
 
-<p>🎯 {{ result.prediction }}</p>
+<p style="font-size:18px;">🎯 <strong>{{ result.prediction }}</strong></p>
 <p>🔥 Confidence: {{ result.confidence }}</p>
 
-{% if result.score %}
-<p>📊 Score probable: {{ result.score }}</p>
-{% endif %}
-<p>📊 xG: {{ result.xg_home }} - {{ result.xg_away }}</p>
 <hr>
 
 <p>🏠 Home: {{ result.prob_home }}</p>
 <p>🤝 Draw: {{ result.prob_draw }}</p>
 <p>✈️ Away: {{ result.prob_away }}</p>
+
+<hr>
+
+<p>📊 xG: {{ result.xg_home }} - {{ result.xg_away }}</p>
+
+{% if result.score %}
+<p>⚽ Score probable: {{ result.score }}</p>
+{% endif %}
 
 {% if result.odd_home %}
 <hr>
@@ -158,7 +161,7 @@ button {
 
 </div>
 
-<!-- 🔥 AUTOCOMPLETE -->
+<!-- 🔥 SCRIPTS -->
 <script>
 
 const teams = {{ teams["Team"].tolist() | tojson | safe }};
@@ -195,14 +198,15 @@ function setupSearch(inputId, suggestionId) {
     });
 }
 
-setupSearch("home", "home_suggestions");
-setupSearch("away", "away_suggestions");
-
-</script>
 function fillMatch(home, away) {
     document.getElementById("home").value = home;
     document.getElementById("away").value = away;
 }
+
+setupSearch("home", "home_suggestions");
+setupSearch("away", "away_suggestions");
+
 </script>
+
 </body>
 </html>
