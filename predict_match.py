@@ -79,11 +79,11 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
     # =========================
     # 🔥 BASE STATS
     # =========================
-    home_attack = float(home["GoalsScoredAvg"])
-    home_def = float(home["GoalsConcededAvg"])
+    home_attack = float(home["GoalsScoredHome"])
+    home_def = float(home["GoalsConcededHome"])
 
-    away_attack = float(away["GoalsScoredAvg"])
-    away_def = float(away["GoalsConcededAvg"])
+    away_attack = float(away["GoalsScoredAway"])
+    away_def = float(away["GoalsConcededAway"])
 
     # =========================
     # 🔥 FORM
@@ -103,8 +103,8 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
     alpha = 0.75
     beta = 0.25
 
-    home_form_factor = (home_form - 1.5) * 0.2
-    away_form_factor = (away_form - 1.5) * 0.2
+    home_form_factor = (home_form - 1.5) * 0.4
+    away_form_factor = (away_form - 1.5) * 0.4
 
     home_strength = (
         (home_attack / max(away_def, 0.1)) * alpha +
@@ -125,8 +125,8 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
     # =========================
     league_avg_goals = 2.6
 
-    lambda_home = home_strength * 1.4
-    lambda_away = away_strength * 1.2
+    lambda_home = home_strength * np.random.uniform(1.2, 1.8)
+    lambda_away = away_strength * np.random.uniform(1.0, 1.6)
 
     lambda_home = max(lambda_home, 0.8)
     lambda_away = max(lambda_away, 0.8)
