@@ -89,8 +89,8 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
     # 🔥 FORM
     # =========================
     try:
-        home_form = get_recent_form(home_team)
-        away_form = get_recent_form(away_team)
+        home_form = 1.5
+        away_form = 1.5
     except:
         home_form = 1.5
         away_form = 1.5

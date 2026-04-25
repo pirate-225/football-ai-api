@@ -4,7 +4,7 @@ from predict_match import predict_match
 
 def get_top_bets():
 
-    matches = get_today_matches()
+    matches = get_today_matches()[:10]
     bets = []
 
     for m in matches:
