@@ -40,6 +40,7 @@ def index():
     live_matches = []
     result = None
     message = None
+    top_bets = get_top_bets()
 
     try:
         live_matches = get_live_matches()

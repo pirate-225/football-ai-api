@@ -145,6 +145,10 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
     lambda_home *= (1 + strength_diff * 0.3)
     lambda_away *= (1 - strength_diff * 0.3)
 
+    # 🔥 variance réaliste
+    lambda_home *= np.random.uniform(0.85, 1.35)
+    lambda_away *= np.random.uniform(0.85, 1.35)
+
     # =========================
     # 🔥 POISSON
     # =========================
