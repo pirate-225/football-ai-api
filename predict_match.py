@@ -79,11 +79,11 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
     # =========================
     # 🔥 BASE STATS
     # =========================
-    home_attack = float(home["GoalsScoredHome"])
-    home_def = float(home["GoalsConcededHome"])
+    home_attack = float(home["GoalsScoredAvg"])
+    home_def = float(home["GoalsConcededAvg"])
 
-    away_attack = float(away["GoalsScoredAway"])
-    away_def = float(away["GoalsConcededAway"])
+    away_attack = float(away["GoalsScoredAvg"])
+    away_def = float(away["GoalsConcededAvg"])
 
     # =========================
     # 🔥 FORM
