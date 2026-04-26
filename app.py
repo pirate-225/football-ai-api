@@ -50,19 +50,44 @@ def index():
     result = None
     message = None
 
+    # 🔥 LIVE MATCHES (SAFE)
     live_matches = []
-
     try:
-        live_matches = get_live_matches()[:10]  # 🔥 LIMITATION
+        live_matches = get_live_matches()[:10]
     except Exception as e:
         print("LIVE ERROR:", e)
         live_matches = []
+
+    # 🔥 PREDICTION UNIQUEMENT AU CLICK
+    if request.method == "POST":
+
+        try:
+            home = request.form.get("home_team")
+            away = request.form.get("away_team")
+
+            odd_home = float(request.form.get("odd_home"))
+            odd_draw = float(request.form.get("odd_draw"))
+            odd_away = float(request.form.get("odd_away"))
+
+            result = predict_match(home, away, odd_home, odd_draw, odd_away)
+
+            if result is None:
+                message = "⚠️ Match ignoré"
+
+            else:
+                result["odd_home"] = odd_home
+                result["odd_draw"] = odd_draw
+                result["odd_away"] = odd_away
+
+        except Exception as e:
+            print("PREDICT ERROR:", e)
+            message = "❌ Erreur"
 
     return render_template(
         "index.html",
         teams=teams,
         result=result,
-        top_bets=[],
+        top_bets=[],  # 🔥 toujours OFF
         message=message,
         live_matches=live_matches
     )
