@@ -71,6 +71,33 @@ def index():
             odd_draw = float(request.form.get("odd_draw"))
             odd_away = float(request.form.get("odd_away"))
 
+            print("MATCH INPUT:", home, away)
+            print("LIVE MATCHES:", live_data[:3])
+
+            # 🔥 récupération stats API
+            stats_home = None
+            stats_away = None
+
+            for m in live_data:
+                if m["home"].lower() in home.lower() and m["away"].lower() in away.lower():
+                stats_home = get_team_stats(m["home_id"], m["league_id"], m["season"])
+                stats_away = get_team_stats(m["away_id"], m["league_id"], m["season"])
+                break
+
+            # 🔥 sécurité (évite crash)
+            if stats_home is None or stats_away is None:
+                result = None
+                message = "❌ Match non trouvé dans API"
+            else:
+                result = predict_match(
+                    home,
+                    away,
+                    odd_home,
+                    odd_draw,
+                    odd_away,
+                    stats_home,
+                    stats_away
+                )
             result = predict_match(home, away, odd_home, odd_draw, odd_away, live_data)
 
             if result is None:
@@ -146,7 +173,11 @@ def index():
             odd_away = float(request.form.get("odd_away"))
 
             try:
-                result = predict_match(home, away, odd_home, odd_draw, odd_away, stats_home, stats_away)
+                if stats_home is None or stats_away is None:
+                    result = None
+                    message = "❌ Données API introuvables pour ce match"
+                else:
+                    result = predict_match(home, away, odd_home, odd_draw, odd_away, stats_home, stats_away)
             except Exception as e:
                 print("ERROR PREDICT:", e)
                 result = None
