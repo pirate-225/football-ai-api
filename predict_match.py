@@ -126,9 +126,22 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
 
     league_avg_goals = 2.6
 
-    # base logique
-    lambda_home = home_attack * away_def * home_advantage
-    lambda_away = away_attack * home_def
+    # 🔥 base avec séparation réelle
+    lambda_home = home_attack / max(away_def, 0.5)
+    lambda_away = away_attack / max(home_def, 0.5)
+
+    # avantage domicile réel
+    lambda_home *= 1.25
+
+    # 🔥 écart réel (clé anti 1-1)
+    strength_diff = home_strength - away_strength
+
+    lambda_home *= (1 + strength_diff * 0.8)
+    lambda_away *= (1 - strength_diff * 0.8)
+
+    # casse les égalités parfaites
+    lambda_home += np.random.uniform(-0.2, 0.4)
+    lambda_away += np.random.uniform(-0.2, 0.4)
 
     # normalisation réaliste
     scale = league_avg_goals / (lambda_home + lambda_away)
