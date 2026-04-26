@@ -207,3 +207,75 @@ def get_team_stats_advanced(team_id):
             "shots": 3,
             "possession": 50
         }
+
+def get_team_shots(team_id):
+
+    url = "https://v3.football.api-sports.io/teams/statistics"
+
+    headers = {
+        "x-apisports-key": API_KEY
+    }
+
+    params = {
+        "team": team_id,
+        "season": 2026
+    }
+
+    try:
+        res = requests.get(url, headers=headers, params=params, timeout=5).json()
+
+        shots = res["response"]["shots"]["on"]
+
+        return shots or 5
+
+    except:
+        return 5
+
+def get_team_possession(team_id):
+
+    url = "https://v3.football.api-sports.io/teams/statistics"
+
+    headers = {
+        "x-apisports-key": API_KEY
+    }
+
+    params = {
+        "team": team_id,
+        "season": 2026
+    }
+
+    try:
+        res = requests.get(url, headers=headers, params=params, timeout=5).json()
+
+        possession = res["response"]["fixtures"]["played"]["total"]
+
+        # fallback simple (évite crash)
+        return possession or 50
+
+    except:
+        return 50
+
+def get_team_xg(team_id):
+
+    url = "https://v3.football.api-sports.io/teams/statistics"
+
+    headers = {
+        "x-apisports-key": API_KEY
+    }
+
+    params = {
+        "team": team_id,
+        "season": 2026
+    }
+
+    try:
+        res = requests.get(url, headers=headers, params=params, timeout=5).json()
+
+        goals = res["response"]["goals"]["for"]["total"]["total"]
+
+        matches = res["response"]["fixtures"]["played"]["total"]
+
+        return goals / max(matches, 1)
+
+    except:
+        return 1.2

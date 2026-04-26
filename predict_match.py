@@ -3,7 +3,9 @@ import numpy as np
 
 def predict_match(home_team, away_team, odd_home, odd_draw, odd_away,
                   stats_home, stats_away, form_home, form_away,
-                  adv_home, adv_away):
+                  shots_home, shots_away,
+                  pos_home, pos_away,
+                  xg_home, xg_away):
 
     if stats_home is None or stats_away is None:
         return None
@@ -25,13 +27,25 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away,
     home_strength = (home_attack / max(away_def, 0.1)) * home_advantage
     away_strength = (away_attack / max(home_def, 0.1))
 
-    # 🔥 IMPACT SHOTS
-    home_strength *= (1 + (adv_home["shots"] - adv_away["shots"]) * 0.05)
-    away_strength *= (1 + (adv_away["shots"] - adv_home["shots"]) * 0.05)
+    # 🔥 ELO SIMPLE
+    elo_home = stats_home["attack"] * 100
+    elo_away = stats_away["attack"] * 100
 
-    # 🔥 IMPACT POSSESSION
-    home_strength *= (1 + (adv_home["possession"] - adv_away["possession"]) * 0.01)
-    away_strength *= (1 + (adv_away["possession"] - adv_home["possession"]) * 0.01)
+    elo_diff = elo_home - elo_away
+
+    home_strength *= (1 + elo_diff * 0.001)
+    away_strength *= (1 - elo_diff * 0.001)
+
+    # 🔥 impact tirs
+    home_strength *= (1 + (shots_home - shots_away) * 0.04)
+    away_strength *= (1 + (shots_away - shots_home) * 0.04)
+
+    # 🔥 impact possession (léger)
+    home_strength *= (1 + (pos_home - pos_away) * 0.002)
+    away_strength *= (1 + (pos_away - pos_home) * 0.002)
+
+    home_strength *= (1 + (shots_home - shots_away) * 0.04)
+    away_strength *= (1 + (shots_away - shots_home) * 0.04)
 
     # =========================
     # 🔥 xG
@@ -40,6 +54,14 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away,
 
     lambda_home = home_strength * 1.3
     lambda_away = away_strength * 1.1
+
+    # 🔥 boost xG API
+    lambda_home = (lambda_home + xg_home) / 2
+    lambda_away = (lambda_away + xg_away) / 2
+
+    # 🔥 xG basé sur tirs
+    lambda_home *= (1 + shots_home * 0.03)
+    lambda_away *= (1 + shots_away * 0.03)
 
     # normalisation
     scale = league_avg_goals / (lambda_home + lambda_away)

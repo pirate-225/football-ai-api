@@ -2,8 +2,17 @@ from flask import Flask, render_template, request
 import pandas as pd
 import os
 import requests
-from data_api import get_live_data, get_team_stats, get_team_form, get_team_stats_advanced
+from data_api import (
+    get_live_data,
+    get_team_stats,
+    get_team_form,
+    get_team_stats_advanced,
+    get_team_xg,
+    get_team_possession
+)
 from data_api import get_team_form
+from data_api import get_team_shots
+from data_api import get_team_possession
 
 def get_live_matches():
     try:
@@ -90,6 +99,12 @@ def index():
             adv_home = {"shots": 3, "possession": 50}
             adv_away = {"shots": 3, "possession": 50}
 
+            shots_home = 5
+            shots_away = 5
+
+            pos_home = 50
+            pos_away = 50
+
             for m in live_data:
                 if home.lower() in m["home"].lower() and away.lower() in m["away"].lower():
 
@@ -99,11 +114,22 @@ def index():
                     form_home = get_team_form(m["home_id"])
                     form_away = get_team_form(m["away_id"])
 
+                    shots_home = get_team_shots(m["home_id"])
+                    shots_away = get_team_shots(m["away_id"])
+
+                    pos_home = get_team_possession(m["home_id"])
+                    pos_away = get_team_possession(m["away_id"])
+
+                    xg_home = get_team_xg(m["home_id"])
+                    xg_away = get_team_xg(m["away_id"])
+
                     # 🔥 NOUVEAU (shots + possession)
                     adv_home = get_team_stats_advanced(m["home_id"])
                     adv_away = get_team_stats_advanced(m["away_id"])
 
                     break
+
+            print("FOUND MATCH:", stats_home is not None)
 
             if stats_home is None or stats_away is None:
                 result = None
@@ -119,8 +145,12 @@ def index():
                     stats_away,
                     form_home,
                     form_away,
-                    adv_home,
-                    adv_away
+                    shots_home,
+                    shots_away,
+                    pos_home,
+                    pos_away,
+                    xg_home,
+                    xg_away
                 )
 
                 if result:
