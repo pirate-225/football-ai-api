@@ -1,7 +1,9 @@
 import math
 import numpy as np
 
-def predict_match(home_team, away_team, odd_home, odd_draw, odd_away, stats_home, stats_away, form_home, form_away):
+def predict_match(home_team, away_team, odd_home, odd_draw, odd_away,
+                  stats_home, stats_away, form_home, form_away,
+                  adv_home, adv_away):
 
     if stats_home is None or stats_away is None:
         return None
@@ -22,6 +24,14 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away, stats_home
 
     home_strength = (home_attack / max(away_def, 0.1)) * home_advantage
     away_strength = (away_attack / max(home_def, 0.1))
+
+    # 🔥 IMPACT SHOTS
+    home_strength *= (1 + (adv_home["shots"] - adv_away["shots"]) * 0.05)
+    away_strength *= (1 + (adv_away["shots"] - adv_home["shots"]) * 0.05)
+
+    # 🔥 IMPACT POSSESSION
+    home_strength *= (1 + (adv_home["possession"] - adv_away["possession"]) * 0.01)
+    away_strength *= (1 + (adv_away["possession"] - adv_home["possession"]) * 0.01)
 
     # =========================
     # 🔥 xG

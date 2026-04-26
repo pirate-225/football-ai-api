@@ -170,3 +170,40 @@ def get_team_form(team_id):
             "attack": 1.2,
             "defense": 1.2
         }
+
+def get_team_stats_advanced(team_id):
+
+    url = "https://v3.football.api-sports.io/fixtures/statistics"
+
+    headers = {
+        "x-apisports-key": API_KEY
+    }
+
+    try:
+        res = requests.get(url, headers=headers, timeout=5).json()
+
+        shots_on_target = 0
+        possession = 0
+
+        for team in res.get("response", []):
+
+            if team["team"]["id"] == team_id:
+
+                for stat in team["statistics"]:
+
+                    if stat["type"] == "Shots on Goal":
+                        shots_on_target = float(stat["value"] or 0)
+
+                    if stat["type"] == "Ball Possession":
+                        possession = float(stat["value"].replace('%','') or 50)
+
+        return {
+            "shots": shots_on_target,
+            "possession": possession
+        }
+
+    except:
+        return {
+            "shots": 3,
+            "possession": 50
+        }

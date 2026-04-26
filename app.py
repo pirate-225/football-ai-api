@@ -2,7 +2,7 @@ from flask import Flask, render_template, request
 import pandas as pd
 import os
 import requests
-from data_api import get_live_data, get_team_stats, get_team_form
+from data_api import get_live_data, get_team_stats, get_team_form, get_team_stats_advanced
 from data_api import get_team_form
 
 def get_live_matches():
@@ -84,14 +84,24 @@ def index():
             stats_home = None
             stats_away = None
 
+            form_home = 1.5
+            form_away = 1.5
+
+            adv_home = {"shots": 3, "possession": 50}
+            adv_away = {"shots": 3, "possession": 50}
+
             for m in live_data:
                 if home.lower() in m["home"].lower() and away.lower() in m["away"].lower():
+
                     stats_home = get_team_stats(m["home_id"], m["league_id"], m["season"])
                     stats_away = get_team_stats(m["away_id"], m["league_id"], m["season"])
 
-                    # 🔥 NOUVEAU (FORM)
                     form_home = get_team_form(m["home_id"])
                     form_away = get_team_form(m["away_id"])
+
+                    # 🔥 NOUVEAU (shots + possession)
+                    adv_home = get_team_stats_advanced(m["home_id"])
+                    adv_away = get_team_stats_advanced(m["away_id"])
 
                     break
 
@@ -108,8 +118,10 @@ def index():
                     stats_home,
                     stats_away,
                     form_home,
-                    form_away
-            )
+                    form_away,
+                    adv_home,
+                    adv_away
+                )
 
                 if result:
                     result["odd_home"] = odd_home
@@ -117,7 +129,8 @@ def index():
                     result["odd_away"] = odd_away
 
         except Exception as e:
-            print("PREDICT ERROR:", e)
+            import traceback
+            traceback.print_exc()
             message = "❌ Erreur"
 
     return render_template(
