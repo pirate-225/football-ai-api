@@ -47,7 +47,17 @@ except:
 @app.route("/", methods=["GET", "POST"])
 def index():
 
-    return "OK"
+    result = None
+    message = None
+
+    return render_template(
+        "index.html",
+        teams=teams,
+        result=result,
+        top_bets=[],
+        message=message,
+        live_matches=[]
+    )
 
     try:
         top_bets = get_top_bets()
