@@ -2,7 +2,6 @@ from flask import Flask, render_template, request
 import pandas as pd
 import os
 import requests
-from data_api import get_live_data
 from data_api import get_live_data, get_team_stats
 
 def get_live_matches():
@@ -15,7 +14,7 @@ def get_live_matches():
 
         params = {
             "date": pd.Timestamp.today().strftime("%Y-%m-%d"),
-            "league": "39,61,78,140,135,2,3,848"  
+            "league": "39,61,78,140,135,2,3,848"
         }
 
         res = requests.get(url, headers=headers, params=params, timeout=5).json()
@@ -52,39 +51,44 @@ def index():
     result = None
     message = None
 
-    # 🔥 LIVE MATCHES (SAFE)
-    live_matches = []
+    # 🔥 LIVE DATA (FIX: AVANT UTILISATION)
+    try:
+        live_data = get_live_data()
+        print("LIVE DATA:", live_data[:2])
+    except Exception as e:
+        print("LIVE DATA ERROR:", e)
+        live_data = []
+
+    # 🔥 LIVE MATCHES
     try:
         live_matches = get_live_matches()[:10]
     except Exception as e:
         print("LIVE ERROR:", e)
         live_matches = []
 
-    # 🔥 PREDICTION UNIQUEMENT AU CLICK
+    # 🔥 PREDICTION
     if request.method == "POST":
 
         try:
             home = request.form.get("home_team")
             away = request.form.get("away_team")
 
-            odd_home = float(request.form.get("odd_home"))
-            odd_draw = float(request.form.get("odd_draw"))
-            odd_away = float(request.form.get("odd_away"))
+            odd_home = float(request.form.get("odd_home") or 0)
+            odd_draw = float(request.form.get("odd_draw") or 0)
+            odd_away = float(request.form.get("odd_away") or 0)
 
             print("MATCH INPUT:", home, away)
             print("LIVE MATCHES:", live_data[:3])
 
-            # 🔥 récupération stats API
             stats_home = None
             stats_away = None
 
             for m in live_data:
-                if m["home"].lower() in home.lower() and m["away"].lower() in away.lower():
-                stats_home = get_team_stats(m["home_id"], m["league_id"], m["season"])
-                stats_away = get_team_stats(m["away_id"], m["league_id"], m["season"])
-                break
+                if home.lower() in m["home"].lower() and away.lower() in m["away"].lower():
+                    stats_home = get_team_stats(m["home_id"], m["league_id"], m["season"])
+                    stats_away = get_team_stats(m["away_id"], m["league_id"], m["season"])
+                    break
 
-            # 🔥 sécurité (évite crash)
             if stats_home is None or stats_away is None:
                 result = None
                 message = "❌ Match non trouvé dans API"
@@ -98,114 +102,24 @@ def index():
                     stats_home,
                     stats_away
                 )
-            result = predict_match(home, away, odd_home, odd_draw, odd_away, live_data)
 
-            if result is None:
-                message = "⚠️ Match ignoré"
-
-            else:
-                result["odd_home"] = odd_home
-                result["odd_draw"] = odd_draw
-                result["odd_away"] = odd_away
+                if result:
+                    result["odd_home"] = odd_home
+                    result["odd_draw"] = odd_draw
+                    result["odd_away"] = odd_away
 
         except Exception as e:
             print("PREDICT ERROR:", e)
             message = "❌ Erreur"
 
-    # 🔥 LIVE DATA (UNE SEULE FOIS)
-    live_data = []
-
-    try:
-        live_data = get_live_data()
-        print("LIVE DATA", live_data[:2])  
-    except Exception as e:
-        print("LIVE DATA ERROR:", e)
-        live_data = []
-
-    stats_home = None
-    stats_away = None
-
-    # 🔥 récupérer stats via API
-    for m in live_data:
-        if m["home"] == home and m["away"] == away:
-            stats_home = get_team_stats(m["home_id"], m["league_id"], m["season"])
-            stats_away = get_team_stats(m["away_id"], m["league_id"], m["season"])
-            break
-
     return render_template(
         "index.html",
         teams=teams,
         result=result,
-        top_bets=[],  # 🔥 toujours OFF
+        top_bets=[],
         message=message,
         live_matches=live_matches
     )
-
-    try:
-        top_bets = get_top_bets()
-    except Exception as e:
-        print("TOP BETS ERROR:", e)
-        top_bets = []
-
-    try:
-        live_matches = get_live_matches()
-    except:
-        live_matches = []
-
-    print("LIVE MATCHES:", live_matches)
-
-    # 🔥 TOP BETS API
-    try:
-        top_bets = get_top_bets()
-        live_matches = get_live_matches()
-    except:
-        top_bets = []
-
-    # 🔥 ANALYSE MANUELLE
-    if request.method == "POST":
-
-        try:
-            home = request.form.get("home_team")
-            away = request.form.get("away_team")
-
-            odd_home = float(request.form.get("odd_home"))
-            odd_draw = float(request.form.get("odd_draw"))
-            odd_away = float(request.form.get("odd_away"))
-
-            try:
-                if stats_home is None or stats_away is None:
-                    result = None
-                    message = "❌ Données API introuvables pour ce match"
-                else:
-                    result = predict_match(home, away, odd_home, odd_draw, odd_away, stats_home, stats_away)
-            except Exception as e:
-                print("ERROR PREDICT:", e)
-                result = None
-
-            # ✅ logique propre
-            if result is not None:
-                result["odd_home"] = odd_home
-                result["odd_draw"] = odd_draw
-                result["odd_away"] = odd_away
-            else:
-                message = "❌ Équipe introuvable ou erreur"
-
-        except Exception as e:
-            print("INPUT ERROR:", e)
-            message = "❌ Erreur dans les données entrées"
-
-    try:
-        return render_template(
-            "index.html",
-            teams=teams,
-            result=result,
-            top_bets=top_bets,
-            message=message,
-            live_matches=live_matches
-        )
-    except Exception as e:
-        print("RENDER ERROR:", e)
-        return "Erreur serveur"
 
 
 if __name__ == "__main__":
