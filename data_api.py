@@ -4,6 +4,8 @@ API_KEY = "3b63a56a290a3bd3d4b00c5b232d37d3"
 
 def get_live_data():
 
+    print("API CALL: get_live_data()")
+
     url = "https://v3.football.api-sports.io/fixtures"
 
     headers = {
