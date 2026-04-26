@@ -121,35 +121,41 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
     away_strength = away_strength ** 1.3
 
     # =========================
-    # 🔥 xG RÉALISTES
+    # 🔥 xG PROPRES
     # =========================
+
     league_avg_goals = 2.6
 
-    lambda_home = home_strength * np.random.uniform(1.2, 1.8)
-    lambda_away = away_strength * np.random.uniform(1.0, 1.6)
+    # base logique
+    lambda_home = home_attack * away_def * home_advantage
+    lambda_away = away_attack * home_def
 
-    lambda_home = max(lambda_home, 0.8)
-    lambda_away = max(lambda_away, 0.8)
-
-    over = lambda_home + lambda_away
-
-    lambda_home *= np.random.uniform(0.8, 1.3)
-    lambda_away *= np.random.uniform(0.8, 1.3)
-
+    # normalisation réaliste
     scale = league_avg_goals / (lambda_home + lambda_away)
-
     lambda_home *= scale
     lambda_away *= scale
 
-    # 🔥 DIFFÉRENCE DE NIVEAU
+    # 🔥 différence de niveau
     strength_diff = home_strength - away_strength
 
-    lambda_home *= (1 + strength_diff * 0.3)
-    lambda_away *= (1 - strength_diff * 0.3)
+    lambda_home *= (1 + strength_diff * 0.6)
+    lambda_away *= (1 - strength_diff * 0.6)
 
-    # 🔥 variance réaliste
-    lambda_home *= np.random.uniform(0.85, 1.35)
-    lambda_away *= np.random.uniform(0.85, 1.35)
+    # 🔥 boost match ouvert
+    if (lambda_home + lambda_away) > 2.8:
+        lambda_home *= 1.3
+        lambda_away *= 1.3
+
+    # 🔥 petite variance (UNE seule)
+    lambda_home *= np.random.uniform(0.9, 1.2)
+    lambda_away *= np.random.uniform(0.9, 1.2)
+
+    # sécurité
+    lambda_home = max(lambda_home, 0.3)
+    lambda_away = max(lambda_away, 0.3)
+
+    # 🔥 over
+    over = lambda_home + lambda_away
 
     # =========================
     # 🔥 POISSON
@@ -157,7 +163,7 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
     def poisson_prob(lmbda, k):
         return (np.exp(-lmbda) * (lmbda ** k)) / math.factorial(k)
 
-    max_goals = 6
+    max_goals = 7
 
     prob_home = 0
     prob_draw = 0
