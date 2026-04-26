@@ -16,7 +16,7 @@ def get_live_matches():
             "league": "39,61,78,140,135,2,3,848"  
         }
 
-        res = requests.get(url, headers=headers, params=params).json()
+        res = requests.get(url, headers=headers, params=params, timeout=5).json()
 
         matches = []
 
@@ -50,13 +50,21 @@ def index():
     result = None
     message = None
 
+    live_matches = []
+
+    try:
+        live_matches = get_live_matches()[:10]  # 🔥 LIMITATION
+    except Exception as e:
+        print("LIVE ERROR:", e)
+        live_matches = []
+
     return render_template(
         "index.html",
         teams=teams,
         result=result,
         top_bets=[],
         message=message,
-        live_matches=[]
+        live_matches=live_matches
     )
 
     try:
