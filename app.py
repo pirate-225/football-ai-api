@@ -3,6 +3,7 @@ import pandas as pd
 import os
 import requests
 from data_api import get_live_data
+from data_api import get_live_data, get_team_stats
 
 def get_live_matches():
     try:
@@ -70,7 +71,7 @@ def index():
             odd_draw = float(request.form.get("odd_draw"))
             odd_away = float(request.form.get("odd_away"))
 
-            result = predict_match(home, away, odd_home, odd_draw, odd_away)
+            result = predict_match(home, away, odd_home, odd_draw, odd_away, live_data)
 
             if result is None:
                 message = "⚠️ Match ignoré"
@@ -89,9 +90,20 @@ def index():
 
     try:
         live_data = get_live_data()
+        print("LIVE DATA", live_data[:2])  
     except Exception as e:
         print("LIVE DATA ERROR:", e)
         live_data = []
+
+    stats_home = None
+    stats_away = None
+
+    # 🔥 récupérer stats via API
+    for m in live_data:
+        if m["home"] == home and m["away"] == away:
+            stats_home = get_team_stats(m["home_id"], m["league_id"], m["season"])
+            stats_away = get_team_stats(m["away_id"], m["league_id"], m["season"])
+            break
 
     return render_template(
         "index.html",
@@ -134,7 +146,7 @@ def index():
             odd_away = float(request.form.get("odd_away"))
 
             try:
-                result = predict_match(home, away, odd_home, odd_draw, odd_away, live_data)
+                result = predict_match(home, away, odd_home, odd_draw, odd_away, stats_home, stats_away)
             except Exception as e:
                 print("ERROR PREDICT:", e)
                 result = None
