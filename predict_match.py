@@ -170,6 +170,10 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
     # 🔥 over
     over = lambda_home + lambda_away
 
+    # 🔥 calibration réaliste (IMPORTANT)
+    lambda_home = min(lambda_home, 3.5)
+    lambda_away = min(lambda_away, 3.5)
+
     # =========================
     # 🔥 POISSON
     # =========================
@@ -201,7 +205,24 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
             else:
                 prob_away += p
 
-    score_home, score_away = best_score
+    # =========================
+    # 🔥 OVER / BTTS
+    # =========================
+    prob_over25 = 0
+    prob_btts = 0
+
+    for i in range(max_goals + 1):
+        for j in range(max_goals + 1):
+
+            p = poisson_prob(lambda_home, i) * poisson_prob(lambda_away, j)
+
+            # 🔥 OVER 2.5
+            if (i + j) > 2:
+                prob_over25 += p
+
+            # 🔥 BTTS (les deux marquent)
+            if i > 0 and j > 0:
+                prob_btts += p
 
     # =========================
     # 🔥 NORMALISATION
@@ -251,7 +272,8 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
     "prob_draw": round(prob_draw, 3),
     "prob_away": round(prob_away, 3),
     "confidence": round(confidence, 3),
-    "score": f"{score_home}-{score_away}",
+    "over25": round(prob_over25, 3),
+    "btts": round(prob_btts, 3),
 
     # 🔥 AJOUTS
     "over": round(over, 2),
