@@ -11,10 +11,10 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away,
     # =========================
     # 🔥 STATS API
     # =========================
-    home_attack = stats_home["attack"] * (1 + (form_home - 1.5) * 0.2)
-    home_def = stats_home["defense"]
+    home_attack = stats_home["attack"] * 0.7 + form_home["attack"] * 0.3
+    away_attack = stats_away["attack"] * 0.7 + form_away["attack"] * 0.3
 
-    away_attack = stats_away["attack"] * (1 + (form_away - 1.5) * 0.2)
+    home_def = stats_home["defense"]
     away_def = stats_away["defense"]
 
     # =========================
