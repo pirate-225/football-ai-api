@@ -131,6 +131,8 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
     lambda_home = max(lambda_home, 0.8)
     lambda_away = max(lambda_away, 0.8)
 
+    over = lambda_home + lambda_away
+
     lambda_home *= np.random.uniform(0.8, 1.3)
     lambda_away *= np.random.uniform(0.8, 1.3)
 
@@ -220,13 +222,19 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
     # =========================
     confidence = abs(prob_home - prob_away)
 
+    dominance = abs(prob_home - prob_away)
+
     return {
-        "xg_home": round(lambda_home, 2),
-        "xg_away": round(lambda_away, 2),
-        "prediction": prediction,
-        "prob_home": round(prob_home, 3),
-        "prob_draw": round(prob_draw, 3),
-        "prob_away": round(prob_away, 3),
-        "confidence": round(confidence, 3),
-        "score": f"{score_home}-{score_away}",
-    }
+    "xg_home": round(lambda_home, 2),
+    "xg_away": round(lambda_away, 2),
+    "prediction": prediction,
+    "prob_home": round(prob_home, 3),
+    "prob_draw": round(prob_draw, 3),
+    "prob_away": round(prob_away, 3),
+    "confidence": round(confidence, 3),
+    "score": f"{score_home}-{score_away}",
+
+    # 🔥 AJOUTS
+    "over": round(over, 2),
+    "dominance": round(dominance, 2),
+}

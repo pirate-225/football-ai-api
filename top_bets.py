@@ -25,7 +25,7 @@ def get_top_bets():
         match = f"{m['home']} vs {m['away']}"
 
         # 🔥 HOME fort
-        if result["prob_home"] > 0.60:
+        if result["prob_home"] > 0.55:
             bets.append({
                 "match": match,
                 "bet": "HOME",
@@ -34,7 +34,7 @@ def get_top_bets():
             })
 
         # 🔥 AWAY fort
-        elif result["prob_away"] > 0.60:
+        elif result["prob_away"] > 0.55:
             bets.append({
                 "match": match,
                 "bet": "AWAY",
