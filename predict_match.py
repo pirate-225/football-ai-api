@@ -46,7 +46,7 @@ def get_recent_form(team_name):
 team_data = pd.read_csv("data_processed/team_stats.csv")
 
 
-def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
+def predict_match(home_team, away_team, odd_home, odd_draw, odd_away, live_data=None):
 
     # =========================
     # 🔥 MATCHING ÉQUIPES
@@ -129,6 +129,15 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
     # 🔥 base avec séparation réelle
     lambda_home = home_attack / max(away_def, 0.5)
     lambda_away = away_attack / max(home_def, 0.5)
+
+    # 🔥 AJOUT DONNÉES LIVE (IMPORTANT)
+    if live_data:
+        for m in live_data:
+            if m["home"] == home_team and m["away"] == away_team:
+
+                if m["home_goals"] is not None:
+                    lambda_home += 0.4 * m["home_goals"]
+                    lambda_away += 0.4 * m["away_goals"]
 
     # avantage domicile réel
     lambda_home *= 1.25

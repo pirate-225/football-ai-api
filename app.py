@@ -2,6 +2,7 @@ from flask import Flask, render_template, request
 import pandas as pd
 import os
 import requests
+from data_api import get_live_data
 
 def get_live_matches():
     try:
@@ -83,6 +84,15 @@ def index():
             print("PREDICT ERROR:", e)
             message = "❌ Erreur"
 
+    # 🔥 LIVE DATA (UNE SEULE FOIS)
+    live_data = []
+
+    try:
+        live_data = get_live_data()
+    except Exception as e:
+        print("LIVE DATA ERROR:", e)
+        live_data = []
+
     return render_template(
         "index.html",
         teams=teams,
@@ -124,7 +134,7 @@ def index():
             odd_away = float(request.form.get("odd_away"))
 
             try:
-                result = predict_match(home, away, odd_home, odd_draw, odd_away)
+                result = predict_match(home, away, odd_home, odd_draw, odd_away, live_data)
             except Exception as e:
                 print("ERROR PREDICT:", e)
                 result = None
