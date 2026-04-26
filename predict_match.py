@@ -1,7 +1,7 @@
 import math
 import numpy as np
 
-def predict_match(home_team, away_team, odd_home, odd_draw, odd_away, stats_home, stats_away):
+def predict_match(home_team, away_team, odd_home, odd_draw, odd_away, stats_home, stats_away, form_home, form_away):
 
     if stats_home is None or stats_away is None:
         return None
@@ -9,10 +9,10 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away, stats_home
     # =========================
     # 🔥 STATS API
     # =========================
-    home_attack = stats_home["attack"]
+    home_attack = stats_home["attack"] * (1 + (form_home - 1.5) * 0.2)
     home_def = stats_home["defense"]
 
-    away_attack = stats_away["attack"]
+    away_attack = stats_away["attack"] * (1 + (form_away - 1.5) * 0.2)
     away_def = stats_away["defense"]
 
     # =========================

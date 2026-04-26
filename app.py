@@ -2,7 +2,8 @@ from flask import Flask, render_template, request
 import pandas as pd
 import os
 import requests
-from data_api import get_live_data, get_team_stats
+from data_api import get_live_data, get_team_stats, get_team_form
+from data_api import get_team_form
 
 def get_live_matches():
     try:
@@ -87,6 +88,11 @@ def index():
                 if home.lower() in m["home"].lower() and away.lower() in m["away"].lower():
                     stats_home = get_team_stats(m["home_id"], m["league_id"], m["season"])
                     stats_away = get_team_stats(m["away_id"], m["league_id"], m["season"])
+
+                    # 🔥 NOUVEAU (FORM)
+                    form_home = get_team_form(m["home_id"])
+                    form_away = get_team_form(m["away_id"])
+
                     break
 
             if stats_home is None or stats_away is None:
@@ -100,8 +106,10 @@ def index():
                     odd_draw,
                     odd_away,
                     stats_home,
-                    stats_away
-                )
+                    stats_away,
+                    form_home,
+                    form_away
+            )
 
                 if result:
                     result["odd_home"] = odd_home

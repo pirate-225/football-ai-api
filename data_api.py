@@ -120,3 +120,53 @@ def get_team_stats(team_id, league_id, season):
             "attack": 1.2,
             "defense": 1.2
         }
+
+def get_team_form(team_id):
+
+    url = "https://v3.football.api-sports.io/fixtures"
+
+    headers = {
+        "x-apisports-key": API_KEY
+    }
+
+    params = {
+        "team": team_id,
+        "last": 5
+    }
+
+    try:
+        res = requests.get(url, headers=headers, params=params, timeout=5).json()
+
+        points = 0
+        goals_for = 0
+        goals_against = 0
+
+        for f in res.get("response", []):
+
+            gh = f["goals"]["home"]
+            ga = f["goals"]["away"]
+
+            if gh is None:
+                continue
+
+            goals_for += gh
+            goals_against += ga
+
+            if gh > ga:
+                points += 3
+            elif gh == ga:
+                points += 1
+
+        return {
+            "form": points / 5,
+            "attack": goals_for / 5,
+            "defense": goals_against / 5
+        }
+
+    except Exception as e:
+        print("FORM API ERROR:", e)
+        return {
+            "form": 1.5,
+            "attack": 1.2,
+            "defense": 1.2
+        }
