@@ -27,6 +27,10 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away,
     home_strength = (home_attack / max(away_def, 0.1)) * home_advantage
     away_strength = (away_attack / max(home_def, 0.1))
 
+    # 🔥 AMPLIFICATION DES ÉCARTS (TRÈS IMPORTANT)
+    home_strength = home_strength ** 1.5
+    away_strength = away_strength ** 1.5
+
     # 🔥 ELO SIMPLE
     elo_home = stats_home["attack"] * 100
     elo_away = stats_away["attack"] * 100
@@ -103,6 +107,15 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away,
 
     total = prob_home + prob_draw + prob_away
 
+    prob_home /= total
+    prob_draw /= total
+    prob_away /= total
+
+    # 🔥 boost favoris
+    prob_home = prob_home ** 1.2
+    prob_away = prob_away ** 1.2
+
+    total = prob_home + prob_draw + prob_away
     prob_home /= total
     prob_draw /= total
     prob_away /= total
