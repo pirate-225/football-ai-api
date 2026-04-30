@@ -1,4 +1,3 @@
-from data_api import get_match_odds
 from predict_match import predict_match
 
 def get_top_bets(live_data):
@@ -8,7 +7,14 @@ def get_top_bets(live_data):
     for m in live_data[:15]:  # 🔥 MAX 15 MATCHS
 
         try:
-            odds = get_match_odds(m["fixture_id"])
+            pred = predict_match(
+                m["home"],
+                m["away"],
+                2.0,
+                3.2,
+                3.5,
+                ...
+            )
 
             if odds is None:
                 continue
