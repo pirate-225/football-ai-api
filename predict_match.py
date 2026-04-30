@@ -1,5 +1,9 @@
+
 import math
 import numpy as np
+
+def implied_prob(odd):
+    return 1 / odd if odd > 0 else 0
 
 def predict_match(home_team, away_team, odd_home, odd_draw, odd_away,
                   stats_home, stats_away, form_home, form_away,
@@ -13,11 +17,19 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away,
     # =========================
     # 🔥 STATS API
     # =========================
-    home_attack = stats_home["attack"] * 0.7 + form_home["attack"] * 0.3
-    away_attack = stats_away["attack"] * 0.7 + form_away["attack"] * 0.3
+    home_attack = (stats_home["attack"] * 0.6 +
+                   form_home["attack"] * 0.3 +
+                   xg_home * 0.1)
+
+    away_attack = (stats_away["attack"] * 0.6 +
+                   form_away["attack"] * 0.3 +
+                   xg_away * 0.1)
 
     home_def = stats_home["defense"]
     away_def = stats_away["defense"]
+
+    home_def = (home_def * 0.7 + form_home["defense"] * 0.3)
+    away_def = (away_def * 0.7 + form_away["defense"] * 0.3)
 
     # =========================
     # 🔥 FORCE
@@ -48,9 +60,6 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away,
     home_strength *= (1 + (pos_home - pos_away) * 0.002)
     away_strength *= (1 + (pos_away - pos_home) * 0.002)
 
-    home_strength *= (1 + (shots_home - shots_away) * 0.04)
-    away_strength *= (1 + (shots_away - shots_home) * 0.04)
-
     # =========================
     # 🔥 xG
     # =========================
@@ -60,8 +69,8 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away,
     lambda_away = away_strength * 1.1
 
     # 🔥 boost xG API
-    lambda_home = (lambda_home + xg_home) / 2
-    lambda_away = (lambda_away + xg_away) / 2
+    lambda_home = (lambda_home * 0.7 + xg_home * 0.3)
+    lambda_away = (lambda_away * 0.7 + xg_away * 0.3)
 
     # 🔥 xG basé sur tirs
     lambda_home *= (1 + shots_home * 0.03)
@@ -111,6 +120,17 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away,
     prob_draw /= total
     prob_away /= total
 
+    # =========================
+    # 🔥 VALUE BETTING
+    # =========================
+    imp_home = implied_prob(odd_home)
+    imp_draw = implied_prob(odd_draw)
+    imp_away = implied_prob(odd_away)
+
+    value_home = prob_home - imp_home
+    value_draw = prob_draw - imp_draw
+    value_away = prob_away - imp_away
+
     # 🔥 boost favoris
     prob_home = prob_home ** 1.2
     prob_away = prob_away ** 1.2
@@ -123,12 +143,24 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away,
     # =========================
     # 🔥 PREDICTION
     # =========================
-    if prob_home > prob_away and prob_home > prob_draw:
-        prediction = "HOME"
-    elif prob_away > prob_home and prob_away > prob_draw:
-        prediction = "AWAY"
-    else:
-        prediction = "DRAW"
+    values = {
+        "HOME": value_home,
+        "DRAW": value_draw,
+        "AWAY": value_away
+    }
+
+    prediction = max(values, key=values.get)
+    best_value = values[prediction]
+
+    # 🔥 filtre value
+    if best_value < 0.05:
+        prediction = "NO BET"
+
+    # 🔥 éviter pièges favoris faibles
+    if prediction != "NO BET":
+        if (prediction == "HOME" and prob_home < 0.45) or \
+           (prediction == "AWAY" and prob_away < 0.45):
+            prediction = "NO BET"
 
     confidence = abs(prob_home - prob_away)
 
@@ -142,4 +174,8 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away,
         "confidence": round(confidence, 3),
         "over25": round(prob_over25, 3),
         "btts": round(prob_btts, 3),
+        "value_home": round(value_home, 3),
+        "value_draw": round(value_draw, 3),
+        "value_away": round(value_away, 3),
+        "best_value": round(best_value, 3),
     }

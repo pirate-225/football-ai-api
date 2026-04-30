@@ -1,45 +1,44 @@
-from api_football import get_today_matches
+from data_api import get_match_odds
 from predict_match import predict_match
 
+def get_top_bets(live_data):
 
-def get_top_bets():
-
-    matches = get_today_matches()[:10]
     bets = []
 
-    for m in matches:
+    for m in live_data:
 
-        odd_home, odd_draw, odd_away = m["odds"]
+        try:
+            odds = get_match_odds(m["fixture_id"])
 
-        result = predict_match(
-            m["home"],
-            m["away"],
-            odd_home,
-            odd_draw,
-            odd_away
-        )
+            if odds is None:
+                continue
 
-        if result is None:
+            pred = predict_match(
+                m["home"],
+                m["away"],
+                odds["home"],
+                odds["draw"],
+                odds["away"],
+                {"attack":1.2,"defense":1.2},
+                {"attack":1.2,"defense":1.2},
+                {"attack":1.2,"defense":1.2},
+                {"attack":1.2,"defense":1.2},
+                5,5,50,50,1.2,1.2
+            )
+
+            if pred and pred["prediction"] != "NO BET" and pred["confidence"] > 0.15:
+
+                bets.append({
+                    "match": f"{m['home']} vs {m['away']}",
+                    "bet": pred["prediction"],
+                    "confidence": pred["confidence"],
+                    "value": pred["best_value"]
+                })
+
+        except Exception as e:
+            print("TOP BET ERROR:", e)
             continue
 
-        match = f"{m['home']} vs {m['away']}"
+    bets = sorted(bets, key=lambda x: x["value"], reverse=True)
 
-        # 🔥 HOME fort
-        if result["prob_home"] > 0.55:
-            bets.append({
-                "match": match,
-                "bet": "HOME",
-                "value": result["prob_home"],
-                "odds": odd_home
-            })
-
-        # 🔥 AWAY fort
-        elif result["prob_away"] > 0.55:
-            bets.append({
-                "match": match,
-                "bet": "AWAY",
-                "value": result["prob_away"],
-                "odds": odd_away
-            })
-
-    return sorted(bets, key=lambda x: x["value"], reverse=True)[:8]
+    return bets[:5]

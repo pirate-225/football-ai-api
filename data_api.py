@@ -36,7 +36,8 @@ def get_live_data():
                 "home_id": f["teams"]["home"]["id"],
                 "away_id": f["teams"]["away"]["id"],
                 "league_id": f["league"]["id"],
-                "season": f["league"]["season"]
+                "season": f["league"]["season"],
+                "fixture_id": f["fixture"]["id"]  # 🔥 AJOUT ICI
             })
 
         print("LIVE MATCHES COUNT:", len(matches))
@@ -209,6 +210,7 @@ def get_team_stats_advanced(team_id):
         }
 
 def get_team_shots(team_id):
+    return 5
 
     url = "https://v3.football.api-sports.io/teams/statistics"
 
@@ -232,6 +234,7 @@ def get_team_shots(team_id):
         return 5
 
 def get_team_possession(team_id):
+    return 50
 
     url = "https://v3.football.api-sports.io/teams/statistics"
 
@@ -279,3 +282,43 @@ def get_team_xg(team_id):
 
     except:
         return 1.2
+
+def get_match_odds(fixture_id):
+
+    url = "https://v3.football.api-sports.io/odds"
+
+    params = {
+        "fixture": fixture_id
+    }
+
+    try:
+        res = requests.get(url, headers=HEADERS, params=params, timeout=5).json()
+
+        bookmakers = res.get("response", [])
+
+        for b in bookmakers:
+            for bet in b.get("bookmakers", []):
+                for market in bet.get("bets", []):
+
+                    if market["name"] == "Match Winner":
+
+                        values = market["values"]
+
+                        odds = {}
+
+                        for v in values:
+                            if v["value"] == "Home":
+                                odds["home"] = float(v["odd"])
+                            elif v["value"] == "Draw":
+                                odds["draw"] = float(v["odd"])
+                            elif v["value"] == "Away":
+                                odds["away"] = float(v["odd"])
+
+                        if len(odds) == 3:
+                            return odds
+
+        return None
+
+    except Exception as e:
+        print("ODDS API ERROR:", e)
+        return None

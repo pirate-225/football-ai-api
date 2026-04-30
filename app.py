@@ -58,6 +58,8 @@ except:
 @app.route("/", methods=["GET", "POST"])
 def index():
 
+    top_bets = []
+
     result = None
     message = None
 
@@ -123,10 +125,6 @@ def index():
                     xg_home = get_team_xg(m["home_id"])
                     xg_away = get_team_xg(m["away_id"])
 
-                    # 🔥 NOUVEAU (shots + possession)
-                    adv_home = get_team_stats_advanced(m["home_id"])
-                    adv_away = get_team_stats_advanced(m["away_id"])
-
                     break
 
             print("FOUND MATCH:", stats_home is not None)
@@ -163,11 +161,20 @@ def index():
             traceback.print_exc()
             message = "❌ Erreur"
 
+        # 🔥 TOP BETS (fix crash)
+        top_bets = []
+
+        try:
+            top_bets = get_top_bets(live_data)
+            print("TOP BETS:", top_bets)
+        except Exception as e:
+            print("TOP BETS ERROR:", e)
+
     return render_template(
         "index.html",
         teams=teams,
         result=result,
-        top_bets=[],
+        top_bets=top_bets,
         message=message,
         live_matches=live_matches
     )
