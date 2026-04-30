@@ -65,7 +65,7 @@ def index():
 
     # 🔥 LIVE DATA (FIX: AVANT UTILISATION)
     try:
-        live_data = get_live_data()[:20]  # 🔥 LIMITE À 20 MATCHS
+        live_data = []()[:20]  # 🔥 LIMITE À 20 MATCHS
         print("LIVE DATA:", live_data[:2])
     except Exception as e:
         print("LIVE DATA ERROR:", e)
@@ -78,8 +78,9 @@ def index():
         print("LIVE ERROR:", e)
         live_matches = []
 
-    # 🔥 PREDICTION
     if request.method == "POST":
+
+        live_data = get_live_data()
 
         try:
             home = request.form.get("home_team")
