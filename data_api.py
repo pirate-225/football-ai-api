@@ -292,7 +292,7 @@ def get_match_odds(fixture_id):
     }
 
     try:
-        res = requests.get(url, headers=HEADERS, params=params, timeout=5).json()
+        res = requests.get(url, headers=HEADERS, params=params, timeout=3).json()
 
         bookmakers = res.get("response", [])
 

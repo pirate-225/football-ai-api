@@ -65,7 +65,7 @@ def index():
 
     # 🔥 LIVE DATA (FIX: AVANT UTILISATION)
     try:
-        live_data = get_live_data()
+        live_data = get_live_data()[:20]  # 🔥 LIMITE À 20 MATCHS
         print("LIVE DATA:", live_data[:2])
     except Exception as e:
         print("LIVE DATA ERROR:", e)
@@ -165,7 +165,10 @@ def index():
         top_bets = []
 
         try:
-            top_bets = get_top_bets(live_data)
+            top_bets = []
+
+            if len(live_data) > 0:
+                top_bets = get_top_bets(live_data[:10])  # 🔥 sécurité
             print("TOP BETS:", top_bets)
         except Exception as e:
             print("TOP BETS ERROR:", e)

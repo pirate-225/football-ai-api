@@ -5,7 +5,7 @@ def get_top_bets(live_data):
 
     bets = []
 
-    for m in live_data:
+    for m in live_data[:15]:  # 🔥 MAX 15 MATCHS
 
         try:
             odds = get_match_odds(m["fixture_id"])
