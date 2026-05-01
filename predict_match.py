@@ -1,76 +1,146 @@
 import math
+import pandas as pd
 import numpy as np
+import requests
 
-def predict_match(home_team, away_team, odd_home, odd_draw, odd_away,
-                  stats_home, stats_away, form_home, form_away,
-                  shots_home, shots_away,
-                  pos_home, pos_away,
-                  xg_home, xg_away):
+# 🔥 FORM LIVE
+def get_recent_form(team_name):
+    try:
+        url = "https://v3.football.api-sports.io/fixtures"
+        headers = {"x-apisports-key": "3b63a56a290a3bd3d4b00c5b232d37d3"}
 
-    if stats_home is None or stats_away is None:
+        params = {"team": team_name, "last": 5}
+
+        res = requests.get(url, headers=headers, params=params).json()
+
+        points = 0
+
+        for f in res.get("response", []):
+            home = f["teams"]["home"]["name"]
+            away = f["teams"]["away"]["name"]
+
+            gh = f["goals"]["home"]
+            ga = f["goals"]["away"]
+
+            if gh is None:
+                continue
+
+            if team_name == home:
+                if gh > ga:
+                    points += 3
+                elif gh == ga:
+                    points += 1
+            else:
+                if ga > gh:
+                    points += 3
+                elif gh == ga:
+                    points += 1
+
+        return points / 5
+
+    except:
+        return 1.5
+
+
+# 🔥 DATA
+team_data = pd.read_csv("data_processed/team_stats.csv")
+
+
+def predict_match(home_team, away_team, odd_home, odd_draw, odd_away):
+
+    # =========================
+    # 🔥 MATCHING ÉQUIPES
+    # =========================
+    def normalize(name):
+        return str(name).lower().strip()
+
+    def find_team(name):
+        name = normalize(name)
+
+        for _, row in team_data.iterrows():
+            team = normalize(row["Team"])
+            if name == team:
+                return row
+
+        # fallback
+        for _, row in team_data.iterrows():
+            team = normalize(row["Team"])
+            if name in team or team in name:
+                return row
+
+        return None
+
+    home = find_team(home_team)
+    away = find_team(away_team)
+
+    if home is None or away is None:
         return None
 
     # =========================
-    # 🔥 STATS API
+    # 🔥 BASE STATS
     # =========================
-    home_attack = stats_home["attack"] * 0.7 + form_home["attack"] * 0.3
-    away_attack = stats_away["attack"] * 0.7 + form_away["attack"] * 0.3
+    home_attack = float(home["GoalsScoredAvg"])
+    home_def = float(home["GoalsConcededAvg"])
 
-    home_def = stats_home["defense"]
-    away_def = stats_away["defense"]
+    away_attack = float(away["GoalsScoredAvg"])
+    away_def = float(away["GoalsConcededAvg"])
+
+    # =========================
+    # 🔥 FORM
+    # =========================
+    try:
+        home_form = get_recent_form(home_team)
+        away_form = get_recent_form(away_team)
+    except:
+        home_form = 1.5
+        away_form = 1.5
 
     # =========================
     # 🔥 FORCE
     # =========================
-    home_advantage = 1.15
+    home_advantage = 1.2
 
-    home_strength = (home_attack / max(away_def, 0.1)) * home_advantage
-    away_strength = (away_attack / max(home_def, 0.1))
+    alpha = 0.75
+    beta = 0.25
 
-    # 🔥 AMPLIFICATION DES ÉCARTS (TRÈS IMPORTANT)
-    home_strength = home_strength ** 1.5
-    away_strength = away_strength ** 1.5
+    home_form_factor = (home_form - 1.5) * 0.2
+    away_form_factor = (away_form - 1.5) * 0.2
 
-    # 🔥 ELO SIMPLE
-    elo_home = stats_home["attack"] * 100
-    elo_away = stats_away["attack"] * 100
+    home_strength = (
+        (home_attack / max(away_def, 0.1)) * alpha +
+        home_form_factor * beta
+    ) * home_advantage
 
-    elo_diff = elo_home - elo_away
+    away_strength = (
+        (away_attack / max(home_def, 0.1)) * alpha +
+        away_form_factor * beta
+    )
 
-    home_strength *= (1 + elo_diff * 0.001)
-    away_strength *= (1 - elo_diff * 0.001)
-
-    # 🔥 impact tirs
-    home_strength *= (1 + (shots_home - shots_away) * 0.04)
-    away_strength *= (1 + (shots_away - shots_home) * 0.04)
-
-    # 🔥 impact possession (léger)
-    home_strength *= (1 + (pos_home - pos_away) * 0.002)
-    away_strength *= (1 + (pos_away - pos_home) * 0.002)
-
-    home_strength *= (1 + (shots_home - shots_away) * 0.04)
-    away_strength *= (1 + (shots_away - shots_home) * 0.04)
+    # 🔥 amplification des écarts (clé)
+    home_strength = home_strength ** 1.3
+    away_strength = away_strength ** 1.3
 
     # =========================
-    # 🔥 xG
+    # 🔥 xG RÉALISTES
     # =========================
     league_avg_goals = 2.6
 
-    lambda_home = home_strength * 1.3
-    lambda_away = away_strength * 1.1
+    lambda_home = home_strength * 1.4
+    lambda_away = away_strength * 1.2
 
-    # 🔥 boost xG API
-    lambda_home = (lambda_home + xg_home) / 2
-    lambda_away = (lambda_away + xg_away) / 2
+    lambda_home = max(lambda_home, 0.8)
+    lambda_away = max(lambda_away, 0.8)
 
-    # 🔥 xG basé sur tirs
-    lambda_home *= (1 + shots_home * 0.03)
-    lambda_away *= (1 + shots_away * 0.03)
-
-    # normalisation
     scale = league_avg_goals / (lambda_home + lambda_away)
+
     lambda_home *= scale
     lambda_away *= scale
+
+    # 🔥 DIFFÉRENCE DE NIVEAU
+    strength_diff = home_strength - away_strength
+
+    lambda_home *= (1 + strength_diff * 0.3)
+    lambda_away *= (1 - strength_diff * 0.3)
 
     # =========================
     # 🔥 POISSON
@@ -84,13 +154,17 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away,
     prob_draw = 0
     prob_away = 0
 
-    prob_over25 = 0
-    prob_btts = 0
+    best_score = (0, 0)
+    best_prob = 0
 
     for i in range(max_goals + 1):
         for j in range(max_goals + 1):
 
             p = poisson_prob(lambda_home, i) * poisson_prob(lambda_away, j)
+
+            if p > best_prob:
+                best_prob = p
+                best_score = (i, j)
 
             if i > j:
                 prob_home += p
@@ -99,21 +173,25 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away,
             else:
                 prob_away += p
 
-            if (i + j) > 2:
-                prob_over25 += p
+    score_home, score_away = best_score
 
-            if i > 0 and j > 0:
-                prob_btts += p
-
+    # =========================
+    # 🔥 NORMALISATION
+    # =========================
     total = prob_home + prob_draw + prob_away
 
-    prob_home /= total
-    prob_draw /= total
-    prob_away /= total
+    if total == 0:
+        prob_home = 0.33
+        prob_draw = 0.34
+        prob_away = 0.33
+    else:
+        prob_home /= total
+        prob_draw /= total
+        prob_away /= total
 
-    # 🔥 boost favoris
-    prob_home = prob_home ** 1.2
-    prob_away = prob_away ** 1.2
+    # 🔥 calibration douce
+    prob_home = prob_home * 0.9 + 0.05
+    prob_away = prob_away * 0.9 + 0.05
 
     total = prob_home + prob_draw + prob_away
     prob_home /= total
@@ -121,7 +199,7 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away,
     prob_away /= total
 
     # =========================
-    # 🔥 PREDICTION
+    # 🔥 PRÉDICTION
     # =========================
     if prob_home > prob_away and prob_home > prob_draw:
         prediction = "HOME"
@@ -130,6 +208,9 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away,
     else:
         prediction = "DRAW"
 
+    # =========================
+    # 🔥 CONFIANCE
+    # =========================
     confidence = abs(prob_home - prob_away)
 
     return {
@@ -140,6 +221,5 @@ def predict_match(home_team, away_team, odd_home, odd_draw, odd_away,
         "prob_draw": round(prob_draw, 3),
         "prob_away": round(prob_away, 3),
         "confidence": round(confidence, 3),
-        "over25": round(prob_over25, 3),
-        "btts": round(prob_btts, 3),
+        "score": f"{score_home}-{score_away}",
     }

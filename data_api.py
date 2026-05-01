@@ -11,13 +11,53 @@ HEADERS = {
 # 🔥 MATCHS DU JOUR
 # =========================
 def get_live_data():
-
     print("API CALL: get_live_data()")
+
+    import datetime
 
     url = "https://v3.football.api-sports.io/fixtures"
 
+    headers = {
+        "x-apisports-key": "3b63a56a290a3bd3d4b00c5b232d37d3"
+    }
+
+    today = datetime.datetime.now().strftime("%Y-%m-%d")
+
     params = {
-        "date": datetime.date.today().strftime("%Y-%m-%d")
+        "date": today,
+        "timezone": "Europe/Paris"
+    }
+
+    try:
+        res = requests.get(url, headers=headers, params=params, timeout=5).json()
+
+        data = []
+
+        for f in res.get("response", []):
+
+            data.append({
+                "home": f["teams"]["home"]["name"],
+                "away": f["teams"]["away"]["name"],
+                "home_goals": f["goals"]["home"],
+                "away_goals": f["goals"]["away"],
+                "league": f["league"]["name"],
+                "home_id": f["teams"]["home"]["id"],
+                "away_id": f["teams"]["away"]["id"],
+                "league_id": f["league"]["id"],
+                "season": f["league"]["season"],
+                "fixture_id": f["fixture"]["id"],
+                "status": f["fixture"]["status"]["short"]
+            })
+
+        print("TOTAL FIXTURES:", len(data))
+        return data
+
+    except Exception as e:
+        print("API ERROR:", e)
+        return []
+
+    params = {
+        "live": "all"
     }
 
     try:

@@ -1,5 +1,6 @@
 from predict_match import predict_match
 
+
 def get_top_bets(live_data):
 
     bets = []
@@ -7,17 +8,8 @@ def get_top_bets(live_data):
     for m in live_data[:15]:  # 🔥 MAX 15 MATCHS
 
         try:
-            pred = predict_match(
-                m["home"],
-                m["away"],
-                2.0,
-                3.2,
-                3.5,
-                ...
-            )
-
-            if odds is None:
-                continue
+            # 🔥 on garde des cotes fixes pour l'instant
+            odds = {"home": 2.0, "draw": 3.2, "away": 3.5}
 
             pred = predict_match(
                 m["home"],
@@ -25,14 +17,14 @@ def get_top_bets(live_data):
                 odds["home"],
                 odds["draw"],
                 odds["away"],
-                {"attack":1.2,"defense":1.2},
-                {"attack":1.2,"defense":1.2},
-                {"attack":1.2,"defense":1.2},
-                {"attack":1.2,"defense":1.2},
-                5,5,50,50,1.2,1.2
+                {"attack": 1.2, "defense": 1.2},
+                {"attack": 1.2, "defense": 1.2},
+                {"attack": 1.2, "defense": 1.2},
+                {"attack": 1.2, "defense": 1.2},
+                5, 5, 50, 50, 1.2, 1.2
             )
 
-            if pred and pred["prediction"] != "NO BET" and pred["confidence"] > 0.15:
+            if pred and pred["prediction"] != "NO BET" and pred["confidence"] > 0.05:
 
                 bets.append({
                     "match": f"{m['home']} vs {m['away']}",
@@ -45,6 +37,7 @@ def get_top_bets(live_data):
             print("TOP BET ERROR:", e)
             continue
 
-    bets = sorted(bets, key=lambda x: x["value"], reverse=True)
+    # 🔥 TRI (on garde UN seul tri logique)
+    bets = sorted(bets, key=lambda x: x["confidence"], reverse=True)
 
     return bets[:5]
