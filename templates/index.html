@@ -122,6 +122,20 @@ button {
 
 <hr>
 
+<p>💰 Value Bet:
+{% if result.value_bet %}
+    <strong>{{ result.value_bet }}</strong>
+{% else %}
+    Aucun
+{% endif %}
+</p>
+
+<p>📈 Edge:
+Home: {{ result.edge_home }} |
+Draw: {{ result.edge_draw }} |
+Away: {{ result.edge_away }}
+</p>
+
 <p>🏠 Home: {{ result.prob_home }}</p>
 <p>🤝 Draw: {{ result.prob_draw }}</p>
 <p>✈️ Away: {{ result.prob_away }}</p>
@@ -130,15 +144,14 @@ button {
 
 <p>📊 xG: {{ result.xg_home }} - {{ result.xg_away }}</p>
 
-<p>🔥 Over: {{ result.over }}</p>
-<p>⚖️ Dominance: {{ result.dominance }}</p>
-
-{% if result.score %}
-<hr>
-
-<p>🔥 Over 2.5: {{ result.over25 }}</p>
-<p>⚽ BTTS: {{ result.btts }}</p>
+<p>🔥 Over 2.5:
+{% if result.over_25 %}
+    OUI ({{ result.prob_over }})
+{% else %}
+    NON ({{ result.prob_over }})
 {% endif %}
+</p>
+<p>⚖️ Dominance: {{ result.dominance }}</p>
 
 {% if result.odd_home %}
 <hr>

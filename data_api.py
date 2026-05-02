@@ -211,35 +211,37 @@ def get_team_form(team_id):
             "defense": 1.2
         }
 
-def get_team_stats_advanced(team_id):
+def get_match_stats(fixture_id):
 
     url = "https://v3.football.api-sports.io/fixtures/statistics"
+    headers = {"x-apisports-key": API_KEY}
 
-    headers = {
-        "x-apisports-key": API_KEY
-    }
+    params = {"fixture": fixture_id}
 
     try:
-        res = requests.get(url, headers=headers, timeout=5).json()
+        res = requests.get(url, headers=headers, params=params, timeout=5).json()
 
-        shots_on_target = 0
-        possession = 0
+        stats = {"home": {}, "away": {}}
 
-        for team in res.get("response", []):
+        for i, team in enumerate(res.get("response", [])):
+            side = "home" if i == 0 else "away"
 
-            if team["team"]["id"] == team_id:
+            for s in team["statistics"]:
 
-                for stat in team["statistics"]:
+                if s["type"] == "Total Shots":
+                    stats[side]["shots"] = int(s["value"] or 0)
 
-                    if stat["type"] == "Shots on Goal":
-                        shots_on_target = float(stat["value"] or 0)
+                if s["type"] == "Ball Possession":
+                    stats[side]["possession"] = int(str(s["value"]).replace('%','') or 50)
 
-                    if stat["type"] == "Ball Possession":
-                        possession = float(stat["value"].replace('%','') or 50)
+        return stats
+
+    except Exception as e:
+        print("MATCH STATS ERROR:", e)
 
         return {
-            "shots": shots_on_target,
-            "possession": possession
+            "home": {"shots": 5, "possession": 50},
+            "away": {"shots": 5, "possession": 50}
         }
 
     except:
@@ -319,3 +321,87 @@ def get_team_xg(team_id):
 
     except:
         return 1.2
+
+def get_odds(fixture_id):
+
+    url = "https://v3.football.api-sports.io/odds"
+    headers = {"x-apisports-key": API_KEY}
+
+    params = {"fixture": fixture_id}
+
+    try:
+        res = requests.get(url, headers=headers, params=params, timeout=5).json()
+
+        for r in res.get("response", []):
+            for b in r.get("bookmakers", []):
+                for bet in b.get("bets", []):
+
+                    if bet["name"] == "Match Winner":
+
+                        odds = {}
+
+                        for v in bet["values"]:
+                            if v["value"] == "Home":
+                                odds["home"] = float(v["odd"])
+                            elif v["value"] == "Draw":
+                                odds["draw"] = float(v["odd"])
+                            elif v["value"] == "Away":
+                                odds["away"] = float(v["odd"])
+
+                        return odds
+
+    except Exception as e:
+        print("ODDS ERROR:", e)
+
+    return None
+
+def get_team_xg_stats(team_id, league_id, season):
+
+    url = "https://v3.football.api-sports.io/teams/statistics"
+    headers = {"x-apisports-key": API_KEY}
+
+    params = {
+        "team": team_id,
+        "league": league_id,
+        "season": season
+    }
+
+    try:
+        res = requests.get(url, headers=headers, params=params, timeout=5).json()
+
+        data = res.get("response", {})
+
+        return {
+            "xg_for": data.get("goals", {}).get("for", {}).get("average", {}).get("total", 1.2),
+            "xg_against": data.get("goals", {}).get("against", {}).get("average", {}).get("total", 1.2)
+        }
+
+    except:
+        return {"xg_for": 1.2, "xg_against": 1.2}
+
+def get_h2h(team1_id, team2_id):
+
+    url = "https://v3.football.api-sports.io/fixtures/headtohead"
+    headers = {"x-apisports-key": API_KEY}
+
+    params = {
+        "h2h": f"{team1_id}-{team2_id}",
+        "last": 5
+    }
+
+    try:
+        res = requests.get(url, headers=headers, params=params).json()
+
+        wins_home = 0
+        wins_away = 0
+
+        for f in res.get("response", []):
+            if f["goals"]["home"] > f["goals"]["away"]:
+                wins_home += 1
+            elif f["goals"]["away"] > f["goals"]["home"]:
+                wins_away += 1
+
+        return wins_home, wins_away
+
+    except:
+        return 0, 0
