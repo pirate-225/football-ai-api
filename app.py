@@ -8,28 +8,47 @@ import requests  # 🔥 manquant
 def get_live_matches():
     try:
         url = "https://v3.football.api-sports.io/fixtures"
-        headers = {"x-apisports-key": "3b63a56a290a3bd3d4b00c5b232d37d3"}
 
-        params = {"date": pd.Timestamp.today().strftime("%Y-%m-%d")}
+        headers = {
+            "x-apisports-key": "3b63a56a290a3bd3d4b00c5b232d37d3"
+        }
 
-        res = requests.get(url, headers=headers, params=params).json()
+        today = pd.Timestamp.today()
+        tomorrow = today + pd.Timedelta(days=1)
+
+        dates = [
+            today.strftime("%Y-%m-%d"),
+            tomorrow.strftime("%Y-%m-%d")
+        ]
 
         matches = []
 
-        for f in res.get("response", []):
-            matches.append({
-                "home": f["teams"]["home"]["name"],
-                "away": f["teams"]["away"]["name"],
-                "home_id": f["teams"]["home"]["id"],
-                "away_id": f["teams"]["away"]["id"],
-                "league_id": f["league"]["id"],
-                "season": f["league"]["season"],
-                "fixture_id": f["fixture"]["id"]
-            })
+        for date in dates:
+
+            params = {"date": date}
+
+            res = requests.get(
+                url,
+                headers=headers,
+                params=params
+            ).json()
+
+            for f in res.get("response", []):
+
+                matches.append({
+                    "home": f["teams"]["home"]["name"],
+                    "away": f["teams"]["away"]["name"],
+                    "home_id": f["teams"]["home"]["id"],
+                    "away_id": f["teams"]["away"]["id"],
+                    "league_id": f["league"]["id"],
+                    "season": f["league"]["season"],
+                    "fixture_id": f["fixture"]["id"]
+                })
 
         return matches
 
-    except:
+    except Exception as e:
+        print("LIVE MATCH ERROR:", e)
         return []
 
 from predict_match import predict_match
