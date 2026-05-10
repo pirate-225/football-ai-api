@@ -4,40 +4,67 @@ import numpy as np
 import requests
 
 # 🔥 FORM LIVE
-def get_recent_form(team_name):
+def get_recent_form(team_id):
+
     try:
         url = "https://v3.football.api-sports.io/fixtures"
-        headers = {"x-apisports-key": "3b63a56a290a3bd3d4b00c5b232d37d3"}
-        params = {"team": team_name, "last": 5}
 
-        res = requests.get(url, headers=headers, params=params).json()
+        headers = {
+            "x-apisports-key": "3b63a56a290a3bd3d4b00c5b232d37d3"
+        }
+
+        params = {
+            "team": team_id,
+            "last": 5
+        }
+
+        res = requests.get(
+            url,
+            headers=headers,
+            params=params
+        ).json()
+
+        print("FORM API RESPONSE:", res)
 
         points = 0
 
         for f in res.get("response", []):
-            home = f["teams"]["home"]["name"]
-            away = f["teams"]["away"]["name"]
+
+            home_id = f["teams"]["home"]["id"]
+            away_id = f["teams"]["away"]["id"]
 
             gh = f["goals"]["home"]
             ga = f["goals"]["away"]
 
-            if gh is None:
+            if gh is None or ga is None:
                 continue
 
-            if team_name == home:
+            # 🔥 équipe joue à domicile
+            if team_id == home_id:
+
                 if gh > ga:
                     points += 3
+
                 elif gh == ga:
                     points += 1
+
+            # 🔥 équipe joue à l'extérieur
             else:
+
                 if ga > gh:
                     points += 3
+
                 elif gh == ga:
                     points += 1
+
+        print("POINTS:", points)
 
         return points / 5
 
-    except:
+    except Exception as e:
+
+        print("FORM ERROR:", e)
+
         return 1.5
 
 
@@ -50,7 +77,8 @@ def predict_match(
     xg_home_stats, xg_away_stats,
     shots_home, shots_away,
     pos_home, pos_away,
-    h2h_home, h2h_away
+    h2h_home, h2h_away,
+    home_id, away_id
 ):
 
     def normalize(name):
@@ -85,8 +113,8 @@ def predict_match(
 
     # 🔥 FORM
     try:
-        home_form = get_recent_form(home)
-        away_form = get_recent_form(away)
+        home_form = get_recent_form(home_id)
+        away_form = get_recent_form(away_id)
     except:
         home_form = 1.5
         away_form = 1.5
@@ -119,90 +147,128 @@ def predict_match(
         xg_away_for = xg_home_for * 0.85
 
     # 🔥 IMPACT RÉEL DES TIRS
-    shots_factor_home = (shots_home / 10)
-    shots_factor_away = (shots_away / 10)
-
-    # 🔥 NOUVEAU CALCUL PLUS INDÉPENDANT
+    # =========================
+    # 🔥 BASE OFFENSIVE / DEFENSIVE
+    # =========================
 
     attack_home = (
-        xg_home_for * 0.5 +
-        home_attack * 0.3 +
-        shots_home * 0.02
+        home_attack * 0.75 +
+        xg_home_for * 0.25
     )
 
     attack_away = (
-        xg_away_for * 0.5 +
-        away_attack * 0.3 +
-        shots_away * 0.02
+        away_attack * 0.75 +
+        xg_away_for * 0.25
     )
 
-    # ⚠️ IMPORTANT → défini AVANT utilisation
-    defense_home = xg_home_against
-    defense_away = xg_away_against
+    defense_home = (
+        home_def * 0.75 +
+        xg_home_against * 0.25
+    )
 
-    home_adv = 1.12
+    defense_away = (
+        away_def * 0.75 +
+        xg_away_against * 0.25
+    )
 
-    lambda_home = (attack_home / max(defense_away, 0.1)) * home_adv
-    lambda_away = (attack_away / max(defense_home, 0.1))
+    # =========================
+    # 🔥 AVANTAGE DOMICILE
+    # =========================
 
-    # 🔥 BOOST CONTEXTE (très important)
-    form_diff = (home_form - away_form) * 0.4
-    form_diff = max(min(form_diff, 0.4), -0.4)
+    home_adv = 1.10
 
-    lambda_home *= (1 + form_diff)
-    lambda_away *= (1 - form_diff)
+    # =========================
+    # 🔥 NOUVELLE FORMULE LAMBDA
+    # =========================
 
-    lambda_home *= (1 + form_diff * 0.35)
-    lambda_away *= (1 - form_diff * 0.35)
+    lambda_home = (
+        attack_home * 0.65 +
+        (2 - defense_away) * 0.35
+    ) * home_adv
 
-    # sécurité
-    lambda_home = max(lambda_home, 0.3)
-    lambda_away = max(lambda_away, 0.3)
+    lambda_away = (
+        attack_away * 0.65 +
+        (2 - defense_home) * 0.35
+    )
 
-    # 🔥 ANTI-FAVORI (équilibrage)
-    diff = lambda_home - lambda_away
+    # =========================
+    # 🔥 IMPACT FORME (LÉGER)
+    # =========================
 
-    if abs(diff) < 0.5:
-        lambda_home *= 1.05
-        lambda_away *= 1.05
-
-    # 🔥 IMPACT POSSESSION (léger mais utile)
-    pos_diff = (pos_home - pos_away) / 100
-
-    lambda_home *= (1 + pos_diff * 0.3)
-    lambda_away *= (1 - pos_diff * 0.3)
-
-    # 🔥 DIFF NIVEAU SAFE
-    diff = lambda_home - lambda_away
-    diff = max(min(diff, 1), -1)
-
-    lambda_home *= (1 + diff * 0.25)
-    lambda_away *= (1 - diff * 0.25)
-
-    # 🔥 FORM IMPACT (plus puissant mais contrôlé)
-    form_diff = (home_form - away_form) * 0.5
-    form_diff = max(min(form_diff, 0.5), -0.5)
+    form_diff = (home_form - away_form) * 0.12
+    form_diff = max(min(form_diff, 0.15), -0.15)
 
     lambda_home *= (1 + form_diff)
     lambda_away *= (1 - form_diff)
 
-    # 🔥 SECURITE
-    lambda_home = max(lambda_home, 0.3)
-    lambda_away = max(lambda_away, 0.3)
+    # =========================
+    # 🔥 IMPACT POSSESSION
+    # =========================
 
-    # 🔥 NORMALISATION
-    league_avg_goals = 2.6
+    if pos_home != 50 or pos_away != 50:
+
+        pos_diff = (pos_home - pos_away) / 100
+
+        lambda_home *= (1 + pos_diff * 0.10)
+        lambda_away *= (1 - pos_diff * 0.10)
+
+    # =========================
+    # 🔥 IMPACT TIRS
+    # =========================
+
+    shots_total = shots_home + shots_away
+
+    if shots_total > 24:
+        lambda_home *= 1.08
+        lambda_away *= 1.08
+
+    elif shots_total < 18:
+        lambda_home *= 0.92
+        lambda_away *= 0.92
+
+    # =========================
+    # 🔥 LIMITES IMPORTANTES
+    # =========================
+
+    lambda_home = min(max(lambda_home, 0.4), 3.2)
+    lambda_away = min(max(lambda_away, 0.4), 3.2)
+
+    # =========================
+    # 🔥 NORMALISATION DOUCE
+    # =========================
+
+    league_avg_goals = 2.7
 
     total_lambda = lambda_home + lambda_away
 
     if total_lambda > 0:
+
         scale = league_avg_goals / total_lambda
 
-        # 🔥 très faible variation (clé)
-        scale = max(min(scale, 1.05), 0.95)
+        scale = max(min(scale, 1.15), 0.85)
 
         lambda_home *= scale
         lambda_away *= scale
+
+    print("===================================")
+    print(home, "vs", away)
+
+    print("XG HOME:", xg_home_for)
+    print("XG AWAY:", xg_away_for)
+
+    print("HOME ATTACK:", attack_home)
+    print("AWAY ATTACK:", attack_away)
+
+    print("HOME DEF:", defense_home)
+    print("AWAY DEF:", defense_away)
+
+    print("LAMBDA HOME:", lambda_home)
+    print("LAMBDA AWAY:", lambda_away)
+
+    print("SHOTS:", shots_home, shots_away)
+    print("POSSESSION:", pos_home, pos_away)
+
+    print("FORM:", home_form, away_form)
 
     # 🔥 POISSON
     def poisson(lmbda, k):
@@ -222,11 +288,15 @@ def predict_match(
 
     # 🔥 NORMALISATION
     total = prob_home + prob_draw + prob_away
+
     prob_home /= total
     prob_draw /= total
     prob_away /= total
 
-    # 🔥 FUSION SIMPLE ET STABLE (IMPORTANT)
+    # =========================
+    # 🔥 FUSION LÉGÈRE BOOKMAKER
+    # =========================
+
     if odd_home > 0 and odd_draw > 0 and odd_away > 0:
 
         market_home = 1 / odd_home
@@ -239,9 +309,17 @@ def predict_match(
         market_draw /= total_market
         market_away /= total_market
 
-    # 🔥 MODE INDÉPENDANT
-    # on NE mélange PAS avec les cotes
-    pass
+        # 🔥 légère influence marché
+        prob_home = prob_home * 0.85 + market_home * 0.15
+        prob_draw = prob_draw * 0.85 + market_draw * 0.15
+        prob_away = prob_away * 0.85 + market_away * 0.15
+
+        # 🔥 renormalisation finale
+        total = prob_home + prob_draw + prob_away
+
+        prob_home /= total
+        prob_draw /= total
+        prob_away /= total
 
     total = prob_home + prob_draw + prob_away
     prob_home /= total
@@ -317,11 +395,6 @@ def predict_match(
     prob_home /= total
     prob_draw /= total
     prob_away /= total
-
-    # 🔥 EDGE (temporaire neutre)
-    edge_home = 0
-    edge_away = 0
-    edge_draw = 0
 
     # 🔥 OVER 2.5
     prob_over = 0

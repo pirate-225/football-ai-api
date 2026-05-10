@@ -199,7 +199,9 @@ def index():
                 pos_home,
                 pos_away,
                 h2h_home,
-                h2h_away
+                h2h_away,
+                selected_match["home_id"],
+                selected_match["away_id"]
             )
 
             if result is not None:
